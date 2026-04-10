@@ -162,7 +162,7 @@ document.addEventListener('DOMContentLoaded', function () {
             e.preventDefault();
             var input = this.querySelector('input[type="email"]');
             if (input && input.value) {
-                alert('Obrigado por se inscrever! Voce recebera nossas novidades em ' + input.value);
+                alert('Obrigado por se inscrever! Você receberá nossas novidades em ' + input.value);
                 input.value = '';
             }
         });
