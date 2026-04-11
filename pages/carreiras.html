@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carreiras em Gestão de Mudanças - ACMP Brasil</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="icon" type="image/png" href="../img/logo-acmp-brasil.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .page-hero { background: linear-gradient(135deg, var(--primary-dark), var(--primary)); padding: 80px 0 50px; color: white; text-align: center; position: relative; overflow: hidden; }
+        .page-hero::before { content:''; position: absolute; inset: 0; background: url('https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=1600&q=80') center/cover; opacity: 0.12; }
+        .page-hero h1 { font-size: 2.5rem; font-weight: 800; margin-bottom: 12px; position: relative; }
+        .page-hero p { opacity: 0.9; font-size: 1.05rem; max-width: 650px; margin: 0 auto; position: relative; }
+        .careers-content { max-width: 1000px; margin: 0 auto; padding: 40px 20px 80px; }
+        .back-link { display: inline-flex; align-items: center; gap: 8px; color: var(--primary); font-weight: 600; font-size: 0.9rem; margin-bottom: 24px; }
+        .back-link:hover { gap: 12px; }
+
+        /* Tabs */
+        .career-tabs { display: flex; gap: 4px; margin-bottom: 24px; border-bottom: 2px solid var(--border); flex-wrap: wrap; }
+        .career-tab { padding: 14px 20px; font-weight: 600; font-size: 0.88rem; cursor: pointer; color: var(--text-light); border-bottom: 3px solid transparent; margin-bottom: -2px; background: none; border-top: none; border-left: none; border-right: none; font-family: var(--font-main); display: flex; align-items: center; gap: 8px; transition: all 0.2s; }
+        .career-tab:hover { color: var(--primary); }
+        .career-tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+        .career-tab .tab-count { background: var(--bg-light); padding: 2px 8px; border-radius: 50px; font-size: 0.72rem; font-weight: 700; }
+        .career-tab.active .tab-count { background: rgba(26,58,92,0.1); color: var(--primary); }
+
+        /* Job Cards */
+        .job-list { display: flex; flex-direction: column; gap: 14px; }
+        .job-card { background: var(--bg-white); border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 24px; transition: all 0.3s; display: flex; gap: 20px; align-items: flex-start; }
+        .job-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); border-color: var(--primary); }
+        .job-icon { width: 50px; height: 50px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; color: white; flex-shrink: 0; }
+        .job-icon.acmp { background: var(--primary); }
+        .job-icon.linkedin { background: #0077b5; }
+        .job-icon.manual { background: #e88c30; }
+        .job-body { flex: 1; }
+        .job-body h3 { font-size: 1.05rem; font-weight: 700; color: var(--text-dark); margin-bottom: 6px; }
+        .job-company { font-size: 0.88rem; color: var(--primary); font-weight: 600; margin-bottom: 8px; }
+        .job-meta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 10px; }
+        .job-meta span { display: flex; align-items: center; gap: 5px; font-size: 0.8rem; color: var(--text-light); }
+        .job-meta i { font-size: 0.75rem; color: var(--primary); }
+        .job-desc { font-size: 0.85rem; color: var(--text-body); line-height: 1.6; margin-bottom: 14px; }
+        .job-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+        .job-tag { padding: 3px 10px; border-radius: 50px; font-size: 0.7rem; font-weight: 600; background: var(--bg-light); color: var(--text-light); }
+        .job-tag.remote { background: #dcfce7; color: #16a34a; }
+        .job-tag.featured { background: #fef3c7; color: #d97706; }
+        .job-apply { display: inline-flex; align-items: center; gap: 6px; padding: 8px 18px; background: var(--primary); color: white; border-radius: var(--radius-sm); font-size: 0.82rem; font-weight: 600; transition: all 0.2s; }
+        .job-apply:hover { background: var(--primary-light); transform: translateY(-1px); }
+        .job-apply.linkedin-btn { background: #0077b5; }
+        .job-apply.linkedin-btn:hover { background: #005a8c; }
+
+        /* Empty & Loading */
+        .jobs-empty { text-align: center; padding: 60px 20px; color: var(--text-light); }
+        .jobs-empty i { font-size: 3rem; opacity: 0.2; margin-bottom: 16px; display: block; }
+        .jobs-loading { text-align: center; padding: 40px; color: var(--text-light); }
+
+        /* Stats bar */
+        .careers-stats { display: flex; gap: 24px; margin-bottom: 24px; flex-wrap: wrap; }
+        .careers-stat { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-body); }
+        .careers-stat i { color: var(--primary); }
+
+        /* Post job CTA */
+        .post-job-cta { background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: white; border-radius: var(--radius-lg); padding: 30px; text-align: center; margin-top: 40px; }
+        .post-job-cta h3 { font-size: 1.2rem; font-weight: 700; margin-bottom: 8px; }
+        .post-job-cta p { opacity: 0.9; font-size: 0.9rem; margin-bottom: 16px; }
+
+        @media (max-width: 768px) {
+            .job-card { flex-direction: column; }
+            .career-tabs { gap: 0; }
+        }
+    </style>
+</head>
+<body>
+    <header class="main-header">
+        <div class="container header-content">
+            <a href="../index.html" class="logo">
+                <img src="../img/logo-acmp-brasil.png" alt="ACMP Brasil" style="height: 44px; width: auto; display: block;">
+            </a>
+        </div>
+    </header>
+
+    <section class="page-hero">
+        <div class="container">
+            <h1><i class="fas fa-briefcase"></i> Carreiras em Gestão de Mudanças</h1>
+            <p>Vagas do ACMP Global, LinkedIn e oportunidades exclusivas para profissionais de Change Management.</p>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="careers-content">
+            <a href="../index.html" class="back-link"><i class="fas fa-arrow-left"></i> Voltar para a página inicial</a>
+
+            <div class="careers-stats" id="careers-stats">
+                <div class="careers-stat"><i class="fas fa-briefcase"></i> <span id="total-jobs">-</span> vagas disponíveis</div>
+                <div class="careers-stat"><i class="fas fa-sync"></i> Atualizado diariamente</div>
+                <div class="careers-stat"><i class="fas fa-clock"></i> Vagas expiram após 60 dias</div>
+            </div>
+
+            <div class="career-tabs">
+                <button class="career-tab active" onclick="filterJobs('all', this)">
+                    <i class="fas fa-th-list"></i> Todas <span class="tab-count" id="count-all">-</span>
+                </button>
+                <button class="career-tab" onclick="filterJobs('acmp-global', this)">
+                    <i class="fas fa-globe"></i> ACMP Global <span class="tab-count" id="count-acmp">-</span>
+                </button>
+                <button class="career-tab" onclick="filterJobs('linkedin', this)">
+                    <i class="fab fa-linkedin"></i> LinkedIn <span class="tab-count" id="count-linkedin">-</span>
+                </button>
+                <button class="career-tab" onclick="filterJobs('manual', this)">
+                    <i class="fas fa-star"></i> Exclusivas ACMP Brasil <span class="tab-count" id="count-manual">-</span>
+                </button>
+            </div>
+
+            <div class="job-list" id="job-list">
+                <div class="jobs-loading"><i class="fas fa-spinner fa-spin"></i> Carregando vagas...</div>
+            </div>
+
+            <div class="post-job-cta">
+                <h3><i class="fas fa-plus-circle"></i> Quer publicar uma vaga?</h3>
+                <p>Empresas e consultorias podem publicar vagas de Gestão de Mudanças gratuitamente para a comunidade ACMP Brasil.</p>
+                <a href="mailto:contato@acmpbrasil.org.br?subject=Publicar%20Vaga%20-%20ACMP%20Brasil" class="btn btn-secondary btn-lg"><i class="fas fa-envelope"></i> Enviar Vaga por E-mail</a>
+            </div>
+        </div>
+    </section>
+
+    <footer class="main-footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <div class="footer-bottom-content">
+                    <p>&copy; 2026 ACMP Brasil - Associação de Profissionais de Gestão de Mudanças.</p>
+                    <div class="footer-bottom-links">
+                        <a href="../index.html">Página Inicial</a>
+                        <a href="https://jobs.acmpglobal.org/" target="_blank" rel="noopener">ACMP Career Center</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../js/supabase-client.js"></script>
+    <script src="../js/main.js"></script>
+    <script>
+        var allJobs = [];
+
+        document.addEventListener('DOMContentLoaded', async function () {
+            if (!initSupabase()) {
+                showFallbackJobs();
+                return;
+            }
+            await loadJobs();
+        });
+
+        async function loadJobs() {
+            try {
+                var { data, error } = await supabase
+                    .from('jobs')
+                    .select('*')
+                    .gte('expires_at', new Date().toISOString())
+                    .order('is_featured', { ascending: false })
+                    .order('posted_at', { ascending: false });
+
+                if (error || !data) {
+                    console.error('Error loading jobs:', error);
+                    showFallbackJobs();
+                    return;
+                }
+
+                allJobs = data;
+                renderJobs(allJobs);
+                updateCounts();
+            } catch (e) {
+                showFallbackJobs();
+            }
+        }
+
+        function renderJobs(jobs) {
+            var list = document.getElementById('job-list');
+
+            if (jobs.length === 0) {
+                list.innerHTML = '<div class="jobs-empty"><i class="fas fa-search"></i>Nenhuma vaga encontrada nesta categoria.<br>Tente outra aba ou volte em breve!</div>';
+                return;
+            }
+
+            list.innerHTML = jobs.map(function (job) {
+                var iconClass = job.source === 'linkedin' ? 'linkedin' : job.source === 'manual' ? 'manual' : 'acmp';
+                var iconFA = job.source === 'linkedin' ? 'fab fa-linkedin-in' : job.source === 'manual' ? 'fas fa-star' : 'fas fa-globe';
+                var btnClass = job.source === 'linkedin' ? 'linkedin-btn' : '';
+                var btnText = job.source === 'linkedin' ? 'Buscar no LinkedIn' : 'Ver Vaga';
+
+                var tags = '';
+                if (job.is_remote) tags += '<span class="job-tag remote"><i class="fas fa-wifi"></i> Remoto</span>';
+                if (job.is_featured) tags += '<span class="job-tag featured"><i class="fas fa-star"></i> Destaque</span>';
+                if (job.job_type) tags += '<span class="job-tag">' + formatJobType(job.job_type) + '</span>';
+
+                return '<div class="job-card">' +
+                    '<div class="job-icon ' + iconClass + '"><i class="' + iconFA + '"></i></div>' +
+                    '<div class="job-body">' +
+                    '<h3>' + job.title + '</h3>' +
+                    '<div class="job-company">' + (job.company || '') + '</div>' +
+                    '<div class="job-meta">' +
+                    '<span><i class="fas fa-map-marker-alt"></i> ' + (job.location || 'Não especificado') + '</span>' +
+                    '<span><i class="fas fa-clock"></i> ' + timeAgo(job.posted_at) + '</span>' +
+                    (job.salary_range ? '<span><i class="fas fa-dollar-sign"></i> ' + job.salary_range + '</span>' : '') +
+                    '</div>' +
+                    '<div class="job-tags">' + tags + '</div>' +
+                    '<p class="job-desc">' + (job.description || '').substring(0, 200) + (job.description && job.description.length > 200 ? '...' : '') + '</p>' +
+                    '<a href="' + (job.source_url || '#') + '" target="_blank" rel="noopener" class="job-apply ' + btnClass + '"><i class="fas fa-external-link-alt"></i> ' + btnText + '</a>' +
+                    '</div></div>';
+            }).join('');
+
+            document.getElementById('total-jobs').textContent = jobs.length;
+        }
+
+        function filterJobs(source, btn) {
+            document.querySelectorAll('.career-tab').forEach(function (t) { t.classList.remove('active'); });
+            btn.classList.add('active');
+
+            if (source === 'all') {
+                renderJobs(allJobs);
+            } else {
+                renderJobs(allJobs.filter(function (j) { return j.source === source; }));
+            }
+        }
+
+        function updateCounts() {
+            document.getElementById('count-all').textContent = allJobs.length;
+            document.getElementById('count-acmp').textContent = allJobs.filter(function (j) { return j.source === 'acmp-global'; }).length;
+            document.getElementById('count-linkedin').textContent = allJobs.filter(function (j) { return j.source === 'linkedin'; }).length;
+            document.getElementById('count-manual').textContent = allJobs.filter(function (j) { return j.source === 'manual'; }).length;
+        }
+
+        function showFallbackJobs() {
+            // If Supabase not configured, show direct links
+            var list = document.getElementById('job-list');
+            list.innerHTML =
+                '<div class="job-card"><div class="job-icon acmp"><i class="fas fa-globe"></i></div><div class="job-body">' +
+                '<h3>Vagas no ACMP Career Center</h3><div class="job-company">ACMP Global</div>' +
+                '<p class="job-desc">Explore dezenas de vagas de Gestão de Mudanças no Career Center oficial da ACMP Global.</p>' +
+                '<a href="https://jobs.acmpglobal.org/jobs/" target="_blank" rel="noopener" class="job-apply"><i class="fas fa-external-link-alt"></i> Acessar Career Center</a></div></div>' +
+
+                '<div class="job-card"><div class="job-icon linkedin"><i class="fab fa-linkedin-in"></i></div><div class="job-body">' +
+                '<h3>Vagas "Gestão de Mudanças" no Brasil</h3><div class="job-company">LinkedIn Jobs</div>' +
+                '<p class="job-desc">Busca pré-filtrada no LinkedIn por vagas de Gestão de Mudanças no Brasil.</p>' +
+                '<a href="https://www.linkedin.com/jobs/search/?keywords=gest%C3%A3o%20de%20mudan%C3%A7as&location=Brazil&sortBy=DD" target="_blank" rel="noopener" class="job-apply linkedin-btn"><i class="fab fa-linkedin"></i> Buscar no LinkedIn</a></div></div>' +
+
+                '<div class="job-card"><div class="job-icon linkedin"><i class="fab fa-linkedin-in"></i></div><div class="job-body">' +
+                '<h3>Vagas "Change Management" - Remoto</h3><div class="job-company">LinkedIn Jobs</div>' +
+                '<p class="job-desc">Oportunidades remotas de Change Management no mundo todo.</p>' +
+                '<a href="https://www.linkedin.com/jobs/search/?keywords=change%20management&f_WT=2&sortBy=DD" target="_blank" rel="noopener" class="job-apply linkedin-btn"><i class="fab fa-linkedin"></i> Buscar no LinkedIn</a></div></div>';
+
+            document.getElementById('total-jobs').textContent = '3+';
+        }
+
+        function formatJobType(type) {
+            var types = { 'full-time': 'Tempo integral', 'part-time': 'Meio período', 'contract': 'Contrato', 'freelance': 'Freelance', 'internship': 'Estágio' };
+            return types[type] || type;
+        }
+
+        function timeAgo(dateStr) {
+            if (!dateStr) return '';
+            var diff = Date.now() - new Date(dateStr).getTime();
+            var days = Math.floor(diff / 86400000);
+            if (days === 0) return 'Hoje';
+            if (days === 1) return 'Ontem';
+            if (days < 7) return days + ' dias atrás';
+            if (days < 30) return Math.floor(days / 7) + ' sem. atrás';
+            return Math.floor(days / 30) + ' mês(es) atrás';
+        }
+    </script>
+</body>
+</html>
