@@ -155,6 +155,87 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
+    // --- External Link Translation Interceptor ---
+    // Intercepts clicks on acmpglobal.org links and offers Portuguese translation
+    (function () {
+        var modal = document.createElement('div');
+        modal.id = 'translate-modal';
+        modal.innerHTML =
+            '<div class="translate-overlay"></div>' +
+            '<div class="translate-box">' +
+            '<div class="translate-header">' +
+            '<i class="fas fa-language"></i>' +
+            '<h3>Você está saindo do site ACMP Brasil</h3>' +
+            '</div>' +
+            '<p>Esta página está no site da <strong>ACMP Global</strong> e o conteúdo original está em <strong>inglês</strong>.</p>' +
+            '<p>Como deseja visualizar?</p>' +
+            '<div class="translate-buttons">' +
+            '<button id="btn-pt" class="btn btn-primary"><i class="fas fa-globe-americas"></i> Ver em Português</button>' +
+            '<button id="btn-en" class="btn btn-outline"><i class="fas fa-globe"></i> Ver em Inglês (original)</button>' +
+            '</div>' +
+            '<label class="translate-remember"><input type="checkbox" id="translate-remember"> Lembrar minha escolha</label>' +
+            '</div>';
+        document.body.appendChild(modal);
+
+        var savedPref = localStorage.getItem('acmp-lang-pref');
+        var pendingUrl = '';
+
+        function showModal(url) {
+            pendingUrl = url;
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function hideModal() {
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function openTranslated(url) {
+            window.open('https://translate.google.com/translate?sl=en&tl=pt&u=' + encodeURIComponent(url), '_blank');
+        }
+
+        function openOriginal(url) {
+            window.open(url, '_blank');
+        }
+
+        modal.querySelector('.translate-overlay').addEventListener('click', hideModal);
+
+        document.getElementById('btn-pt').addEventListener('click', function () {
+            if (document.getElementById('translate-remember').checked) {
+                localStorage.setItem('acmp-lang-pref', 'pt');
+            }
+            hideModal();
+            openTranslated(pendingUrl);
+        });
+
+        document.getElementById('btn-en').addEventListener('click', function () {
+            if (document.getElementById('translate-remember').checked) {
+                localStorage.setItem('acmp-lang-pref', 'en');
+            }
+            hideModal();
+            openOriginal(pendingUrl);
+        });
+
+        document.addEventListener('click', function (e) {
+            var link = e.target.closest('a[href*="acmpglobal.org"]');
+            if (!link) return;
+
+            var url = link.getAttribute('href');
+            if (!url || url.indexOf('acmpglobal.org') === -1) return;
+
+            e.preventDefault();
+
+            if (savedPref === 'pt') {
+                openTranslated(url);
+            } else if (savedPref === 'en') {
+                openOriginal(url);
+            } else {
+                showModal(url);
+            }
+        });
+    })();
+
     // --- Dark Mode Toggle ---
     var darkToggle = document.getElementById('dark-mode-toggle');
     if (darkToggle) {
