@@ -2,19 +2,51 @@
    ACMP Brasil - Supabase Client
    =================================== */
 
-// TODO: Replace with your real Supabase credentials
 const SUPABASE_URL = 'https://yaumzlssybzoipwmllqy.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlhdW16bHNzeWJ6b2lwd21sbHF5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU5MTcwMTEsImV4cCI6MjA5MTQ5MzAxMX0.GWK1jnlEmgxWmeWk1VGwR25fLBvquWtrkQ4ipq_A3RU';
 
-// Initialize Supabase client (loaded via CDN in HTML)
 let supabase;
 
 function initSupabase() {
-    if (window.supabase && window.supabase.createClient) {
+    // Try multiple ways to find the Supabase client
+    if (supabase) return true;
+
+    // Method 1: window.supabase from CDN
+    if (window.supabase && typeof window.supabase.createClient === 'function') {
         supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        console.log('Supabase initialized via window.supabase');
         return true;
     }
+
+    // Method 2: Check if it's under a different name
+    if (window.Supabase && typeof window.Supabase.createClient === 'function') {
+        supabase = window.Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        console.log('Supabase initialized via window.Supabase');
+        return true;
+    }
+
+    console.error('Supabase SDK not found. Ensure the CDN script loaded.');
     return false;
+}
+
+// Auto-init with retry
+function waitForSupabase(callback, maxRetries) {
+    var retries = maxRetries || 10;
+    var attempt = 0;
+
+    function tryInit() {
+        attempt++;
+        if (initSupabase()) {
+            if (callback) callback(true);
+        } else if (attempt < retries) {
+            setTimeout(tryInit, 300);
+        } else {
+            console.error('Supabase SDK failed to load after ' + retries + ' attempts');
+            if (callback) callback(false);
+        }
+    }
+
+    tryInit();
 }
 
 // =================== AUTH ===================
