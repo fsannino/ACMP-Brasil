@@ -107,29 +107,48 @@
         var SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlhdW16bHNzeWJ6b2lwd21sbHF5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU5MTcwMTEsImV4cCI6MjA5MTQ5MzAxMX0.GWK1jnlEmgxWmeWk1VGwR25fLBvquWtrkQ4ipq_A3RU';
         var sb = null;
 
-        // Load Supabase SDK dynamically
-        var script = document.createElement('script');
-        script.src = 'https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.min.js';
-        script.onload = function() {
-            console.log('SDK loaded, window.supabase:', typeof window.supabase);
+        // Load Supabase SDK dynamically - try multiple CDNs
+        var cdns = [
+            'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js',
+            'https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.min.js',
+            'https://esm.sh/@supabase/supabase-js@2/dist/umd/supabase.min.js'
+        ];
+        var cdnIndex = 0;
+
+        function loadSDK() {
+            if (cdnIndex >= cdns.length) {
+                document.getElementById('loading-msg').innerHTML = '<span style="color:#dc2626;">Erro ao carregar o sistema. Verifique sua conexão e <a href="javascript:location.reload()">recarregue</a>.</span>';
+                return;
+            }
+            console.log('Trying CDN ' + cdnIndex + ': ' + cdns[cdnIndex]);
+            var script = document.createElement('script');
+            script.src = cdns[cdnIndex];
+            script.onload = function() {
+                console.log('SDK loaded from CDN ' + cdnIndex);
+                initClient();
+            };
+            script.onerror = function() {
+                console.warn('CDN ' + cdnIndex + ' failed, trying next...');
+                cdnIndex++;
+                loadSDK();
+            };
+            document.head.appendChild(script);
+        }
+
+        function initClient() {
             try {
                 sb = window.supabase.createClient(SUPA_URL, SUPA_KEY);
-                console.log('Client created successfully');
+                console.log('Supabase client created');
                 document.getElementById('loading-msg').style.display = 'none';
                 document.getElementById('login-content').style.display = 'block';
                 checkSession();
             } catch(e) {
-                console.error('Client creation failed:', e);
-                showError('Erro ao inicializar: ' + e.message);
-                document.getElementById('loading-msg').style.display = 'none';
-                document.getElementById('login-content').style.display = 'block';
+                console.error('Init error:', e);
+                document.getElementById('loading-msg').innerHTML = '<span style="color:#dc2626;">Erro: ' + e.message + '. <a href="javascript:location.reload()">Recarregar</a></span>';
             }
-        };
-        script.onerror = function() {
-            console.error('Failed to load Supabase SDK');
-            document.getElementById('loading-msg').innerHTML = '<span style="color:#dc2626;">Erro ao carregar. <a href="javascript:location.reload()">Recarregar</a></span>';
-        };
-        document.head.appendChild(script);
+        }
+
+        loadSDK();
 
         async function checkSession() {
             try {
