@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Branches Regionais - ACMP Brasil</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231a3a5c'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-family='Arial,sans-serif' font-weight='800' font-size='10' fill='white'%3EACMP%3C/text%3E%3C/svg%3E">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .page-hero { background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 50%, #28a745 100%); padding: 80px 0 60px; color: white; text-align: center; position: relative; overflow: hidden; }
+        .page-hero::before { content: ''; position: absolute; inset: 0; background: url('https://images.unsplash.com/photo-1483729558449-99ef09a8c325?w=1600&q=80') center/cover no-repeat; opacity: 0.12; }
+        .page-hero h1 { font-size: 2.5rem; font-weight: 800; margin-bottom: 16px; position: relative; }
+        .page-hero p { font-size: 1.1rem; opacity: 0.9; max-width: 650px; margin: 0 auto; position: relative; }
+        .page-content { padding: 60px 0; max-width: 1000px; margin: 0 auto; }
+        .page-content > p { font-size: 1rem; line-height: 1.8; color: var(--text-body); margin-bottom: 20px; max-width: 800px; }
+        .page-content h2 { font-size: 1.5rem; font-weight: 700; color: var(--text-dark); margin: 40px 0 16px; }
+        .back-link { display: inline-flex; align-items: center; gap: 8px; color: var(--primary); font-weight: 600; font-size: 0.9rem; margin-bottom: 30px; }
+        .back-link:hover { gap: 12px; }
+
+        /* Advantages Grid */
+        .advantages-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin: 30px 0 50px; }
+        .advantage-card { background: var(--bg-white); padding: 28px 22px; border-radius: var(--radius-md); box-shadow: var(--shadow-sm); border: 1px solid var(--border-light); text-align: center; transition: all 0.3s ease; }
+        .advantage-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+        .advantage-icon { width: 56px; height: 56px; background: linear-gradient(135deg, var(--primary), var(--primary-light)); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; font-size: 1.3rem; color: white; }
+        .advantage-card h3 { font-size: 1rem; font-weight: 700; color: var(--text-dark); margin-bottom: 8px; }
+        .advantage-card p { font-size: 0.85rem; color: var(--text-light); line-height: 1.6; }
+
+        /* Regions Grid */
+        .regions-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin: 30px 0; }
+        .region-card { background: var(--bg-white); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); border: 1px solid var(--border-light); overflow: hidden; transition: all 0.3s ease; }
+        .region-card:hover { box-shadow: var(--shadow-md); transform: translateY(-3px); }
+        .region-header { padding: 20px 24px; color: white; display: flex; align-items: center; gap: 14px; }
+        .region-header i { font-size: 1.5rem; opacity: 0.8; }
+        .region-header h3 { font-size: 1.15rem; font-weight: 700; }
+        .region-header span { font-size: 0.8rem; opacity: 0.85; display: block; margin-top: 2px; }
+        .region-body { padding: 20px 24px; }
+        .region-body p { font-size: 0.88rem; color: var(--text-body); line-height: 1.6; margin-bottom: 12px; }
+        .region-cities { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+        .region-cities span { background: var(--bg-light); padding: 4px 10px; border-radius: 50px; font-size: 0.75rem; color: var(--text-light); font-weight: 500; }
+        .region-status { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-radius: var(--radius-sm); font-size: 0.82rem; font-weight: 600; }
+        .status-active { background: #e8f5e9; color: #2e7d32; }
+        .status-forming { background: #fff3e0; color: #e65100; }
+        .status-planned { background: #e3f2fd; color: #1565c0; }
+
+        /* Region colors */
+        .region-sudeste .region-header { background: linear-gradient(135deg, #1a3a5c, #2a5a8c); }
+        .region-sul .region-header { background: linear-gradient(135deg, #1b5e20, #388e3c); }
+        .region-nordeste .region-header { background: linear-gradient(135deg, #e65100, #ff8f00); }
+        .region-centro .region-header { background: linear-gradient(135deg, #6a1b9a, #8e24aa); }
+        .region-norte .region-header { background: linear-gradient(135deg, #00695c, #00897b); }
+
+        /* Form */
+        .branch-form { background: var(--bg-light); border-radius: var(--radius-lg); padding: 40px; margin: 50px 0 30px; }
+        .branch-form h2 { margin-top: 0; text-align: center; }
+        .branch-form p.form-desc { text-align: center; color: var(--text-light); margin-bottom: 30px; font-size: 0.95rem; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .form-group { margin-bottom: 16px; }
+        .form-group.full { grid-column: 1 / -1; }
+        .form-group label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-dark); margin-bottom: 6px; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-family: var(--font-main); font-size: 0.9rem; background: white; }
+        .form-group textarea { resize: vertical; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(26, 58, 92, 0.1); }
+
+        @media (max-width: 768px) {
+            .advantages-grid { grid-template-columns: 1fr; }
+            .form-grid { grid-template-columns: 1fr; }
+            .regions-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <div class="container top-bar-content">
+            <div class="top-bar-left">
+                <a href="https://www.acmpglobal.org/" target="_blank" rel="noopener"><i class="fas fa-globe"></i> ACMP Global</a>
+                <a href="https://www.acmpglobal.org/page/chapters" target="_blank" rel="noopener"><i class="fas fa-map-marked-alt"></i> Capítulos Globais</a>
+            </div>
+            <div class="top-bar-right">
+                <a href="https://www.acmpglobal.org/page/join_acmp" target="_blank" rel="noopener" class="btn-join">Associe-se</a>
+            </div>
+        </div>
+    </div>
+    <header class="main-header">
+        <div class="container header-content">
+            <a href="../index.html" class="logo">
+                <div class="logo-icon"><span class="logo-letters">ACMP</span></div>
+                <div class="logo-text">
+                    <span class="logo-title">ACMP Brasil</span>
+                    <span class="logo-subtitle">Gestao de Mudancas</span>
+                </div>
+            </a>
+        </div>
+    </header>
+
+    <section class="page-hero">
+        <div class="container">
+            <h1><i class="fas fa-map-marked-alt"></i> Branches Regionais</h1>
+            <p>Fortalecendo a Gestão de Mudanças em cada região do Brasil com conhecimento, networking e comunidade local.</p>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container page-content">
+            <a href="../index.html" class="back-link"><i class="fas fa-arrow-left"></i> Voltar para a página inicial</a>
+
+            <p>A ACMP Brasil está expandindo sua presença por todo o território nacional através de <strong>branches regionais</strong>. Cada branch funciona como um polo local da comunidade de Gestão de Mudanças, promovendo eventos, networking e desenvolvimento profissional adaptados à realidade de cada região.</p>
+
+            <p>Inspirados no modelo da ACMP Global, que possui mais de 40 capítulos em 6 continentes, estamos construindo uma rede que leva o conhecimento de gestão de mudanças para além do eixo Rio-São Paulo, fortalecendo profissionais em todas as regiões do Brasil.</p>
+
+            <h2>Por que ter Branches Regionais?</h2>
+
+            <div class="advantages-grid">
+                <div class="advantage-card">
+                    <div class="advantage-icon"><i class="fas fa-network-wired"></i></div>
+                    <h3>Networking Local</h3>
+                    <p>Conecte-se com profissionais de Gestão de Mudanças da sua cidade e região. Encontros presenciais regulares criam laços que conferências virtuais não conseguem.</p>
+                </div>
+                <div class="advantage-card">
+                    <div class="advantage-icon"><i class="fas fa-graduation-cap"></i></div>
+                    <h3>Conhecimento Acessível</h3>
+                    <p>Workshops, meetups e grupos de estudo locais tornam o aprendizado contínuo mais acessível, sem necessidade de viagens para capitais distantes.</p>
+                </div>
+                <div class="advantage-card">
+                    <div class="advantage-icon"><i class="fas fa-chart-line"></i></div>
+                    <h3>Mercado Regional</h3>
+                    <p>Cada região tem desafios únicos de transformação. Branches locais ajudam a adaptar práticas globais de CM à realidade do mercado regional.</p>
+                </div>
+                <div class="advantage-card">
+                    <div class="advantage-icon"><i class="fas fa-user-tie"></i></div>
+                    <h3>Liderança e Visibilidade</h3>
+                    <p>Líderes de branch ganham experiência em gestão, visibilidade na comunidade e créditos para renovação do CCMP.</p>
+                </div>
+                <div class="advantage-card">
+                    <div class="advantage-icon"><i class="fas fa-handshake"></i></div>
+                    <h3>Parcerias Locais</h3>
+                    <p>Universidades, empresas e consultorias da região podem se tornar parceiros, ampliando o alcance e impacto da comunidade.</p>
+                </div>
+                <div class="advantage-card">
+                    <div class="advantage-icon"><i class="fas fa-flag"></i></div>
+                    <h3>Representatividade</h3>
+                    <p>O Brasil é imenso. Branches garantem que a voz de cada região seja ouvida nas decisões e direções da ACMP Brasil.</p>
+                </div>
+            </div>
+
+            <h2>Nossas Regiões</h2>
+
+            <div class="regions-grid">
+                <div class="region-card region-sudeste">
+                    <div class="region-header">
+                        <i class="fas fa-city"></i>
+                        <div>
+                            <h3>Sudeste</h3>
+                            <span>SP, RJ, MG, ES</span>
+                        </div>
+                    </div>
+                    <div class="region-body">
+                        <p>A região com a maior concentração de profissionais de Gestão de Mudanças do Brasil. Hub de grandes empresas, consultorias e centros de inovação.</p>
+                        <div class="region-cities">
+                            <span>São Paulo</span>
+                            <span>Rio de Janeiro</span>
+                            <span>Belo Horizonte</span>
+                            <span>Campinas</span>
+                            <span>Vitória</span>
+                        </div>
+                        <div class="region-status status-active"><i class="fas fa-check-circle"></i> Em formação - Líderes voluntários bem-vindos</div>
+                    </div>
+                </div>
+
+                <div class="region-card region-sul">
+                    <div class="region-header">
+                        <i class="fas fa-leaf"></i>
+                        <div>
+                            <h3>Sul</h3>
+                            <span>PR, SC, RS</span>
+                        </div>
+                    </div>
+                    <div class="region-body">
+                        <p>Polo industrial e de tecnologia com forte presença de empresas em transformação digital. Ecossistema maduro de startups e inovação.</p>
+                        <div class="region-cities">
+                            <span>Curitiba</span>
+                            <span>Porto Alegre</span>
+                            <span>Florianópolis</span>
+                            <span>Joinville</span>
+                        </div>
+                        <div class="region-status status-forming"><i class="fas fa-clock"></i> Buscando líderes fundadores</div>
+                    </div>
+                </div>
+
+                <div class="region-card region-nordeste">
+                    <div class="region-header">
+                        <i class="fas fa-sun"></i>
+                        <div>
+                            <h3>Nordeste</h3>
+                            <span>BA, PE, CE, MA, PB, RN, AL, SE, PI</span>
+                        </div>
+                    </div>
+                    <div class="region-body">
+                        <p>Região em forte crescimento econômico com investimentos em energia, tecnologia e serviços. Grande demanda por profissionalização da gestão de mudanças.</p>
+                        <div class="region-cities">
+                            <span>Salvador</span>
+                            <span>Recife</span>
+                            <span>Fortaleza</span>
+                            <span>São Luís</span>
+                        </div>
+                        <div class="region-status status-forming"><i class="fas fa-clock"></i> Buscando líderes fundadores</div>
+                    </div>
+                </div>
+
+                <div class="region-card region-centro">
+                    <div class="region-header">
+                        <i class="fas fa-landmark"></i>
+                        <div>
+                            <h3>Centro-Oeste</h3>
+                            <span>DF, GO, MT, MS</span>
+                        </div>
+                    </div>
+                    <div class="region-body">
+                        <p>Sede do governo federal e de grandes projetos de transformação no setor público. Agronegócio em constante modernização tecnológica.</p>
+                        <div class="region-cities">
+                            <span>Brasília</span>
+                            <span>Goiânia</span>
+                            <span>Campo Grande</span>
+                            <span>Cuiabá</span>
+                        </div>
+                        <div class="region-status status-planned"><i class="fas fa-calendar"></i> Planejado para 2026-2027</div>
+                    </div>
+                </div>
+
+                <div class="region-card region-norte">
+                    <div class="region-header">
+                        <i class="fas fa-tree"></i>
+                        <div>
+                            <h3>Norte</h3>
+                            <span>AM, PA, RO, AC, RR, AP, TO</span>
+                        </div>
+                    </div>
+                    <div class="region-body">
+                        <p>Região com projetos de grande porte em mineração, energia e logística. Oportunidade única de levar as melhores práticas de CM para projetos de impacto.</p>
+                        <div class="region-cities">
+                            <span>Manaus</span>
+                            <span>Belém</span>
+                            <span>Porto Velho</span>
+                            <span>Palmas</span>
+                        </div>
+                        <div class="region-status status-planned"><i class="fas fa-calendar"></i> Planejado para 2027</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="branch-form" id="form-branch">
+                <h2><i class="fas fa-rocket"></i> Quero liderar ou participar de um Branch</h2>
+                <p class="form-desc">Preencha o formulário para manifestar seu interesse em liderar ou integrar um branch regional.</p>
+
+                <form action="https://formspree.io/f/xpwdqjkl" method="POST">
+                    <input type="hidden" name="_subject" value="Interesse em Branch Regional - ACMP Brasil">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Nome completo *</label>
+                            <input type="text" name="nome" required>
+                        </div>
+                        <div class="form-group">
+                            <label>E-mail *</label>
+                            <input type="email" name="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Telefone / WhatsApp</label>
+                            <input type="tel" name="telefone" placeholder="(11) 99999-9999">
+                        </div>
+                        <div class="form-group">
+                            <label>LinkedIn</label>
+                            <input type="url" name="linkedin" placeholder="https://linkedin.com/in/...">
+                        </div>
+                        <div class="form-group">
+                            <label>Cidade / Estado *</label>
+                            <input type="text" name="cidade_estado" required placeholder="Ex: Curitiba, PR">
+                        </div>
+                        <div class="form-group">
+                            <label>Região de interesse *</label>
+                            <select name="regiao" required>
+                                <option value="">Selecione</option>
+                                <option value="sudeste">Sudeste (SP, RJ, MG, ES)</option>
+                                <option value="sul">Sul (PR, SC, RS)</option>
+                                <option value="nordeste">Nordeste</option>
+                                <option value="centro-oeste">Centro-Oeste (DF, GO, MT, MS)</option>
+                                <option value="norte">Norte</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Tipo de interesse *</label>
+                            <select name="interesse" required>
+                                <option value="">Selecione</option>
+                                <option value="lider">Quero liderar o branch</option>
+                                <option value="co-lider">Quero ser co-líder</option>
+                                <option value="participar">Quero participar como membro</option>
+                                <option value="empresa-parceira">Minha empresa quer ser parceira</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Possui certificação CCMP?</label>
+                            <select name="ccmp">
+                                <option value="">Selecione</option>
+                                <option value="sim">Sim</option>
+                                <option value="nao">Não</option>
+                                <option value="em-processo">Em processo</option>
+                            </select>
+                        </div>
+                        <div class="form-group full">
+                            <label>Conte sobre sua experiência e motivação</label>
+                            <textarea name="motivacao" rows="4" placeholder="Descreva sua experiência em Gestão de Mudanças e por que gostaria de ajudar a construir um branch regional..."></textarea>
+                        </div>
+                    </div>
+                    <div style="text-align: center; margin-top: 20px;">
+                        <button type="submit" class="btn btn-primary btn-lg"><i class="fas fa-paper-plane"></i> Enviar Interesse</button>
+                    </div>
+                </form>
+            </div>
+
+            <div style="text-align: center; margin: 30px 0;">
+                <p style="color: var(--text-light); font-size: 0.9rem; margin-bottom: 12px;">Conheça os capítulos da ACMP no mundo todo</p>
+                <a href="https://www.acmpglobal.org/page/chapters" target="_blank" rel="noopener" class="btn btn-outline"><i class="fas fa-globe"></i> Capítulos ACMP Global</a>
+            </div>
+        </div>
+    </section>
+
+    <footer class="main-footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <div class="footer-bottom-content">
+                    <p>&copy; 2026 ACMP Brasil - Associação de Profissionais de Gestão de Mudanças.</p>
+                    <div class="footer-bottom-links">
+                        <a href="../index.html">Página Inicial</a>
+                        <a href="https://www.acmpglobal.org/" target="_blank" rel="noopener">ACMP Global</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

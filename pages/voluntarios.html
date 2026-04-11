@@ -84,8 +84,53 @@
 
             <div class="page-cta">
                 <h3>Quero ser voluntário na ACMP Brasil</h3>
-                <p>Entre em contato com o capítulo Brasil ou explore oportunidades de voluntariado também no nível global da ACMP.</p>
-                <a href="https://www.acmpglobal.org/page/volunteer" target="_blank" class="btn btn-primary btn-lg"><i class="fas fa-external-link-alt"></i> Voluntariado ACMP Global</a>
+                <p>Preencha o formulário abaixo e entraremos em contato.</p>
+            </div>
+
+            <form class="volunteer-form" action="https://formspree.io/f/xpwdqjkl" method="POST" style="max-width: 600px; margin: 0 auto 40px;">
+                <input type="hidden" name="_subject" value="Novo voluntário ACMP Brasil">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+                    <div>
+                        <label style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-dark); margin-bottom: 6px;">Nome completo *</label>
+                        <input type="text" name="nome" required style="width: 100%; padding: 12px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-family: var(--font-main); font-size: 0.9rem;">
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-dark); margin-bottom: 6px;">E-mail *</label>
+                        <input type="email" name="email" required style="width: 100%; padding: 12px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-family: var(--font-main); font-size: 0.9rem;">
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+                    <div>
+                        <label style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-dark); margin-bottom: 6px;">Cidade / Estado *</label>
+                        <input type="text" name="cidade_estado" required placeholder="Ex: São Paulo, SP" style="width: 100%; padding: 12px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-family: var(--font-main); font-size: 0.9rem;">
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-dark); margin-bottom: 6px;">LinkedIn</label>
+                        <input type="url" name="linkedin" placeholder="https://linkedin.com/in/..." style="width: 100%; padding: 12px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-family: var(--font-main); font-size: 0.9rem;">
+                    </div>
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-dark); margin-bottom: 6px;">Comitê de interesse *</label>
+                    <select name="comite" required style="width: 100%; padding: 12px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-family: var(--font-main); font-size: 0.9rem; background: white;">
+                        <option value="">Selecione um comitê</option>
+                        <option value="eventos">Comitê de Eventos</option>
+                        <option value="comunicacao">Comitê de Comunicação</option>
+                        <option value="educacao">Comitê de Educação</option>
+                        <option value="traducao">Comitê de Tradução do Standard</option>
+                        <option value="branches">Líder de Branch Regional</option>
+                        <option value="outro">Outro / Qualquer comitê</option>
+                    </select>
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-dark); margin-bottom: 6px;">Por que gostaria de ser voluntário?</label>
+                    <textarea name="motivacao" rows="4" placeholder="Conte um pouco sobre você e sua motivação..." style="width: 100%; padding: 12px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-family: var(--font-main); font-size: 0.9rem; resize: vertical;"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary btn-lg" style="width: 100%;"><i class="fas fa-paper-plane"></i> Enviar Candidatura</button>
+            </form>
+
+            <div style="text-align: center; margin-bottom: 20px;">
+                <p style="font-size: 0.88rem; color: var(--text-light);">Quer explorar oportunidades de voluntariado no nível global?</p>
+                <a href="https://www.acmpglobal.org/page/volunteer" target="_blank" rel="noopener" class="btn btn-outline"><i class="fas fa-external-link-alt"></i> Voluntariado ACMP Global</a>
             </div>
         </div>
     </section>

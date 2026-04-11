@@ -65,7 +65,7 @@
                             <li><a href="#sobre">Sobre a ACMP Brasil</a></li>
                             <li><a href="#sobre">Missão e Visão</a></li>
                             <li><a href="#deib">Diversidade e Inclusão</a></li>
-                            <li><a href="https://www.acmpglobal.org/page/chapters" target="_blank" rel="noopener">Capítulos Globais</a></li>
+                            <li><a href="pages/branches.html">Branches Regionais</a></li>
                             <li><a href="#gestao-mudancas">O que é Gestão de Mudanças</a></li>
                             <li><a href="#etica">Código de Ética</a></li>
                         </ul>
@@ -444,6 +444,39 @@
             </div>
             <div class="events-cta">
                 <a href="https://www.acmpglobal.org/events/event_list.asp" target="_blank" rel="noopener" class="btn btn-secondary"><i class="fas fa-calendar"></i> Ver Calendário Completo</a>
+            </div>
+
+            <!-- Event Interest Form -->
+            <div id="evento-inscricao" style="background: var(--bg-light); border-radius: var(--radius-lg); padding: 40px; margin-top: 50px;">
+                <div style="text-align: center; margin-bottom: 24px;">
+                    <h3 style="font-size: 1.4rem; font-weight: 700; color: var(--text-dark); margin-bottom: 8px;"><i class="fas fa-ticket-alt"></i> Inscreva-se nos Eventos</h3>
+                    <p style="color: var(--text-light); font-size: 0.95rem;">Receba informações e links de inscrição diretamente no seu e-mail.</p>
+                </div>
+                <form action="https://formspree.io/f/xpwdqjkl" method="POST" style="max-width: 650px; margin: 0 auto;">
+                    <input type="hidden" name="_subject" value="Inscrição em Evento - ACMP Brasil">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+                        <input type="text" name="nome" placeholder="Seu nome completo *" required style="padding: 12px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-family: var(--font-main); font-size: 0.9rem;">
+                        <input type="email" name="email" placeholder="Seu e-mail *" required style="padding: 12px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-family: var(--font-main); font-size: 0.9rem;">
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+                        <select name="evento" required style="padding: 12px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-family: var(--font-main); font-size: 0.9rem; background: white;">
+                            <option value="">Evento de interesse *</option>
+                            <option value="change-orlando-2026">Change Orlando 2026 (Mai 17-20)</option>
+                            <option value="global-cm-day">Dia Global da Gestão de Mudanças</option>
+                            <option value="webinars">Webinars ACMP (série contínua)</option>
+                            <option value="todos">Todos os eventos</option>
+                        </select>
+                        <select name="tipo_participacao" style="padding: 12px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-family: var(--font-main); font-size: 0.9rem; background: white;">
+                            <option value="">Tipo de participação</option>
+                            <option value="presencial">Presencial</option>
+                            <option value="online">Online / Virtual</option>
+                            <option value="ambos">Ambos</option>
+                        </select>
+                    </div>
+                    <div style="text-align: center;">
+                        <button type="submit" class="btn btn-primary btn-lg"><i class="fas fa-paper-plane"></i> Quero Participar</button>
+                    </div>
+                </form>
             </div>
         </div>
     </section>
