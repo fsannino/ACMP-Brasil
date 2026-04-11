@@ -1,8 +1,11 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Performance: preload critical resources -->
+    <link rel="preload" href="css/styles.css" as="style">
+    <link rel="preload" href="img/logo-acmp-brasil.png" as="image">
     <meta name="description" content="ACMP Brasil - Associação de Profissionais de Gestão de Mudanças. Capítulo brasileiro da ACMP Global.">
     <title>ACMP Brasil - Associação de Profissionais de Gestão de Mudanças</title>
 
@@ -81,7 +84,7 @@
                 <img src="img/logo-acmp-brasil.png" alt="ACMP Brasil" class="logo-img">
             </a>
 
-            <nav class="main-nav" id="main-nav">
+            <nav class="main-nav" id="main-nav" role="navigation" aria-label="Menu principal">
                 <ul class="nav-list">
                     <li class="nav-item has-dropdown">
                         <a href="#sobre">Sobre <i class="fas fa-chevron-down"></i></a>
@@ -164,8 +167,11 @@
         </div>
     </header>
 
+    <!-- Skip to content (accessibility) -->
+    <a href="#inicio" class="skip-link" aria-label="Ir para o conteúdo principal">Ir para o conteúdo</a>
+
     <!-- Hero Section -->
-    <section class="hero" id="inicio">
+    <section class="hero" id="inicio" role="banner">
         <div class="hero-overlay"></div>
         <div class="container hero-content">
             <div class="hero-badge">Capítulo Brasileiro da ACMP Global</div>
@@ -693,7 +699,7 @@
     </section>
 
     <!-- Footer -->
-    <footer class="main-footer" id="contato">
+    <footer class="main-footer" id="contato" role="contentinfo">
         <div class="container">
             <div class="footer-grid">
                 <div class="footer-col footer-about">
@@ -761,6 +767,19 @@
         <i class="fab fa-whatsapp"></i>
     </a>
     <div class="whatsapp-tooltip" id="whatsapp-tooltip">Fale conosco pelo WhatsApp</div>
+
+    <!-- LGPD Cookie Consent Banner -->
+    <div class="cookie-banner" id="cookie-banner">
+        <div class="cookie-inner">
+            <div class="cookie-text">
+                <strong>Privacidade e Cookies</strong> - Este site utiliza cookies e ferramentas de analytics para melhorar sua experiência. Em conformidade com a <strong>LGPD</strong> (Lei Geral de Proteção de Dados), solicitamos seu consentimento para coletar dados de navegação de forma anônima.
+            </div>
+            <div class="cookie-buttons">
+                <button class="cookie-btn cookie-accept" id="cookie-accept">Aceitar</button>
+                <button class="cookie-btn cookie-reject" id="cookie-reject">Recusar</button>
+            </div>
+        </div>
+    </div>
 
     <!-- Dark Mode Toggle -->
     <button class="dark-mode-toggle" id="dark-mode-toggle" aria-label="Alternar modo escuro">

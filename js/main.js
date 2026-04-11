@@ -155,6 +155,50 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
+    // --- LGPD Cookie Consent ---
+    (function () {
+        var banner = document.getElementById('cookie-banner');
+        var acceptBtn = document.getElementById('cookie-accept');
+        var rejectBtn = document.getElementById('cookie-reject');
+        if (!banner) return;
+
+        var consent = localStorage.getItem('acmp-cookie-consent');
+        if (consent === null) {
+            setTimeout(function () { banner.classList.add('active'); }, 1500);
+        } else if (consent === 'accepted') {
+            loadAnalytics();
+        }
+
+        if (acceptBtn) {
+            acceptBtn.addEventListener('click', function () {
+                localStorage.setItem('acmp-cookie-consent', 'accepted');
+                banner.classList.remove('active');
+                loadAnalytics();
+            });
+        }
+
+        if (rejectBtn) {
+            rejectBtn.addEventListener('click', function () {
+                localStorage.setItem('acmp-cookie-consent', 'rejected');
+                banner.classList.remove('active');
+            });
+        }
+
+        function loadAnalytics() {
+            // Google Analytics - Replace G-XXXXXXXXXX with your GA4 Measurement ID
+            if (window.gtag) return;
+            var gaId = 'G-XXXXXXXXXX'; // TODO: Replace with real GA4 ID
+            var s = document.createElement('script');
+            s.async = true;
+            s.src = 'https://www.googletagmanager.com/gtag/js?id=' + gaId;
+            document.head.appendChild(s);
+            window.dataLayer = window.dataLayer || [];
+            window.gtag = function () { dataLayer.push(arguments); };
+            window.gtag('js', new Date());
+            window.gtag('config', gaId, { anonymize_ip: true });
+        }
+    })();
+
     // --- Site Search ---
     (function () {
         var toggle = document.getElementById('search-toggle');
