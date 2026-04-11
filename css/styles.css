@@ -166,8 +166,10 @@ img {
 }
 
 .logo-img {
-    height: 52px;
+    height: 56px;
     width: auto;
+    display: block;
+    max-width: 240px;
 }
 
 /* Legacy logo classes for sub-pages */
