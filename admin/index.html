@@ -56,7 +56,8 @@
                 <span class="admin-badge"><i class="fas fa-shield-alt"></i> ADMIN</span>
             </div>
             <div class="header-actions">
-                <a href="../membros/"><i class="fas fa-users"></i> Área do Membro</a>
+                <a href="/"><i class="fas fa-home"></i> Site</a>
+                <a href="/membros/"><i class="fas fa-users"></i> Área do Membro</a>
                 <button onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> Sair</button>
             </div>
         </div>
@@ -187,66 +188,79 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-    <script src="../js/supabase-client.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', async function() {
-            if (!initSupabase()) return;
-            if (!await requireAuth()) return;
-            if (!await requireAdmin()) return;
+        var SUPA_URL = 'https://yaumzlssybzoipwmllqy.supabase.co';
+        var SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlhdW16bHNzeWJ6b2lwd21sbHF5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU5MTcwMTEsImV4cCI6MjA5MTQ5MzAxMX0.GWK1jnlEmgxWmeWk1VGwR25fLBvquWtrkQ4ipq_A3RU';
+        var sb = null;
+
+        var cdns = ['https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js','https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.min.js'];
+        var ci = 0;
+        function loadSDK() {
+            if (ci >= cdns.length) return;
+            var s = document.createElement('script'); s.src = cdns[ci];
+            s.onload = function() { sb = window.supabase.createClient(SUPA_URL, SUPA_KEY); initAdmin(); };
+            s.onerror = function() { ci++; loadSDK(); };
+            document.head.appendChild(s);
+        }
+        loadSDK();
+
+        async function initAdmin() {
+            var sess = await sb.auth.getSession();
+            if (!sess.data.session) { window.location.href = '../membros/login.html'; return; }
+            var user = sess.data.session.user;
+            var prof = await sb.from('member_profiles').select('role').eq('id', user.id).single();
+            if (!prof.data || prof.data.role !== 'admin') { window.location.href = '../membros/'; return; }
             await loadAdminData();
-        });
+        }
 
         async function loadAdminData() {
-            var stats = await getContentStats();
-            document.getElementById('stat-total').textContent = stats.totalMembers;
-            document.getElementById('stat-active').textContent = stats.activeMembers;
-            document.getElementById('stat-pending').textContent = stats.totalMembers - stats.activeMembers;
-
-            var { data: contentList } = await getExclusiveContent('all');
+            var { count: total } = await sb.from('member_profiles').select('*', { count: 'exact', head: true });
+            var { count: active } = await sb.from('member_profiles').select('*', { count: 'exact', head: true }).eq('membership_status', 'active');
+            var { data: contentList } = await sb.from('exclusive_content').select('*');
+            document.getElementById('stat-total').textContent = total || 0;
+            document.getElementById('stat-active').textContent = active || 0;
+            document.getElementById('stat-pending').textContent = (total || 0) - (active || 0);
             document.getElementById('stat-content').textContent = contentList ? contentList.length : 0;
-
             await loadMembersTable();
             await loadContentTable();
         }
 
         async function loadMembersTable() {
-            var { data } = await getAllMembers();
+            var { data } = await sb.from('member_profiles').select('*').order('created_at', { ascending: false });
             var tbody = document.getElementById('members-tbody');
             if (!data || data.length === 0) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">Nenhum membro</td></tr>'; return; }
             tbody.innerHTML = data.map(function(m) {
-                return '<tr>' +
-                    '<td><strong>' + (m.full_name || '-') + '</strong></td>' +
-                    '<td>' + m.email + '</td>' +
+                var badge = { active:'<span style="background:#dcfce7;color:#16a34a;padding:3px 10px;border-radius:50px;font-size:0.75rem;font-weight:600;">Ativo</span>', pending:'<span style="background:#fef3c7;color:#d97706;padding:3px 10px;border-radius:50px;font-size:0.75rem;font-weight:600;">Pendente</span>', expired:'<span style="background:#fee2e2;color:#dc2626;padding:3px 10px;border-radius:50px;font-size:0.75rem;font-weight:600;">Expirado</span>', rejected:'<span style="background:#f3f4f6;color:#6b7280;padding:3px 10px;border-radius:50px;font-size:0.75rem;font-weight:600;">Recusado</span>' };
+                var dt = m.created_at ? new Date(m.created_at).toLocaleDateString('pt-BR') : '';
+                return '<tr><td><strong>' + (m.full_name || '-') + '</strong></td><td>' + m.email + '</td>' +
                     '<td>' + (m.city ? m.city + (m.state ? ', ' + m.state : '') : '-') + '</td>' +
-                    '<td>' + getStatusBadge(m.membership_status) + '</td>' +
+                    '<td>' + (badge[m.membership_status] || m.membership_status) + '</td>' +
                     '<td>' + (m.ccmp_certified ? '<i class="fas fa-medal" style="color:#d97706;"></i>' : '-') + '</td>' +
-                    '<td>' + formatDate(m.created_at) + '</td>' +
-                    '<td>' +
+                    '<td>' + dt + '</td><td>' +
                     '<button class="action-btn approve" onclick="setStatus(\'' + m.id + '\',\'active\')"><i class="fas fa-check"></i></button>' +
-                    '<button class="action-btn reject" onclick="setStatus(\'' + m.id + '\',\'expired\')"><i class="fas fa-times"></i></button>' +
+                    '<button class="action-btn reject" onclick="setStatus(\'' + m.id + '\',\'rejected\')"><i class="fas fa-times"></i></button>' +
                     '</td></tr>';
             }).join('');
         }
 
         async function loadContentTable() {
-            var { data } = await getExclusiveContent('all');
+            var { data } = await sb.from('exclusive_content').select('*').order('created_at', { ascending: false });
             var tbody = document.getElementById('content-tbody');
-            if (!data || data.length === 0) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Nenhum conteúdo</td></tr>'; return; }
+            if (!data || data.length === 0) { tbody.innerHTML = '<tr><td colspan="6">Nenhum conteúdo</td></tr>'; return; }
+            var icons = { pdf:'fas fa-file-pdf', video:'fas fa-play-circle', article:'fas fa-newspaper', webinar:'fas fa-video', game:'fas fa-gamepad', template:'fas fa-file-alt', tool:'fas fa-tools' };
+            var colors = { pdf:'#e74c3c', video:'#9b59b6', article:'#3498db', webinar:'#2ecc71', game:'#e67e22', template:'#1abc9c', tool:'#95a5a6' };
+            var cats = { standard:'Standard', certificacao:'Certificação', webinars:'Webinars', ferramentas:'Ferramentas', jogos:'Jogos', artigos:'Artigos', templates:'Templates' };
             tbody.innerHTML = data.map(function(c) {
-                return '<tr>' +
-                    '<td><strong>' + c.title + '</strong></td>' +
-                    '<td><i class="' + getContentIcon(c.content_type) + '" style="color:' + getContentColor(c.content_type) + ';"></i> ' + c.content_type + '</td>' +
-                    '<td>' + getCategoryLabel(c.category) + '</td>' +
-                    '<td>' + c.access_level + '</td>' +
-                    '<td>' + (c.download_count || 0) + '</td>' +
-                    '<td><button class="action-btn reject" onclick="removeContent(' + c.id + ')"><i class="fas fa-trash"></i></button></td>' +
-                    '</tr>';
+                return '<tr><td><strong>' + c.title + '</strong></td>' +
+                    '<td><i class="' + (icons[c.content_type]||'fas fa-file') + '" style="color:' + (colors[c.content_type]||'#666') + ';"></i> ' + c.content_type + '</td>' +
+                    '<td>' + (cats[c.category]||c.category) + '</td><td>' + c.access_level + '</td>' +
+                    '<td>' + (c.download_count||0) + '</td>' +
+                    '<td><button class="action-btn reject" onclick="removeContent(' + c.id + ')"><i class="fas fa-trash"></i></button></td></tr>';
             }).join('');
         }
 
         async function setStatus(userId, status) {
-            await updateMemberStatus(userId, status);
+            await sb.from('member_profiles').update({ membership_status: status, updated_at: new Date().toISOString() }).eq('id', userId);
             showAlert('admin-alert', 'Status atualizado!', 'success');
             await loadMembersTable();
             await loadAdminData();
@@ -254,7 +268,7 @@
 
         async function handleAddContent(e) {
             e.preventDefault();
-            var { data, error } = await addContent({
+            var { error } = await sb.from('exclusive_content').insert({
                 title: document.getElementById('ct-title').value,
                 content_type: document.getElementById('ct-type').value,
                 category: document.getElementById('ct-category').value,
@@ -269,31 +283,36 @@
 
         async function removeContent(id) {
             if (!confirm('Remover este conteúdo?')) return;
-            await deleteContent(id);
-            await loadContentTable();
-            await loadAdminData();
+            await sb.from('exclusive_content').delete().eq('id', id);
+            await loadContentTable(); await loadAdminData();
         }
 
         async function handleCSVUpload(e) {
-            var file = e.target.files[0];
-            if (!file) return;
+            var file = e.target.files[0]; if (!file) return;
             var reader = new FileReader();
             reader.onload = async function(ev) {
-                var { count, error } = await importMembersCSV(ev.target.result);
-                if (error) { showAlert('import-alert', 'Erro: ' + error.message, 'error'); }
-                else { showAlert('import-alert', count + ' membros importados com sucesso!', 'success'); }
+                var lines = ev.target.result.split('\n').filter(function(l){return l.trim();});
+                var header = lines[0].split(',').map(function(h){return h.trim().toLowerCase();});
+                var records = [];
+                for (var i=1; i<lines.length; i++) {
+                    var vals = lines[i].split(',').map(function(v){return v.trim();});
+                    var rec = {}; header.forEach(function(h,idx){rec[h]=vals[idx]||'';}); if(rec.email) records.push(rec);
+                }
+                var { error } = await sb.from('imported_members').upsert(records, { onConflict: 'email' });
+                if (error) showAlert('import-alert', 'Erro: ' + error.message, 'error');
+                else showAlert('import-alert', records.length + ' membros importados!', 'success');
             };
             reader.readAsText(file);
         }
 
         async function handleSync() {
-            var { synced, error } = await syncImportedMembers();
-            if (error) { showAlert('import-alert', 'Erro: ' + error.message, 'error'); }
-            else { showAlert('import-alert', (synced || 0) + ' membros sincronizados!', 'success'); await loadMembersTable(); await loadAdminData(); }
+            var { data, error } = await sb.rpc('sync_imported_members');
+            if (error) showAlert('import-alert', 'Erro: ' + error.message, 'error');
+            else { showAlert('import-alert', (data||0) + ' membros sincronizados!', 'success'); await loadMembersTable(); await loadAdminData(); }
         }
 
         function showAdminTab(tab) {
-            document.querySelectorAll('.admin-tab').forEach(function(t) { t.classList.remove('active'); });
+            document.querySelectorAll('.admin-tab').forEach(function(t){t.classList.remove('active');});
             event.target.classList.add('active');
             document.getElementById('panel-members').style.display = tab === 'members' ? 'block' : 'none';
             document.getElementById('panel-content').style.display = tab === 'content' ? 'block' : 'none';
@@ -301,16 +320,14 @@
         }
 
         function showAlert(id, msg, type) {
-            var el = document.getElementById(id);
-            el.style.display = 'block';
+            var el = document.getElementById(id); el.style.display = 'block';
             el.style.background = type === 'success' ? '#dcfce7' : '#fee2e2';
             el.style.color = type === 'success' ? '#16a34a' : '#dc2626';
-            el.style.padding = '12px'; el.style.borderRadius = '8px';
-            el.textContent = msg;
-            setTimeout(function() { el.style.display = 'none'; }, 4000);
+            el.style.padding = '12px'; el.style.borderRadius = '8px'; el.textContent = msg;
+            setTimeout(function(){el.style.display='none';}, 4000);
         }
 
-        async function handleLogout() { await signOut(); }
+        async function handleLogout() { await sb.auth.signOut(); window.location.href = '../membros/login.html'; }
     </script>
 </body>
 </html>
