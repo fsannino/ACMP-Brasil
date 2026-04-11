@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checklist de Conteúdo - ACMP Brasil</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f5f5f5; color: #333; padding: 20px; max-width: 900px; margin: 0 auto; }
+        h1 { color: #1e3a5f; margin-bottom: 8px; font-size: 1.8rem; }
+        .subtitle { color: #666; margin-bottom: 30px; font-size: 0.95rem; }
+        .section { background: white; border-radius: 12px; padding: 28px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .section h2 { color: #1e3a5f; font-size: 1.2rem; margin-bottom: 6px; display: flex; align-items: center; gap: 10px; }
+        .section h2 .badge { font-size: 0.7rem; padding: 3px 10px; border-radius: 50px; font-weight: 700; text-transform: uppercase; }
+        .badge-alta { background: #fee2e2; color: #dc2626; }
+        .badge-media { background: #fef3c7; color: #d97706; }
+        .badge-baixa { background: #dbeafe; color: #2563eb; }
+        .section p.desc { color: #888; font-size: 0.85rem; margin-bottom: 18px; }
+        .field { margin-bottom: 16px; }
+        .field label { display: block; font-weight: 600; font-size: 0.88rem; color: #1e3a5f; margin-bottom: 5px; }
+        .field label small { font-weight: 400; color: #999; }
+        .field input, .field textarea, .field select { width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 8px; font-family: inherit; font-size: 0.9rem; }
+        .field input:focus, .field textarea:focus { outline: none; border-color: #1e3a5f; box-shadow: 0 0 0 3px rgba(30,58,95,0.1); }
+        .field textarea { resize: vertical; min-height: 80px; }
+        .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .check-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; border-bottom: 1px solid #f0f0f0; }
+        .check-item:last-child { border-bottom: none; }
+        .check-item input[type="checkbox"] { margin-top: 3px; width: 18px; height: 18px; accent-color: #1e3a5f; }
+        .check-item label { font-size: 0.9rem; cursor: pointer; }
+        .check-item label strong { color: #1e3a5f; }
+        .check-item .file-where { font-size: 0.75rem; color: #999; display: block; margin-top: 2px; }
+        .depoimento-card { background: #f9fafb; border: 1px solid #eee; border-radius: 10px; padding: 20px; margin-bottom: 16px; }
+        .depoimento-card h3 { font-size: 0.95rem; color: #1e3a5f; margin-bottom: 12px; }
+        .foto-slot { display: inline-flex; align-items: center; gap: 8px; background: #f0f0f5; padding: 8px 14px; border-radius: 8px; font-size: 0.82rem; color: #666; margin: 4px 0; }
+        .foto-slot i { font-size: 1.1rem; }
+        .progress { background: #e5e7eb; border-radius: 50px; height: 10px; margin: 16px 0 8px; overflow: hidden; }
+        .progress-bar { height: 100%; background: linear-gradient(90deg, #1e3a5f, #3b82f6); border-radius: 50px; transition: width 0.5s; }
+        .progress-text { font-size: 0.78rem; color: #999; text-align: right; }
+        .btn-export { background: #1e3a5f; color: white; border: none; padding: 14px 28px; border-radius: 8px; font-size: 0.95rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; margin-top: 10px; }
+        .btn-export:hover { background: #2a5a8c; }
+        @media print { body { background: white; } .section { box-shadow: none; border: 1px solid #ddd; page-break-inside: avoid; } .btn-export { display: none; } }
+    </style>
+</head>
+<body>
+
+<h1>Checklist de Conteúdo - ACMP Brasil</h1>
+<p class="subtitle">Preencha os dados abaixo. Este arquivo é apenas para referência interna - NÃO é publicado no site.</p>
+
+<div id="progress-container">
+    <div class="progress"><div class="progress-bar" id="progress-bar" style="width: 0%"></div></div>
+    <div class="progress-text" id="progress-text">0 de 0 itens concluídos</div>
+</div>
+
+<!-- ===================== DADOS DA ORGANIZAÇÃO ===================== -->
+<div class="section">
+    <h2>Dados da Organização <span class="badge badge-alta">Prioridade Alta</span></h2>
+    <p class="desc">Informações básicas que precisam ser reais antes do lançamento.</p>
+
+    <div class="check-item">
+        <input type="checkbox" id="c1" onchange="updateProgress()">
+        <label for="c1"><strong>Telefone / WhatsApp</strong> - Número real para o botão flutuante e contato
+            <span class="file-where">Arquivo: index.html (botão WhatsApp) | Trocar: 5511999999999</span>
+        </label>
+    </div>
+    <div class="field">
+        <label>Número com DDD (formato: 5511999999999)</label>
+        <input type="text" placeholder="Ex: 5511987654321">
+    </div>
+
+    <div class="check-item">
+        <input type="checkbox" id="c2" onchange="updateProgress()">
+        <label for="c2"><strong>E-mail oficial</strong> - Confirmar ou alterar
+            <span class="file-where">Arquivo: index.html (footer) | Atual: contato@acmpbrasil.org.br</span>
+        </label>
+    </div>
+    <div class="field">
+        <label>E-mail de contato</label>
+        <input type="email" placeholder="Ex: contato@acmpbrasil.org.br">
+    </div>
+
+    <div class="check-item">
+        <input type="checkbox" id="c3" onchange="updateProgress()">
+        <label for="c3"><strong>Redes sociais da ACMP Brasil</strong> - URLs reais (hoje apontam para ACMP Global)
+            <span class="file-where">Arquivo: index.html (footer social links)</span>
+        </label>
+    </div>
+    <div class="field-row">
+        <div class="field"><label>LinkedIn</label><input type="url" placeholder="https://linkedin.com/company/acmp-brazil"></div>
+        <div class="field"><label>Facebook</label><input type="url" placeholder="https://facebook.com/acmpbrazil"></div>
+    </div>
+    <div class="field-row">
+        <div class="field"><label>Instagram</label><input type="url" placeholder="https://instagram.com/acmpbrasil"></div>
+        <div class="field"><label>YouTube</label><input type="url" placeholder="https://youtube.com/@acmpbrasil"></div>
+    </div>
+
+    <div class="check-item">
+        <input type="checkbox" id="c4" onchange="updateProgress()">
+        <label for="c4"><strong>Formspree ID</strong> - Criar conta gratuita em formspree.io e obter form ID
+            <span class="file-where">Arquivos: index.html, pages/voluntarios.html, pages/branches.html | Trocar: xpwdqjkl</span>
+        </label>
+    </div>
+    <div class="field">
+        <label>Form ID do Formspree <small>(formato: xAbCdEfG)</small></label>
+        <input type="text" placeholder="Ex: xAbCdEfG">
+    </div>
+
+    <div class="check-item">
+        <input type="checkbox" id="c5" onchange="updateProgress()">
+        <label for="c5"><strong>Google Analytics ID</strong> - Criar propriedade GA4 em analytics.google.com
+            <span class="file-where">Arquivo: js/main.js | Trocar: G-XXXXXXXXXX</span>
+        </label>
+    </div>
+    <div class="field">
+        <label>Measurement ID do GA4 <small>(formato: G-XXXXXXXXXX)</small></label>
+        <input type="text" placeholder="Ex: G-A1B2C3D4E5">
+    </div>
+</div>
+
+<!-- ===================== DEPOIMENTOS ===================== -->
+<div class="section">
+    <h2>Depoimentos de Membros <span class="badge badge-media">Prioridade Média</span></h2>
+    <p class="desc">4 depoimentos reais para o carrossel. Hoje são textos genéricos. Forneça nome, cargo, cidade e texto.</p>
+
+    <div class="check-item">
+        <input type="checkbox" id="c6" onchange="updateProgress()">
+        <label for="c6"><strong>Depoimento 1</strong>
+            <span class="file-where">Arquivo: index.html seção #depoimentos</span>
+        </label>
+    </div>
+    <div class="depoimento-card">
+        <h3>Depoimento 1</h3>
+        <div class="field-row">
+            <div class="field"><label>Nome completo</label><input type="text" placeholder="Ex: Maria Silva"></div>
+            <div class="field"><label>Cargo e empresa</label><input type="text" placeholder="Ex: Gerente de CM, Empresa XYZ"></div>
+        </div>
+        <div class="field-row">
+            <div class="field"><label>Cidade</label><input type="text" placeholder="Ex: São Paulo"></div>
+            <div class="field"><label>Foto (arrastar arquivo aqui ou indicar caminho)</label><input type="file" accept="image/*"></div>
+        </div>
+        <div class="field"><label>Texto do depoimento (2-3 frases)</label><textarea placeholder="Ex: A ACMP Brasil transformou minha carreira..."></textarea></div>
+    </div>
+
+    <div class="check-item">
+        <input type="checkbox" id="c7" onchange="updateProgress()">
+        <label for="c7"><strong>Depoimento 2</strong></label>
+    </div>
+    <div class="depoimento-card">
+        <h3>Depoimento 2</h3>
+        <div class="field-row">
+            <div class="field"><label>Nome completo</label><input type="text"></div>
+            <div class="field"><label>Cargo e empresa</label><input type="text"></div>
+        </div>
+        <div class="field-row">
+            <div class="field"><label>Cidade</label><input type="text"></div>
+            <div class="field"><label>Foto</label><input type="file" accept="image/*"></div>
+        </div>
+        <div class="field"><label>Texto do depoimento</label><textarea></textarea></div>
+    </div>
+
+    <div class="check-item">
+        <input type="checkbox" id="c8" onchange="updateProgress()">
+        <label for="c8"><strong>Depoimento 3</strong></label>
+    </div>
+    <div class="depoimento-card">
+        <h3>Depoimento 3</h3>
+        <div class="field-row">
+            <div class="field"><label>Nome completo</label><input type="text"></div>
+            <div class="field"><label>Cargo e empresa</label><input type="text"></div>
+        </div>
+        <div class="field-row">
+            <div class="field"><label>Cidade</label><input type="text"></div>
+            <div class="field"><label>Foto</label><input type="file" accept="image/*"></div>
+        </div>
+        <div class="field"><label>Texto do depoimento</label><textarea></textarea></div>
+    </div>
+
+    <div class="check-item">
+        <input type="checkbox" id="c9" onchange="updateProgress()">
+        <label for="c9"><strong>Depoimento 4</strong></label>
+    </div>
+    <div class="depoimento-card">
+        <h3>Depoimento 4</h3>
+        <div class="field-row">
+            <div class="field"><label>Nome completo</label><input type="text"></div>
+            <div class="field"><label>Cargo e empresa</label><input type="text"></div>
+        </div>
+        <div class="field-row">
+            <div class="field"><label>Cidade</label><input type="text"></div>
+            <div class="field"><label>Foto</label><input type="file" accept="image/*"></div>
+        </div>
+        <div class="field"><label>Texto do depoimento</label><textarea></textarea></div>
+    </div>
+</div>
+
+<!-- ===================== GALERIA DE FOTOS ===================== -->
+<div class="section">
+    <h2>Galeria de Fotos <span class="badge badge-media">Prioridade Média</span></h2>
+    <p class="desc">6 fotos reais de eventos da ACMP Brasil. Hoje usa fotos genéricas do Unsplash. Ideal: resolução mínima 800x600px.</p>
+
+    <div class="check-item">
+        <input type="checkbox" id="c10" onchange="updateProgress()">
+        <label for="c10"><strong>Foto 1 (grande)</strong> - Imagem principal, será exibida em tamanho maior
+            <span class="file-where">Arquivo: index.html seção #galeria | Ideal: 800x500px</span>
+        </label>
+    </div>
+    <div class="field-row">
+        <div class="field"><label>Arquivo da foto</label><input type="file" accept="image/*"></div>
+        <div class="field"><label>Legenda</label><input type="text" placeholder="Ex: Conferência ACMP Brasil 2025"></div>
+    </div>
+
+    <div class="check-item">
+        <input type="checkbox" id="c11" onchange="updateProgress()">
+        <label for="c11"><strong>Fotos 2-6</strong> - 5 fotos menores (workshops, meetups, networking)
+            <span class="file-where">Ideal: 400x300px cada</span>
+        </label>
+    </div>
+    <div class="field">
+        <label>Foto 2</label>
+        <div class="field-row"><input type="file" accept="image/*"><input type="text" placeholder="Legenda"></div>
+    </div>
+    <div class="field">
+        <label>Foto 3</label>
+        <div class="field-row"><input type="file" accept="image/*"><input type="text" placeholder="Legenda"></div>
+    </div>
+    <div class="field">
+        <label>Foto 4</label>
+        <div class="field-row"><input type="file" accept="image/*"><input type="text" placeholder="Legenda"></div>
+    </div>
+    <div class="field">
+        <label>Foto 5</label>
+        <div class="field-row"><input type="file" accept="image/*"><input type="text" placeholder="Legenda"></div>
+    </div>
+    <div class="field">
+        <label>Foto 6</label>
+        <div class="field-row"><input type="file" accept="image/*"><input type="text" placeholder="Legenda"></div>
+    </div>
+</div>
+
+<!-- ===================== PARCEIROS ===================== -->
+<div class="section">
+    <h2>Parceiros e Apoiadores <span class="badge badge-media">Prioridade Média</span></h2>
+    <p class="desc">Logos e nomes de organizações parceiras. Hoje a seção tem cards genéricos.</p>
+
+    <div class="check-item">
+        <input type="checkbox" id="c12" onchange="updateProgress()">
+        <label for="c12"><strong>Lista de parceiros</strong> - Nomes e logos de universidades, empresas, consultorias
+            <span class="file-where">Arquivo: index.html seção #parceiros</span>
+        </label>
+    </div>
+    <div class="field"><label>Parceiro 1 - Nome + Logo (arquivo)</label>
+        <div class="field-row"><input type="text" placeholder="Nome da organização"><input type="file" accept="image/*"></div>
+    </div>
+    <div class="field"><label>Parceiro 2</label>
+        <div class="field-row"><input type="text" placeholder="Nome da organização"><input type="file" accept="image/*"></div>
+    </div>
+    <div class="field"><label>Parceiro 3</label>
+        <div class="field-row"><input type="text" placeholder="Nome da organização"><input type="file" accept="image/*"></div>
+    </div>
+    <div class="field"><label>Parceiro 4</label>
+        <div class="field-row"><input type="text" placeholder="Nome da organização"><input type="file" accept="image/*"></div>
+    </div>
+</div>
+
+<!-- ===================== HISTÓRIA ===================== -->
+<div class="section">
+    <h2>Validação da Timeline <span class="badge badge-media">Prioridade Média</span></h2>
+    <p class="desc">A página de história tem uma timeline que precisa ser validada com datas e fatos reais.</p>
+
+    <div class="check-item">
+        <input type="checkbox" id="c13" onchange="updateProgress()">
+        <label for="c13"><strong>Datas corretas</strong> - Confirmar anos dos marcos na timeline
+            <span class="file-where">Arquivo: pages/historia.html</span>
+        </label>
+    </div>
+    <div class="field"><label>Ano de fundação do capítulo Brasil</label><input type="text" placeholder="Ex: 2018"></div>
+    <div class="field"><label>Primeiro evento presencial (ano e local)</label><input type="text" placeholder="Ex: 2019, São Paulo"></div>
+    <div class="field"><label>Outros marcos importantes</label><textarea placeholder="Liste datas e eventos relevantes que devem constar na timeline..."></textarea></div>
+</div>
+
+<!-- ===================== BRANCHES ===================== -->
+<div class="section">
+    <h2>Branches Regionais <span class="badge badge-baixa">Prioridade Baixa</span></h2>
+    <p class="desc">Status real de cada branch e líderes, se houver.</p>
+
+    <div class="check-item">
+        <input type="checkbox" id="c14" onchange="updateProgress()">
+        <label for="c14"><strong>Status dos branches</strong> - Confirmar quais estão ativos, em formação ou planejados
+            <span class="file-where">Arquivo: pages/branches.html</span>
+        </label>
+    </div>
+    <div class="field"><label>Sudeste - Status e líder (se houver)</label><input type="text" placeholder="Ex: Em formação, líder: João Silva"></div>
+    <div class="field"><label>Sul - Status e líder</label><input type="text" placeholder="Ex: Planejado para 2026"></div>
+    <div class="field"><label>Nordeste - Status e líder</label><input type="text"></div>
+    <div class="field"><label>Centro-Oeste - Status e líder</label><input type="text"></div>
+    <div class="field"><label>Norte - Status e líder</label><input type="text"></div>
+</div>
+
+<!-- ===================== OG IMAGE ===================== -->
+<div class="section">
+    <h2>Imagem para Redes Sociais <span class="badge badge-baixa">Prioridade Baixa</span></h2>
+    <p class="desc">Imagem que aparece quando o site é compartilhado no LinkedIn, WhatsApp, etc.</p>
+
+    <div class="check-item">
+        <input type="checkbox" id="c15" onchange="updateProgress()">
+        <label for="c15"><strong>Open Graph Image</strong> - Imagem 1200x630px com logo e texto da ACMP Brasil
+            <span class="file-where">Arquivo: index.html meta tag og:image | Hoje: foto Unsplash genérica</span>
+        </label>
+    </div>
+    <div class="field"><label>Arquivo da imagem (1200x630px, PNG ou JPG)</label><input type="file" accept="image/*"></div>
+</div>
+
+<!-- ===================== RESUMO ===================== -->
+<div class="section" style="background: #1e3a5f; color: white;">
+    <h2 style="color: white;">Resumo</h2>
+    <p style="color: rgba(255,255,255,0.8); font-size: 0.9rem; margin-top: 10px;">
+        Total: <strong>15 itens</strong> para preencher<br>
+        5 de prioridade alta (dados da organização)<br>
+        8 de prioridade média (depoimentos, fotos, parceiros, história)<br>
+        2 de prioridade baixa (branches, OG image)
+    </p>
+    <button class="btn-export" onclick="window.print()">Imprimir este checklist</button>
+</div>
+
+<script>
+function updateProgress() {
+    var checks = document.querySelectorAll('input[type="checkbox"]');
+    var total = checks.length;
+    var done = 0;
+    checks.forEach(function(c) { if (c.checked) done++; });
+    var pct = Math.round((done / total) * 100);
+    document.getElementById('progress-bar').style.width = pct + '%';
+    document.getElementById('progress-text').textContent = done + ' de ' + total + ' itens concluídos (' + pct + '%)';
+}
+updateProgress();
+</script>
+
+</body>
+</html>
