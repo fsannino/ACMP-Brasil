@@ -189,21 +189,14 @@
         </div>
     </div>
 
+    <script src="../js/supabase.min.js"></script>
     <script>
         var SUPA_URL = 'https://yaumzlssybzoipwmllqy.supabase.co';
         var SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlhdW16bHNzeWJ6b2lwd21sbHF5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU5MTcwMTEsImV4cCI6MjA5MTQ5MzAxMX0.GWK1jnlEmgxWmeWk1VGwR25fLBvquWtrkQ4ipq_A3RU';
         var sb = null;
 
-        var cdns = ['https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js','https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.min.js'];
-        var ci = 0;
-        function loadSDK() {
-            if (ci >= cdns.length) return;
-            var s = document.createElement('script'); s.src = cdns[ci];
-            s.onload = function() { sb = window.supabase.createClient(SUPA_URL, SUPA_KEY); initAdmin(); };
-            s.onerror = function() { ci++; loadSDK(); };
-            document.head.appendChild(s);
-        }
-        loadSDK();
+        sb = window.supabase.createClient(SUPA_URL, SUPA_KEY);
+        initAdmin();
 
         var currentRole = 'member';
 
