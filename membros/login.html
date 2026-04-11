@@ -170,6 +170,16 @@
 
         loadSDK();
 
+        setTimeout(function() {
+            if (!sb) {
+                document.getElementById('loading-msg').innerHTML =
+                    '<span style="color:#d97706;">Carregamento lento. </span>' +
+                    '<a href="javascript:location.reload()" style="color:#1a3a5c;font-weight:600;">Recarregar</a>' +
+                    '<br><br><span style="font-size:0.8rem;color:#999;">Se persistir, tente aba anônima ou outro navegador.</span>';
+                document.getElementById('login-content').style.display = 'block';
+            }
+        }, 8000);
+
         async function checkSession() {
             try {
                 var result = await sb.auth.getSession();
