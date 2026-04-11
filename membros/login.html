@@ -111,25 +111,29 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <script src="../js/supabase-client.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', async function() {
+        document.addEventListener('DOMContentLoaded', function() {
             console.log('Page loaded. Protocol:', window.location.protocol);
             if (window.location.protocol === 'file:') {
                 showError('Este site precisa estar hospedado em um servidor web (ex: Vercel). Não funciona aberto como arquivo local.');
                 return;
             }
-            if (!initSupabase()) {
-                showError('Erro ao conectar com o Supabase. Verifique as credenciais em supabase-client.js.');
-                return;
-            }
-            try {
-                var session = await getSession();
-                if (session) { window.location.href = 'index.html'; }
-            } catch (err) {
-                console.error('Session check error:', err);
-            }
+
+            waitForSupabase(async function(ok) {
+                if (!ok) {
+                    showError('Erro ao carregar o sistema de autenticação. Recarregue a página.');
+                    return;
+                }
+                console.log('Supabase ready!');
+                try {
+                    var session = await getSession();
+                    if (session) { window.location.href = 'index.html'; }
+                } catch (err) {
+                    console.error('Session check error:', err);
+                }
+            });
         });
 
         function showTab(tab) {
