@@ -115,9 +115,21 @@
     <script src="../js/supabase-client.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', async function() {
-            if (!initSupabase()) { showError('Erro ao conectar com o servidor.'); return; }
-            var session = await getSession();
-            if (session) { window.location.href = 'index.html'; }
+            console.log('Page loaded. Protocol:', window.location.protocol);
+            if (window.location.protocol === 'file:') {
+                showError('Este site precisa estar hospedado em um servidor web (ex: Vercel). Não funciona aberto como arquivo local.');
+                return;
+            }
+            if (!initSupabase()) {
+                showError('Erro ao conectar com o Supabase. Verifique as credenciais em supabase-client.js.');
+                return;
+            }
+            try {
+                var session = await getSession();
+                if (session) { window.location.href = 'index.html'; }
+            } catch (err) {
+                console.error('Session check error:', err);
+            }
         });
 
         function showTab(tab) {
@@ -136,12 +148,29 @@
             e.preventDefault();
             var btn = document.getElementById('btn-login');
             btn.disabled = true; btn.textContent = 'Entrando...';
-            var { data, error } = await signIn(
-                document.getElementById('login-email').value,
-                document.getElementById('login-password').value
-            );
-            if (error) { showError(error.message === 'Invalid login credentials' ? 'E-mail ou senha incorretos.' : error.message); btn.disabled = false; btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Entrar'; }
-            else { window.location.href = 'index.html'; }
+            try {
+                var { data, error } = await signIn(
+                    document.getElementById('login-email').value,
+                    document.getElementById('login-password').value
+                );
+                console.log('Login result:', { data, error });
+                if (error) {
+                    var msg = error.message;
+                    if (msg === 'Invalid login credentials') msg = 'E-mail ou senha incorretos.';
+                    if (msg.includes('fetch')) msg = 'Erro de conexão. Verifique se o site está online (não funciona como arquivo local).';
+                    showError(msg);
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Entrar';
+                } else {
+                    showSuccess('Login realizado! Redirecionando...');
+                    setTimeout(function() { window.location.href = 'index.html'; }, 500);
+                }
+            } catch (err) {
+                console.error('Login exception:', err);
+                showError('Erro: ' + err.message + '. O site precisa estar em um servidor web (Vercel), não como arquivo local.');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Entrar';
+            }
         }
 
         async function handleRegister(e) {
