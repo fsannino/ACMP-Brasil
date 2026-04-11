@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nossa História - ACMP Brasil</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231a3a5c'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-family='Arial,sans-serif' font-weight='800' font-size='10' fill='white'%3EACMP%3C/text%3E%3C/svg%3E">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .page-hero { background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 50%, var(--primary-light) 100%); padding: 80px 0 60px; color: white; text-align: center; position: relative; overflow: hidden; }
+        .page-hero::before { content: ''; position: absolute; inset: 0; background: url('https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=1600&q=80') center/cover no-repeat; opacity: 0.1; }
+        .page-hero h1 { font-size: 2.5rem; font-weight: 800; margin-bottom: 16px; position: relative; }
+        .page-hero p { font-size: 1.1rem; opacity: 0.9; max-width: 650px; margin: 0 auto; position: relative; }
+        .page-content { padding: 60px 0; max-width: 900px; margin: 0 auto; }
+        .page-content > p { font-size: 1rem; line-height: 1.8; color: var(--text-body); margin-bottom: 20px; }
+        .back-link { display: inline-flex; align-items: center; gap: 8px; color: var(--primary); font-weight: 600; font-size: 0.9rem; margin-bottom: 30px; }
+        .back-link:hover { gap: 12px; }
+
+        /* Timeline */
+        .timeline { position: relative; padding: 20px 0; margin: 40px 0; }
+        .timeline::before { content: ''; position: absolute; left: 50%; top: 0; bottom: 0; width: 3px; background: linear-gradient(to bottom, var(--primary), var(--primary-light), var(--secondary)); transform: translateX(-50%); border-radius: 3px; }
+        .timeline-item { position: relative; width: 50%; padding: 0 40px 50px; }
+        .timeline-item:nth-child(odd) { left: 0; text-align: right; }
+        .timeline-item:nth-child(even) { left: 50%; }
+        .timeline-dot { position: absolute; top: 8px; width: 18px; height: 18px; background: var(--primary); border: 3px solid white; border-radius: 50%; box-shadow: 0 0 0 3px var(--primary); z-index: 2; }
+        .timeline-item:nth-child(odd) .timeline-dot { right: -9px; }
+        .timeline-item:nth-child(even) .timeline-dot { left: -9px; }
+        .timeline-year { display: inline-block; background: var(--primary); color: white; padding: 4px 14px; border-radius: 50px; font-size: 0.85rem; font-weight: 700; margin-bottom: 10px; }
+        .timeline-card { background: var(--bg-white); padding: 24px; border-radius: var(--radius-md); box-shadow: var(--shadow-sm); border: 1px solid var(--border-light); transition: all 0.3s ease; }
+        .timeline-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+        .timeline-card h3 { font-size: 1.1rem; font-weight: 700; color: var(--text-dark); margin-bottom: 8px; }
+        .timeline-card p { font-size: 0.88rem; color: var(--text-body); line-height: 1.6; margin: 0; }
+        .timeline-card .timeline-icon { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; background: linear-gradient(135deg, rgba(26,58,92,0.1), rgba(42,90,140,0.15)); border-radius: var(--radius-sm); margin-bottom: 12px; color: var(--primary); font-size: 1.1rem; }
+        .timeline-item:nth-child(odd) .timeline-card .timeline-icon { margin-left: auto; }
+
+        /* Context Section */
+        .context-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin: 30px 0; }
+        .context-card { background: var(--bg-white); padding: 28px; border-radius: var(--radius-md); box-shadow: var(--shadow-sm); border-left: 4px solid var(--primary); }
+        .context-card h3 { font-size: 1.05rem; font-weight: 700; color: var(--text-dark); margin-bottom: 8px; }
+        .context-card p { font-size: 0.88rem; color: var(--text-body); line-height: 1.6; }
+
+        /* Quote */
+        .history-quote { background: linear-gradient(135deg, var(--primary-dark), var(--primary)); color: white; padding: 40px; border-radius: var(--radius-lg); text-align: center; margin: 40px 0; }
+        .history-quote blockquote { font-size: 1.2rem; font-style: italic; line-height: 1.7; max-width: 700px; margin: 0 auto 16px; }
+        .history-quote cite { font-size: 0.85rem; opacity: 0.8; font-style: normal; }
+
+        /* CTA */
+        .history-cta { background: var(--bg-light); border-radius: var(--radius-lg); padding: 40px; text-align: center; margin: 40px 0; }
+        .history-cta h3 { font-size: 1.3rem; font-weight: 700; color: var(--text-dark); margin-bottom: 12px; }
+        .history-cta p { color: var(--text-light); margin-bottom: 20px; }
+        .history-cta .btn-group { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+
+        @media (max-width: 768px) {
+            .timeline::before { left: 20px; }
+            .timeline-item { width: 100%; left: 0 !important; padding: 0 0 40px 50px; text-align: left !important; }
+            .timeline-dot { left: 11px !important; right: auto !important; }
+            .timeline-item:nth-child(odd) .timeline-card .timeline-icon { margin-left: 0; }
+            .context-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <div class="container top-bar-content">
+            <div class="top-bar-left">
+                <a href="https://www.acmpglobal.org/" target="_blank" rel="noopener"><i class="fas fa-globe"></i> ACMP Global</a>
+                <a href="https://www.acmpglobal.org/page/acmp-connect" target="_blank" rel="noopener"><i class="fas fa-users"></i> ACMP Connect</a>
+            </div>
+            <div class="top-bar-right">
+                <a href="https://www.acmpglobal.org/page/join_acmp" target="_blank" rel="noopener" class="btn-join">Associe-se</a>
+            </div>
+        </div>
+    </div>
+    <header class="main-header">
+        <div class="container header-content">
+            <a href="../index.html" class="logo">
+                <div class="logo-icon"><span class="logo-letters">ACMP</span></div>
+                <div class="logo-text">
+                    <span class="logo-title">ACMP Brasil</span>
+                    <span class="logo-subtitle">Gestão de Mudanças</span>
+                </div>
+            </a>
+        </div>
+    </header>
+
+    <section class="page-hero">
+        <div class="container">
+            <h1><i class="fas fa-landmark"></i> Nossa História</h1>
+            <p>A trajetória da Gestão de Mudanças no Brasil e a construção do capítulo brasileiro da ACMP.</p>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container page-content">
+            <a href="../index.html" class="back-link"><i class="fas fa-arrow-left"></i> Voltar para a página inicial</a>
+
+            <p>A história da ACMP Brasil se entrelaça com a evolução da própria disciplina de Gestão de Mudanças no país. De uma prática pouco conhecida, restrita a grandes consultorias internacionais, a Gestão de Mudanças se consolidou como uma competência estratégica essencial para organizações brasileiras de todos os portes e setores.</p>
+
+            <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--text-dark); margin: 40px 0 16px;">O contexto brasileiro</h2>
+
+            <div class="context-grid">
+                <div class="context-card">
+                    <h3><i class="fas fa-chart-line" style="color: var(--primary); margin-right: 8px;"></i> Transformação acelerada</h3>
+                    <p>O Brasil, como uma das maiores economias do mundo, passou por ondas intensas de transformação: privatizações nos anos 90, expansão global nos anos 2000, digitalização acelerada a partir de 2015, e a transformação forçada pela pandemia em 2020.</p>
+                </div>
+                <div class="context-card">
+                    <h3><i class="fas fa-users" style="color: var(--primary); margin-right: 8px;"></i> O fator humano</h3>
+                    <p>A cultura brasileira, com sua ênfase em relações pessoais e colaboração, sempre trouxe tanto desafios quanto oportunidades únicas para a gestão do lado humano das mudanças organizacionais.</p>
+                </div>
+                <div class="context-card">
+                    <h3><i class="fas fa-graduation-cap" style="color: var(--primary); margin-right: 8px;"></i> Gap de formação</h3>
+                    <p>Por anos, a Gestão de Mudanças no Brasil foi praticada de forma intuitiva. Faltavam metodologias estruturadas, certificações reconhecidas e uma comunidade profissional organizada.</p>
+                </div>
+                <div class="context-card">
+                    <h3><i class="fas fa-lightbulb" style="color: var(--primary); margin-right: 8px;"></i> Demanda crescente</h3>
+                    <p>Com a aceleração digital e a complexidade crescente das transformações organizacionais, a demanda por profissionais qualificados em Gestão de Mudanças cresceu exponencialmente no mercado brasileiro.</p>
+                </div>
+            </div>
+
+            <div class="history-quote">
+                <blockquote>"A Gestão de Mudanças não é sobre gerenciar a mudança em si, mas sobre preparar, equipar e apoiar as pessoas para que adotem a mudança com sucesso."</blockquote>
+                <cite>- ACMP Standard for Change Management&copy;</cite>
+            </div>
+
+            <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--text-dark); margin: 40px 0 16px; text-align: center;">Linha do Tempo</h2>
+
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-card">
+                        <div class="timeline-icon"><i class="fas fa-globe"></i></div>
+                        <span class="timeline-year">2011</span>
+                        <h3>Fundação da ACMP Global</h3>
+                        <p>A Association of Change Management Professionals (ACMP) é fundada como uma organização global sem fins lucrativos, com a missão de ser a fonte independente de excelência profissional em Gestão de Mudanças.</p>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-card">
+                        <div class="timeline-icon"><i class="fas fa-book"></i></div>
+                        <span class="timeline-year">2014</span>
+                        <h3>ACMP Standard 1&ordf; Edição</h3>
+                        <p>A ACMP publica a primeira edição do Standard for Change Management&copy;, estabelecendo o corpo de conhecimento e as melhores práticas da disciplina em nível global.</p>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-card">
+                        <div class="timeline-icon"><i class="fas fa-certificate"></i></div>
+                        <span class="timeline-year">2016</span>
+                        <h3>Certificação CCMP&reg;</h3>
+                        <p>O programa de certificação CCMP (Certified Change Management Professional) é lançado, criando um padrão internacional de competência profissional. Primeiros brasileiros obtêm a credencial.</p>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-card">
+                        <div class="timeline-icon"><i class="fas fa-flag"></i></div>
+                        <span class="timeline-year">2017-2018</span>
+                        <h3>Primeiros passos no Brasil</h3>
+                        <p>Profissionais brasileiros pioneiros começam a se articular para trazer a ACMP ao Brasil. Encontros informais em São Paulo e Rio de Janeiro reúnem praticantes de Gestão de Mudanças interessados em formalizar uma comunidade.</p>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-card">
+                        <div class="timeline-icon"><i class="fas fa-rocket"></i></div>
+                        <span class="timeline-year">2019</span>
+                        <h3>ACMP Brasil Chapter</h3>
+                        <p>O capítulo brasileiro da ACMP ganha corpo com eventos presenciais, incluindo workshops sobre Gestão de Mudanças em Projetos Ágeis e Transformação Digital. Eventos são realizados em São Paulo e Sorocaba, atraindo profissionais de diversas indústrias.</p>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-card">
+                        <div class="timeline-icon"><i class="fas fa-laptop-house"></i></div>
+                        <span class="timeline-year">2020</span>
+                        <h3>Pandemia e digitalização</h3>
+                        <p>A pandemia de COVID-19 acelera brutalmente a necessidade de Gestão de Mudanças no Brasil. Milhões de profissionais migram para o trabalho remoto. O capítulo Brasil migra para eventos online, ampliando seu alcance para todo o território nacional. Evento sobre "O Caminho das Transformações Organizacionais" marca a adaptação.</p>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-card">
+                        <div class="timeline-icon"><i class="fas fa-book-open"></i></div>
+                        <span class="timeline-year">2021</span>
+                        <h3>Standard 2&ordf; Edição</h3>
+                        <p>A ACMP publica a segunda edição do Standard for Change Management&copy;, incorporando avanços da disciplina. No Brasil, cresce a demanda por treinamento e certificação em gestão de mudanças.</p>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-card">
+                        <div class="timeline-icon"><i class="fas fa-chart-bar"></i></div>
+                        <span class="timeline-year">2022-2023</span>
+                        <h3>Maturidade e crescimento</h3>
+                        <p>O mercado brasileiro de consultoria em gestão de mudanças cresce significativamente. Empresas nacionais e multinacionais operando no Brasil passam a exigir profissionais certificados. O CCMP se consolida como diferencial competitivo no mercado brasileiro.</p>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-card">
+                        <div class="timeline-icon"><i class="fas fa-robot"></i></div>
+                        <span class="timeline-year">2024-2025</span>
+                        <h3>IA e nova era</h3>
+                        <p>A Inteligência Artificial transforma a prática de Gestão de Mudanças. 88% das organizações já utilizam IA em alguma função de negócio. O mercado global de consultoria em CM atinge US$ 2 bilhões, com crescimento de 9% ao ano (CAGR). Profissionais de mudanças se adaptam para liderar transformações cada vez mais complexas.</p>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-card">
+                        <div class="timeline-icon"><i class="fas fa-map-marked-alt"></i></div>
+                        <span class="timeline-year">2026</span>
+                        <h3>Expansão nacional</h3>
+                        <p>A ACMP Brasil lança sua iniciativa de branches regionais, levando a comunidade de Gestão de Mudanças para as 5 regiões do país. Projetos de tradução do Standard para português, FAQ em português, e integração cada vez maior com a rede global de mais de 40 capítulos.</p>
+                    </div>
+                </div>
+            </div>
+
+            <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--text-dark); margin: 40px 0 16px;">O futuro da Gestão de Mudanças no Brasil</h2>
+
+            <p>O Brasil está em um momento decisivo para a profissão de Gestão de Mudanças. A combinação de transformação digital acelerada, pressão por resultados sustentáveis e a crescente complexidade organizacional cria uma demanda sem precedentes por profissionais qualificados.</p>
+
+            <p>Com o mercado global de consultoria em gestão de mudanças projetado para atingir US$ 3,29 bilhões até 2031, e com o Brasil como uma das economias mais dinâmicas do mundo, o potencial de crescimento é enorme. A ACMP Brasil está posicionada para liderar essa evolução, conectando profissionais brasileiros a uma rede global de excelência.</p>
+
+            <p>Nosso compromisso é continuar construindo pontes - entre teoria e prática, entre o global e o local, entre profissionais experientes e a nova geração. Porque no Brasil, como em todo lugar, mudanças bem-sucedidas dependem fundamentalmente das pessoas.</p>
+
+            <div class="history-cta">
+                <h3>Faça parte desta história</h3>
+                <p>A história da ACMP Brasil está sendo escrita agora - e você pode ser parte dela.</p>
+                <div class="btn-group">
+                    <a href="https://www.acmpglobal.org/page/join_acmp" target="_blank" rel="noopener" class="btn btn-primary btn-lg"><i class="fas fa-user-plus"></i> Associe-se</a>
+                    <a href="voluntarios.html" class="btn btn-outline btn-lg"><i class="fas fa-hands-helping"></i> Seja Voluntário</a>
+                    <a href="branches.html" class="btn btn-secondary btn-lg"><i class="fas fa-map-marked-alt"></i> Branches Regionais</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="main-footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <div class="footer-bottom-content">
+                    <p>&copy; 2026 ACMP Brasil - Associação de Profissionais de Gestão de Mudanças.</p>
+                    <div class="footer-bottom-links">
+                        <a href="../index.html">Página Inicial</a>
+                        <a href="https://www.acmpglobal.org/page/about_acmp" target="_blank" rel="noopener">Sobre a ACMP Global</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
