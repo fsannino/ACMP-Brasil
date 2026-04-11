@@ -155,6 +155,72 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
+    // --- Testimonials Carousel ---
+    (function () {
+        var track = document.getElementById('testimonial-track');
+        var dotsContainer = document.getElementById('testimonial-dots');
+        var prevBtn = document.getElementById('testimonial-prev');
+        var nextBtn = document.getElementById('testimonial-next');
+        if (!track || !dotsContainer) return;
+
+        var cards = track.children;
+        var total = cards.length;
+        var current = 0;
+
+        for (var i = 0; i < total; i++) {
+            var dot = document.createElement('div');
+            dot.className = 'testimonial-dot' + (i === 0 ? ' active' : '');
+            dot.dataset.index = i;
+            dot.addEventListener('click', function () { goTo(parseInt(this.dataset.index)); });
+            dotsContainer.appendChild(dot);
+        }
+
+        function goTo(index) {
+            current = index;
+            track.style.transform = 'translateX(-' + (current * 100) + '%)';
+            var dots = dotsContainer.querySelectorAll('.testimonial-dot');
+            dots.forEach(function (d, i) { d.classList.toggle('active', i === current); });
+        }
+
+        if (prevBtn) prevBtn.addEventListener('click', function () { goTo(current <= 0 ? total - 1 : current - 1); });
+        if (nextBtn) nextBtn.addEventListener('click', function () { goTo(current >= total - 1 ? 0 : current + 1); });
+
+        setInterval(function () { goTo(current >= total - 1 ? 0 : current + 1); }, 6000);
+    })();
+
+    // --- Exit Intent Popup ---
+    (function () {
+        if (sessionStorage.getItem('exit-shown') || window.innerWidth < 768) return;
+
+        var popup = document.createElement('div');
+        popup.id = 'exit-popup';
+        popup.innerHTML =
+            '<div class="exit-overlay"></div>' +
+            '<div class="exit-box">' +
+            '<button class="exit-close" id="exit-close"><i class="fas fa-times"></i></button>' +
+            '<div class="exit-icon"><i class="fas fa-hand-paper"></i></div>' +
+            '<h3>Espere! Antes de sair...</h3>' +
+            '<p>Inscreva-se na newsletter da ACMP Brasil e receba conteúdos exclusivos sobre Gestão de Mudanças.</p>' +
+            '<form class="exit-form" action="https://formspree.io/f/xpwdqjkl" method="POST">' +
+            '<input type="hidden" name="_subject" value="Newsletter via Exit Popup - ACMP Brasil">' +
+            '<input type="email" name="email" placeholder="Seu melhor e-mail" required>' +
+            '<button type="submit" class="btn btn-primary">Quero Receber</button>' +
+            '</form>' +
+            '<a href="https://www.acmpglobal.org/page/join_acmp" target="_blank" rel="noopener" class="exit-join">Ou associe-se agora <i class="fas fa-arrow-right"></i></a>' +
+            '</div>';
+        document.body.appendChild(popup);
+
+        document.addEventListener('mouseout', function (e) {
+            if (e.clientY < 5 && !sessionStorage.getItem('exit-shown')) {
+                popup.classList.add('active');
+                sessionStorage.setItem('exit-shown', '1');
+            }
+        });
+
+        popup.querySelector('.exit-overlay').addEventListener('click', function () { popup.classList.remove('active'); });
+        document.getElementById('exit-close').addEventListener('click', function () { popup.classList.remove('active'); });
+    })();
+
     // --- LGPD Cookie Consent ---
     (function () {
         var banner = document.getElementById('cookie-banner');

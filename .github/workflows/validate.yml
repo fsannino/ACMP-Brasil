@@ -1,0 +1,66 @@
+name: Validate HTML & Links
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install html-validate
+        run: npm install -g html-validate
+
+      - name: Validate HTML files
+        run: |
+          echo "=== Validating HTML files ==="
+          ERRORS=0
+          for f in index.html 404.html pages/*.html blog/*.html; do
+            if [ -f "$f" ]; then
+              echo "Checking: $f"
+              html-validate "$f" --config '{"extends":["html-validate:recommended"],"rules":{"no-trailing-whitespace":"off","no-inline-style":"off","attribute-boolean-style":"off","no-raw-characters":"off","heading-level":"off","prefer-native-element":"off"}}' || ERRORS=$((ERRORS + 1))
+            fi
+          done
+          if [ $ERRORS -gt 0 ]; then
+            echo "::warning::$ERRORS files had validation warnings"
+          fi
+          echo "Validation complete"
+
+      - name: Check for broken internal links
+        run: |
+          echo "=== Checking internal links ==="
+          BROKEN=0
+          for f in index.html pages/*.html blog/*.html; do
+            if [ -f "$f" ]; then
+              # Extract href values pointing to local files
+              grep -oP 'href="(?!http|#|mailto|tel|data|javascript)[^"]*"' "$f" | tr -d '"' | while read -r link; do
+                # Resolve relative path
+                DIR=$(dirname "$f")
+                TARGET="$DIR/$link"
+                if [ ! -f "$TARGET" ] && [ ! -f "$link" ]; then
+                  echo "::warning file=$f::Broken link: $link"
+                  BROKEN=$((BROKEN + 1))
+                fi
+              done
+            fi
+          done
+          echo "Link check complete"
+
+      - name: Count pages and assets
+        run: |
+          echo "=== Site Statistics ==="
+          echo "HTML files: $(find . -name '*.html' | wc -l)"
+          echo "CSS files: $(find . -name '*.css' | wc -l)"
+          echo "JS files: $(find . -name '*.js' ! -path './node_modules/*' | wc -l)"
+          echo "Image files: $(find . -name '*.png' -o -name '*.svg' -o -name '*.jpg' | wc -l)"
+          echo "Total size: $(du -sh --exclude=.git --exclude=node_modules . | cut -f1)"

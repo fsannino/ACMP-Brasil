@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog - ACMP Brasil</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="icon" type="image/png" href="../img/logo-acmp-brasil.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .blog-hero { background: linear-gradient(135deg, var(--primary-dark), var(--primary)); padding: 80px 0 50px; color: white; text-align: center; }
+        .blog-hero h1 { font-size: 2.5rem; font-weight: 800; margin-bottom: 12px; }
+        .blog-hero p { opacity: 0.9; font-size: 1.05rem; max-width: 600px; margin: 0 auto; }
+        .blog-content { padding: 60px 0; max-width: 1000px; margin: 0 auto; }
+        .back-link { display: inline-flex; align-items: center; gap: 8px; color: var(--primary); font-weight: 600; font-size: 0.9rem; margin-bottom: 30px; }
+        .back-link:hover { gap: 12px; }
+        .blog-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 28px; }
+        .blog-card { background: var(--bg-white); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm); border: 1px solid var(--border-light); transition: all 0.3s; }
+        .blog-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+        .blog-card-img { height: 180px; background-size: cover; background-position: center; }
+        .blog-card-body { padding: 24px; }
+        .blog-card-meta { display: flex; gap: 14px; margin-bottom: 10px; font-size: 0.78rem; color: var(--text-light); }
+        .blog-card-meta span { display: flex; align-items: center; gap: 4px; }
+        .blog-card-body h2 { font-size: 1.1rem; font-weight: 700; color: var(--text-dark); margin-bottom: 10px; line-height: 1.4; }
+        .blog-card-body h2 a { color: inherit; }
+        .blog-card-body h2 a:hover { color: var(--primary); }
+        .blog-card-body p { font-size: 0.85rem; color: var(--text-light); line-height: 1.6; margin-bottom: 14px; }
+        .blog-read-more { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; font-weight: 600; color: var(--primary); }
+        .blog-read-more:hover { gap: 10px; }
+        .blog-tag { display: inline-block; background: rgba(26,58,92,0.08); color: var(--primary); padding: 3px 10px; border-radius: 50px; font-size: 0.7rem; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <header class="main-header">
+        <div class="container header-content">
+            <a href="../index.html" class="logo">
+                <img src="../img/logo-acmp-brasil.png" alt="ACMP Brasil" style="height: 44px; width: auto; display: block;">
+            </a>
+        </div>
+    </header>
+
+    <section class="blog-hero">
+        <div class="container">
+            <h1><i class="fas fa-pen-fancy"></i> Blog ACMP Brasil</h1>
+            <p>Artigos, insights e reflexões sobre Gestão de Mudanças no contexto brasileiro.</p>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container blog-content">
+            <a href="../index.html" class="back-link"><i class="fas fa-arrow-left"></i> Voltar para a página inicial</a>
+
+            <div class="blog-grid">
+                <div class="blog-card">
+                    <div class="blog-card-img" style="background-image: url('https://images.unsplash.com/photo-1677442136019-21780ecad995?w=600&h=360&fit=crop');"></div>
+                    <div class="blog-card-body">
+                        <div class="blog-card-meta">
+                            <span><i class="fas fa-calendar"></i> Abril, 2026</span>
+                            <span class="blog-tag">IA & CM</span>
+                        </div>
+                        <h2><a href="ia-gestao-mudancas.html">Como a IA está transformando a Gestão de Mudanças</a></h2>
+                        <p>88% das organizações já usam IA. Descubra como profissionais de mudanças estão se adaptando à era da inteligência artificial.</p>
+                        <a href="ia-gestao-mudancas.html" class="blog-read-more">Ler artigo <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+
+                <div class="blog-card">
+                    <div class="blog-card-img" style="background-image: url('https://images.unsplash.com/photo-1552664730-d307ca884978?w=600&h=360&fit=crop');"></div>
+                    <div class="blog-card-body">
+                        <div class="blog-card-meta">
+                            <span><i class="fas fa-calendar"></i> Março, 2026</span>
+                            <span class="blog-tag">Mercado</span>
+                        </div>
+                        <h2><a href="mercado-cm-brasil.html">O mercado de Gestão de Mudanças no Brasil em 2026</a></h2>
+                        <p>Com crescimento de 9% ao ano globalmente, o Brasil se posiciona como um dos mercados mais promissores para profissionais de CM.</p>
+                        <a href="mercado-cm-brasil.html" class="blog-read-more">Ler artigo <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+
+                <div class="blog-card">
+                    <div class="blog-card-img" style="background-image: url('https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=600&h=360&fit=crop');"></div>
+                    <div class="blog-card-body">
+                        <div class="blog-card-meta">
+                            <span><i class="fas fa-calendar"></i> Fevereiro, 2026</span>
+                            <span class="blog-tag">Certificação</span>
+                        </div>
+                        <h2><a href="guia-ccmp.html">Guia completo: como se preparar para o CCMP no Brasil</a></h2>
+                        <p>Tudo que você precisa saber sobre requisitos, treinamento, exame e dicas de profissionais brasileiros certificados.</p>
+                        <a href="guia-ccmp.html" class="blog-read-more">Ler artigo <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="main-footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <div class="footer-bottom-content">
+                    <p>&copy; 2026 ACMP Brasil - Associação de Profissionais de Gestão de Mudanças.</p>
+                    <div class="footer-bottom-links">
+                        <a href="../index.html">Página Inicial</a>
+                        <a href="https://www.acmpglobal.org/" target="_blank" rel="noopener">ACMP Global</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <script src="../js/main.js"></script>
+</body>
+</html>
