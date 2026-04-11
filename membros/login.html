@@ -90,7 +90,27 @@
                         <label>Confirmar senha</label>
                         <input type="password" id="reg-password2" required placeholder="Repita a senha" minlength="6">
                     </div>
+                    <div class="form-group">
+                        <label>Tipo de cadastro</label>
+                        <select id="reg-type" style="width:100%;padding:12px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:'Inter',sans-serif;font-size:0.9rem;background:white;">
+                            <option value="community">Comunidade / Voluntário / Interessado em CM</option>
+                            <option value="member">Sou associado ACMP Global</option>
+                        </select>
+                        <p style="font-size:0.75rem;color:var(--text-light);margin-top:6px;" id="reg-type-hint">
+                            Acesso gratuito a conteúdos selecionados da comunidade.
+                        </p>
+                    </div>
                     <button type="submit" class="btn-submit" id="btn-register"><i class="fas fa-user-plus"></i> Criar Conta</button>
+                    <script>
+                        document.getElementById('reg-type').addEventListener('change', function() {
+                            var hint = document.getElementById('reg-type-hint');
+                            if (this.value === 'member') {
+                                hint.textContent = 'Sua associação será verificada. Acesso completo após aprovação.';
+                            } else {
+                                hint.textContent = 'Acesso gratuito a conteúdos selecionados da comunidade.';
+                            }
+                        });
+                    </script>
                 </form>
             </div>
 
@@ -199,7 +219,7 @@
                     var role = profile.data ? profile.data.role : 'member';
                     console.log('Status:', status, 'Role:', role);
 
-                    if (status === 'active' || role === 'admin') {
+                    if (status === 'active' || status === 'community' || role === 'admin') {
                         showSuccess('Login realizado! Redirecionando...');
                         setTimeout(function() { window.location.href = 'index.html'; }, 500);
                         return;
@@ -234,29 +254,49 @@
             var pw1 = document.getElementById('reg-password').value;
             var pw2 = document.getElementById('reg-password2').value;
             if (pw1 !== pw2) { showError('As senhas não coincidem.'); return; }
+            var regType = document.getElementById('reg-type').value;
             var btn = document.getElementById('btn-register');
             btn.disabled = true; btn.textContent = 'Criando conta...';
             try {
                 var result = await sb.auth.signUp({
                     email: document.getElementById('reg-email').value,
                     password: pw1,
-                    options: { data: { full_name: document.getElementById('reg-name').value } }
+                    options: { data: { full_name: document.getElementById('reg-name').value, reg_type: regType } }
                 });
                 if (result.error) {
                     showError(result.error.message);
                 } else {
-                    // Hide forms, show pending message
-                    document.getElementById('login-content').innerHTML =
-                        '<div style="text-align:center;padding:20px 0;">' +
-                        '<div style="font-size:3rem;color:#d97706;margin-bottom:16px;"><i class="fas fa-clock"></i></div>' +
-                        '<h2 style="font-size:1.3rem;font-weight:700;color:#1a1a2e;margin-bottom:12px;">Inscrição recebida!</h2>' +
-                        '<p style="color:#4a4a5a;font-size:0.92rem;line-height:1.7;margin-bottom:20px;">' +
-                        'Sua solicitação de acesso foi registrada com sucesso.<br><br>' +
-                        '<strong>Próximos passos:</strong><br>' +
-                        'Nossa equipe irá verificar sua associação junto à ACMP Global. ' +
-                        'Você receberá um e-mail assim que seu acesso for liberado.</p>' +
-                        '<div style="background:#fef3c7;border:1px solid #fde68a;border-radius:8px;padding:16px;margin:16px 0;text-align:left;font-size:0.85rem;color:#92400e;">' +
-                        '<strong><i class="fas fa-info-circle"></i> Importante:</strong><br>' +
+                    // Set community status immediately if not member request
+                    if (regType === 'community' && result.data.user) {
+                        await sb.from('member_profiles').update({ membership_status: 'community' }).eq('id', result.data.user.id);
+                    }
+
+                    if (regType === 'community') {
+                        document.getElementById('login-content').innerHTML =
+                            '<div style="text-align:center;padding:20px 0;">' +
+                            '<div style="font-size:3rem;color:#16a34a;margin-bottom:16px;"><i class="fas fa-check-circle"></i></div>' +
+                            '<h2 style="font-size:1.3rem;font-weight:700;color:#1a1a2e;margin-bottom:12px;">Bem-vindo à comunidade!</h2>' +
+                            '<p style="color:#4a4a5a;font-size:0.92rem;line-height:1.7;margin-bottom:20px;">' +
+                            'Sua conta foi criada com sucesso.<br>' +
+                            'Você já pode fazer login e acessar conteúdos da comunidade.</p>' +
+                            '<div style="background:#dcfce7;border:1px solid #bbf7d0;border-radius:8px;padding:16px;margin:16px 0;text-align:left;font-size:0.85rem;color:#16a34a;">' +
+                            '<strong><i class="fas fa-lightbulb"></i> Dica:</strong> Para acesso completo ao conteúdo exclusivo, ' +
+                            '<a href="https://www.acmpglobal.org/page/join_acmp" target="_blank" style="color:#16a34a;font-weight:600;">associe-se à ACMP Global</a>.</div>' +
+                            '<button onclick="location.reload()" style="background:#1a3a5c;color:white;border:none;padding:12px 28px;border-radius:6px;font-size:0.92rem;font-weight:600;cursor:pointer;margin-top:10px;"><i class="fas fa-sign-in-alt"></i> Fazer Login</button>' +
+                            '</div>';
+                    } else {
+                        // Member request - show pending message
+                        document.getElementById('login-content').innerHTML =
+                            '<div style="text-align:center;padding:20px 0;">' +
+                            '<div style="font-size:3rem;color:#d97706;margin-bottom:16px;"><i class="fas fa-clock"></i></div>' +
+                            '<h2 style="font-size:1.3rem;font-weight:700;color:#1a1a2e;margin-bottom:12px;">Inscrição recebida!</h2>' +
+                            '<p style="color:#4a4a5a;font-size:0.92rem;line-height:1.7;margin-bottom:20px;">' +
+                            'Sua solicitação de acesso como <strong>membro ACMP</strong> foi registrada.<br><br>' +
+                            '<strong>Próximos passos:</strong><br>' +
+                            'Nossa equipe irá verificar sua associação junto à ACMP Global. ' +
+                            'Você receberá um e-mail assim que seu acesso for liberado.</p>' +
+                            '<div style="background:#fef3c7;border:1px solid #fde68a;border-radius:8px;padding:16px;margin:16px 0;text-align:left;font-size:0.85rem;color:#92400e;">' +
+                            '<strong><i class="fas fa-info-circle"></i> Importante:</strong><br>' +
                         'O acesso à área exclusiva é restrito a membros ativos da ACMP. ' +
                         'Se você ainda não é associado, <a href="https://www.acmpglobal.org/page/join_acmp" target="_blank" style="color:#d97706;font-weight:600;">associe-se aqui</a>.' +
                         '</div>' +

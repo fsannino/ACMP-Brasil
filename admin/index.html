@@ -138,9 +138,10 @@
                 </div>
                 <div><label>Nível de Acesso</label>
                     <select id="ct-access">
-                        <option value="member">Membros</option>
+                        <option value="community">Comunidade (todos cadastrados)</option>
+                        <option value="member">Membros ACMP (associados)</option>
                         <option value="certified">Apenas CCMP</option>
-                        <option value="public">Público</option>
+                        <option value="public">Público (sem login)</option>
                     </select>
                 </div>
                 <div class="full"><label>Descrição</label><textarea id="ct-desc" rows="2"></textarea></div>
@@ -204,12 +205,27 @@
         }
         loadSDK();
 
+        var currentRole = 'member';
+
         async function initAdmin() {
             var sess = await sb.auth.getSession();
             if (!sess.data.session) { window.location.href = '../membros/login.html'; return; }
             var user = sess.data.session.user;
             var prof = await sb.from('member_profiles').select('role').eq('id', user.id).single();
-            if (!prof.data || prof.data.role !== 'admin') { window.location.href = '../membros/'; return; }
+            if (!prof.data || (prof.data.role !== 'admin' && prof.data.role !== 'moderator')) {
+                window.location.href = '../membros/'; return;
+            }
+            currentRole = prof.data.role;
+
+            // Moderators: hide delete buttons, content management, import
+            if (currentRole === 'moderator') {
+                document.querySelector('.admin-badge').textContent = 'GESTOR';
+                // Hide content and import tabs
+                var tabs = document.querySelectorAll('.admin-tab');
+                if (tabs[1]) tabs[1].style.display = 'none'; // Content tab
+                if (tabs[2]) tabs[2].style.display = 'none'; // Import tab
+            }
+
             await loadAdminData();
         }
 
@@ -230,15 +246,16 @@
             var tbody = document.getElementById('members-tbody');
             if (!data || data.length === 0) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">Nenhum membro</td></tr>'; return; }
             tbody.innerHTML = data.map(function(m) {
-                var badge = { active:'<span style="background:#dcfce7;color:#16a34a;padding:3px 10px;border-radius:50px;font-size:0.75rem;font-weight:600;">Ativo</span>', pending:'<span style="background:#fef3c7;color:#d97706;padding:3px 10px;border-radius:50px;font-size:0.75rem;font-weight:600;">Pendente</span>', expired:'<span style="background:#fee2e2;color:#dc2626;padding:3px 10px;border-radius:50px;font-size:0.75rem;font-weight:600;">Expirado</span>', rejected:'<span style="background:#f3f4f6;color:#6b7280;padding:3px 10px;border-radius:50px;font-size:0.75rem;font-weight:600;">Recusado</span>' };
+                var badge = { active:'<span style="background:#dcfce7;color:#16a34a;padding:3px 10px;border-radius:50px;font-size:0.75rem;font-weight:600;">Ativo</span>', community:'<span style="background:#dbeafe;color:#2563eb;padding:3px 10px;border-radius:50px;font-size:0.75rem;font-weight:600;">Comunidade</span>', pending:'<span style="background:#fef3c7;color:#d97706;padding:3px 10px;border-radius:50px;font-size:0.75rem;font-weight:600;">Pendente</span>', expired:'<span style="background:#fee2e2;color:#dc2626;padding:3px 10px;border-radius:50px;font-size:0.75rem;font-weight:600;">Expirado</span>', rejected:'<span style="background:#f3f4f6;color:#6b7280;padding:3px 10px;border-radius:50px;font-size:0.75rem;font-weight:600;">Recusado</span>' };
                 var dt = m.created_at ? new Date(m.created_at).toLocaleDateString('pt-BR') : '';
                 return '<tr><td><strong>' + (m.full_name || '-') + '</strong></td><td>' + m.email + '</td>' +
                     '<td>' + (m.city ? m.city + (m.state ? ', ' + m.state : '') : '-') + '</td>' +
                     '<td>' + (badge[m.membership_status] || m.membership_status) + '</td>' +
                     '<td>' + (m.ccmp_certified ? '<i class="fas fa-medal" style="color:#d97706;"></i>' : '-') + '</td>' +
                     '<td>' + dt + '</td><td>' +
-                    '<button class="action-btn approve" onclick="setStatus(\'' + m.id + '\',\'active\')"><i class="fas fa-check"></i></button>' +
-                    '<button class="action-btn reject" onclick="setStatus(\'' + m.id + '\',\'rejected\')"><i class="fas fa-times"></i></button>' +
+                    '<button class="action-btn approve" onclick="setStatus(\'' + m.id + '\',\'active\')" title="Aprovar"><i class="fas fa-check"></i></button>' +
+                    '<button class="action-btn" onclick="setStatus(\'' + m.id + '\',\'community\')" title="Comunidade" style="color:#2563eb;border-color:#2563eb;"><i class="fas fa-users"></i></button>' +
+                    (currentRole === 'admin' ? '<button class="action-btn reject" onclick="setStatus(\'' + m.id + '\',\'rejected\')" title="Rejeitar"><i class="fas fa-times"></i></button>' : '') +
                     '</td></tr>';
             }).join('');
         }

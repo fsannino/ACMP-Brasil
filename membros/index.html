@@ -188,9 +188,12 @@
                 document.getElementById('user-name').textContent = currentProfile.full_name || user.email;
                 document.getElementById('welcome-msg').textContent = 'Olá, ' + (currentProfile.full_name || 'Associado') + '!';
 
-                var statusHTML = currentProfile.membership_status === 'active'
-                    ? '<span class="status-badge status-active"><i class="fas fa-check-circle"></i> Membro Ativo</span>'
-                    : '<span class="status-badge status-pending"><i class="fas fa-clock"></i> Associação Pendente</span>';
+                var statusMap = {
+                    active: '<span class="status-badge status-active"><i class="fas fa-check-circle"></i> Membro Ativo</span>',
+                    community: '<span class="status-badge" style="background:rgba(59,130,246,0.15);color:#2563eb;"><i class="fas fa-users"></i> Comunidade</span>',
+                    pending: '<span class="status-badge status-pending"><i class="fas fa-clock"></i> Pendente</span>'
+                };
+                var statusHTML = statusMap[currentProfile.membership_status] || statusMap.pending;
                 document.getElementById('membership-status').innerHTML = statusHTML;
 
                 if (currentProfile.role === 'admin') {
@@ -236,7 +239,9 @@
             var icon = icons[item.content_type] || 'fas fa-file';
             var color = colors[item.content_type] || '#666';
             var url = item.file_url || item.external_url || '#';
-            return '<div class="content-card" onclick="accessContent(' + item.id + ',\'' + url + '\',\'' + item.content_type + '\')" style="position:relative;">' +
+            var levelBadges = { community:'<span style="position:absolute;top:10px;left:10px;background:#dbeafe;color:#2563eb;padding:2px 8px;border-radius:50px;font-size:0.6rem;font-weight:700;">COMUNIDADE</span>', member:'<span style="position:absolute;top:10px;left:10px;background:#dcfce7;color:#16a34a;padding:2px 8px;border-radius:50px;font-size:0.6rem;font-weight:700;">MEMBRO</span>', certified:'<span style="position:absolute;top:10px;left:10px;background:#fef3c7;color:#d97706;padding:2px 8px;border-radius:50px;font-size:0.6rem;font-weight:700;">CCMP</span>' };
+            var levelBadge = levelBadges[item.access_level] || '';
+            return '<div class="content-card" onclick="accessContent(' + item.id + ',\'' + url + '\',\'' + item.content_type + '\',\'' + item.access_level + '\')" style="position:relative;">' + levelBadge +
                 (item.is_featured ? '<div class="featured-badge"><i class="fas fa-star"></i> Destaque</div>' : '') +
                 '<div class="card-icon" style="background:' + color + ';"><i class="' + icon + '"></i></div>' +
                 '<h3>' + item.title + '</h3><p>' + (item.description || '') + '</p>' +
@@ -244,8 +249,17 @@
                 '<span><i class="fas fa-download"></i> ' + (item.download_count || 0) + '</span></div></div>';
         }
 
-        function accessContent(id, url, type) {
-            if (currentProfile && currentProfile.membership_status !== 'active' && currentProfile.role !== 'admin') {
+        function accessContent(id, url, type, accessLevel) {
+            var userStatus = currentProfile ? currentProfile.membership_status : 'pending';
+            var userRole = currentProfile ? currentProfile.role : 'member';
+            if (userRole === 'admin') { /* admin sees all */ }
+            else if (accessLevel === 'member' && userStatus === 'community') {
+                alert('Este conteúdo é exclusivo para membros ACMP.\n\nAssine em acmpglobal.org/page/join_acmp para acesso completo.');
+                return;
+            } else if (accessLevel === 'certified' && !currentProfile.ccmp_certified) {
+                alert('Este conteúdo é exclusivo para profissionais com certificação CCMP.');
+                return;
+            } else if (userStatus === 'pending') {
                 alert('Seu acesso está pendente de aprovação.');
                 return;
             }
