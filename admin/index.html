@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - ACMP Brasil</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="icon" type="image/png" href="../img/logo-acmp-brasil.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body { background: var(--bg-light); }
+        .admin-header { background: #1a1a2e; padding: 14px 0; }
+        .admin-header-inner { display: flex; justify-content: space-between; align-items: center; }
+        .admin-header .admin-badge { background: #e74c3c; color: white; padding: 4px 12px; border-radius: 50px; font-size: 0.72rem; font-weight: 700; margin-left: 10px; }
+        .admin-header .header-actions a, .admin-header .header-actions button { color: rgba(255,255,255,0.7); background: none; border: 1px solid rgba(255,255,255,0.2); padding: 6px 14px; border-radius: var(--radius-sm); font-size: 0.8rem; cursor: pointer; text-decoration: none; font-family: var(--font-main); }
+        .admin-header .header-actions { display: flex; gap: 8px; }
+        .admin { max-width: 1100px; margin: 0 auto; padding: 30px 20px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 30px; }
+        .stat-card { background: var(--bg-white); padding: 24px; border-radius: var(--radius-md); box-shadow: var(--shadow-sm); }
+        .stat-card .stat-icon { width: 44px; height: 44px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; color: white; margin-bottom: 12px; }
+        .stat-card .stat-val { font-size: 2rem; font-weight: 800; color: var(--text-dark); }
+        .stat-card .stat-lbl { font-size: 0.8rem; color: var(--text-light); margin-top: 4px; }
+        .admin-tabs { display: flex; gap: 4px; margin-bottom: 20px; border-bottom: 2px solid var(--border); }
+        .admin-tab { padding: 12px 20px; font-weight: 600; font-size: 0.88rem; cursor: pointer; color: var(--text-light); border-bottom: 2px solid transparent; margin-bottom: -2px; background: none; border-top: none; border-left: none; border-right: none; font-family: var(--font-main); }
+        .admin-tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+        .admin-panel { background: var(--bg-white); border-radius: var(--radius-lg); padding: 28px; box-shadow: var(--shadow-sm); }
+        .admin-panel h3 { font-size: 1.1rem; font-weight: 700; color: var(--text-dark); margin-bottom: 16px; }
+        table.admin-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        table.admin-table th { background: var(--bg-light); padding: 12px 14px; text-align: left; font-weight: 600; color: var(--text-dark); border-bottom: 2px solid var(--border); }
+        table.admin-table td { padding: 12px 14px; border-bottom: 1px solid var(--border-light); color: var(--text-body); }
+        table.admin-table tr:hover { background: var(--bg-light); }
+        .action-btn { padding: 4px 10px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: white; cursor: pointer; font-size: 0.78rem; font-family: var(--font-main); margin: 0 2px; transition: all 0.2s; }
+        .action-btn:hover { background: var(--bg-light); }
+        .action-btn.approve { color: #16a34a; border-color: #16a34a; }
+        .action-btn.reject { color: #dc2626; border-color: #dc2626; }
+        .csv-upload { border: 2px dashed var(--border); border-radius: var(--radius-md); padding: 30px; text-align: center; margin: 16px 0; cursor: pointer; transition: all 0.2s; }
+        .csv-upload:hover { border-color: var(--primary); background: rgba(26,58,92,0.02); }
+        .csv-upload i { font-size: 2rem; color: var(--text-light); margin-bottom: 10px; }
+        .csv-upload p { font-size: 0.88rem; color: var(--text-light); }
+        .content-form { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .content-form .full { grid-column: 1 / -1; }
+        .content-form input, .content-form select, .content-form textarea { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-family: var(--font-main); font-size: 0.88rem; }
+        .content-form label { display: block; font-size: 0.82rem; font-weight: 600; color: var(--text-dark); margin-bottom: 4px; }
+        .alert-admin { padding: 12px 16px; border-radius: var(--radius-sm); font-size: 0.85rem; margin-bottom: 16px; }
+        @media (max-width: 768px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } .content-form { grid-template-columns: 1fr; } .admin-header-inner { flex-direction: column; gap: 10px; } }
+    </style>
+</head>
+<body>
+    <div class="admin-header">
+        <div class="container admin-header-inner">
+            <div style="display: flex; align-items: center;">
+                <a href="../index.html"><img src="../img/logo-acmp-brasil-white.png" alt="ACMP Brasil" style="height: 30px;"></a>
+                <span class="admin-badge"><i class="fas fa-shield-alt"></i> ADMIN</span>
+            </div>
+            <div class="header-actions">
+                <a href="../membros/"><i class="fas fa-users"></i> Área do Membro</a>
+                <button onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> Sair</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="admin">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon" style="background: #3b82f6;"><i class="fas fa-users"></i></div>
+                <div class="stat-val" id="stat-total">-</div>
+                <div class="stat-lbl">Total de Membros</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background: #16a34a;"><i class="fas fa-check-circle"></i></div>
+                <div class="stat-val" id="stat-active">-</div>
+                <div class="stat-lbl">Membros Ativos</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background: #d97706;"><i class="fas fa-clock"></i></div>
+                <div class="stat-val" id="stat-pending">-</div>
+                <div class="stat-lbl">Pendentes</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background: #8b5cf6;"><i class="fas fa-file-alt"></i></div>
+                <div class="stat-val" id="stat-content">-</div>
+                <div class="stat-lbl">Conteúdos</div>
+            </div>
+        </div>
+
+        <div class="admin-tabs">
+            <button class="admin-tab active" onclick="showAdminTab('members')"><i class="fas fa-users"></i> Membros</button>
+            <button class="admin-tab" onclick="showAdminTab('content')"><i class="fas fa-folder"></i> Conteúdo</button>
+            <button class="admin-tab" onclick="showAdminTab('import')"><i class="fas fa-file-csv"></i> Importar CSV</button>
+        </div>
+
+        <!-- Members Panel -->
+        <div class="admin-panel" id="panel-members">
+            <h3>Gerenciar Membros</h3>
+            <div id="admin-alert" class="alert-admin" style="display: none;"></div>
+            <div style="overflow-x: auto;">
+                <table class="admin-table">
+                    <thead>
+                        <tr><th>Nome</th><th>E-mail</th><th>Cidade</th><th>Status</th><th>CCMP</th><th>Desde</th><th>Ações</th></tr>
+                    </thead>
+                    <tbody id="members-tbody">
+                        <tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text-light);">Carregando...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Content Panel -->
+        <div class="admin-panel" id="panel-content" style="display: none;">
+            <h3>Adicionar Conteúdo Exclusivo</h3>
+            <form class="content-form" onsubmit="handleAddContent(event)">
+                <div><label>Título *</label><input type="text" id="ct-title" required></div>
+                <div><label>Tipo *</label>
+                    <select id="ct-type" required>
+                        <option value="pdf">PDF / Documento</option>
+                        <option value="video">Vídeo</option>
+                        <option value="webinar">Webinar Gravado</option>
+                        <option value="article">Artigo</option>
+                        <option value="template">Template</option>
+                        <option value="game">Jogo Online</option>
+                        <option value="tool">Ferramenta</option>
+                    </select>
+                </div>
+                <div><label>Categoria *</label>
+                    <select id="ct-category" required>
+                        <option value="standard">Standard ACMP</option>
+                        <option value="certificacao">Certificação</option>
+                        <option value="webinars">Webinars</option>
+                        <option value="ferramentas">Ferramentas</option>
+                        <option value="jogos">Jogos</option>
+                        <option value="artigos">Artigos</option>
+                        <option value="templates">Templates</option>
+                    </select>
+                </div>
+                <div><label>Nível de Acesso</label>
+                    <select id="ct-access">
+                        <option value="member">Membros</option>
+                        <option value="certified">Apenas CCMP</option>
+                        <option value="public">Público</option>
+                    </select>
+                </div>
+                <div class="full"><label>Descrição</label><textarea id="ct-desc" rows="2"></textarea></div>
+                <div><label>URL do arquivo / link externo</label><input type="url" id="ct-url" placeholder="https://..."></div>
+                <div><label>Destaque?</label>
+                    <select id="ct-featured"><option value="false">Não</option><option value="true">Sim</option></select>
+                </div>
+                <div class="full"><button type="submit" class="btn btn-primary" style="width:100%;"><i class="fas fa-plus"></i> Adicionar Conteúdo</button></div>
+            </form>
+            <div id="content-alert" style="margin-top: 12px; display: none;"></div>
+
+            <h3 style="margin-top: 30px;">Conteúdos Existentes</h3>
+            <div style="overflow-x: auto;">
+                <table class="admin-table">
+                    <thead><tr><th>Título</th><th>Tipo</th><th>Categoria</th><th>Acesso</th><th>Downloads</th><th>Ações</th></tr></thead>
+                    <tbody id="content-tbody"><tr><td colspan="6" style="text-align:center;padding:30px;">Carregando...</td></tr></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Import Panel -->
+        <div class="admin-panel" id="panel-import" style="display: none;">
+            <h3>Importar Membros do ACMP Global (CSV)</h3>
+            <p style="color: var(--text-light); font-size: 0.88rem; margin-bottom: 16px;">
+                Exporte a lista de membros do ACMP Global e faça upload aqui. O sistema sincroniza automaticamente o status de cada membro.
+            </p>
+            <p style="color: var(--text-body); font-size: 0.85rem; margin-bottom: 20px;">
+                <strong>Formato esperado do CSV:</strong><br>
+                <code style="background: var(--bg-light); padding: 8px 12px; border-radius: 4px; display: block; margin-top: 8px; font-size: 0.82rem;">
+                    email,full_name,acmp_member_id,membership_type,expiry_date,ccmp_status
+                </code>
+            </p>
+
+            <div class="csv-upload" onclick="document.getElementById('csv-file').click();">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <p>Clique para selecionar arquivo CSV ou arraste aqui</p>
+                <input type="file" id="csv-file" accept=".csv" style="display:none;" onchange="handleCSVUpload(event)">
+            </div>
+            <div id="import-alert" style="display: none; margin-top: 12px;"></div>
+
+            <div style="margin-top: 20px;">
+                <button class="btn btn-primary" onclick="handleSync()"><i class="fas fa-sync"></i> Sincronizar Membros Importados</button>
+                <p style="font-size: 0.78rem; color: var(--text-light); margin-top: 8px;">Atualiza o status dos membros cadastrados com base nos dados importados do ACMP Global.</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../js/supabase-client.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+            if (!initSupabase()) return;
+            if (!await requireAuth()) return;
+            if (!await requireAdmin()) return;
+            await loadAdminData();
+        });
+
+        async function loadAdminData() {
+            var stats = await getContentStats();
+            document.getElementById('stat-total').textContent = stats.totalMembers;
+            document.getElementById('stat-active').textContent = stats.activeMembers;
+            document.getElementById('stat-pending').textContent = stats.totalMembers - stats.activeMembers;
+
+            var { data: contentList } = await getExclusiveContent('all');
+            document.getElementById('stat-content').textContent = contentList ? contentList.length : 0;
+
+            await loadMembersTable();
+            await loadContentTable();
+        }
+
+        async function loadMembersTable() {
+            var { data } = await getAllMembers();
+            var tbody = document.getElementById('members-tbody');
+            if (!data || data.length === 0) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">Nenhum membro</td></tr>'; return; }
+            tbody.innerHTML = data.map(function(m) {
+                return '<tr>' +
+                    '<td><strong>' + (m.full_name || '-') + '</strong></td>' +
+                    '<td>' + m.email + '</td>' +
+                    '<td>' + (m.city ? m.city + (m.state ? ', ' + m.state : '') : '-') + '</td>' +
+                    '<td>' + getStatusBadge(m.membership_status) + '</td>' +
+                    '<td>' + (m.ccmp_certified ? '<i class="fas fa-medal" style="color:#d97706;"></i>' : '-') + '</td>' +
+                    '<td>' + formatDate(m.created_at) + '</td>' +
+                    '<td>' +
+                    '<button class="action-btn approve" onclick="setStatus(\'' + m.id + '\',\'active\')"><i class="fas fa-check"></i></button>' +
+                    '<button class="action-btn reject" onclick="setStatus(\'' + m.id + '\',\'expired\')"><i class="fas fa-times"></i></button>' +
+                    '</td></tr>';
+            }).join('');
+        }
+
+        async function loadContentTable() {
+            var { data } = await getExclusiveContent('all');
+            var tbody = document.getElementById('content-tbody');
+            if (!data || data.length === 0) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Nenhum conteúdo</td></tr>'; return; }
+            tbody.innerHTML = data.map(function(c) {
+                return '<tr>' +
+                    '<td><strong>' + c.title + '</strong></td>' +
+                    '<td><i class="' + getContentIcon(c.content_type) + '" style="color:' + getContentColor(c.content_type) + ';"></i> ' + c.content_type + '</td>' +
+                    '<td>' + getCategoryLabel(c.category) + '</td>' +
+                    '<td>' + c.access_level + '</td>' +
+                    '<td>' + (c.download_count || 0) + '</td>' +
+                    '<td><button class="action-btn reject" onclick="removeContent(' + c.id + ')"><i class="fas fa-trash"></i></button></td>' +
+                    '</tr>';
+            }).join('');
+        }
+
+        async function setStatus(userId, status) {
+            await updateMemberStatus(userId, status);
+            showAlert('admin-alert', 'Status atualizado!', 'success');
+            await loadMembersTable();
+            await loadAdminData();
+        }
+
+        async function handleAddContent(e) {
+            e.preventDefault();
+            var { data, error } = await addContent({
+                title: document.getElementById('ct-title').value,
+                content_type: document.getElementById('ct-type').value,
+                category: document.getElementById('ct-category').value,
+                access_level: document.getElementById('ct-access').value,
+                description: document.getElementById('ct-desc').value,
+                file_url: document.getElementById('ct-url').value,
+                is_featured: document.getElementById('ct-featured').value === 'true'
+            });
+            if (error) { showAlert('content-alert', 'Erro: ' + error.message, 'error'); }
+            else { showAlert('content-alert', 'Conteúdo adicionado!', 'success'); e.target.reset(); await loadContentTable(); await loadAdminData(); }
+        }
+
+        async function removeContent(id) {
+            if (!confirm('Remover este conteúdo?')) return;
+            await deleteContent(id);
+            await loadContentTable();
+            await loadAdminData();
+        }
+
+        async function handleCSVUpload(e) {
+            var file = e.target.files[0];
+            if (!file) return;
+            var reader = new FileReader();
+            reader.onload = async function(ev) {
+                var { count, error } = await importMembersCSV(ev.target.result);
+                if (error) { showAlert('import-alert', 'Erro: ' + error.message, 'error'); }
+                else { showAlert('import-alert', count + ' membros importados com sucesso!', 'success'); }
+            };
+            reader.readAsText(file);
+        }
+
+        async function handleSync() {
+            var { synced, error } = await syncImportedMembers();
+            if (error) { showAlert('import-alert', 'Erro: ' + error.message, 'error'); }
+            else { showAlert('import-alert', (synced || 0) + ' membros sincronizados!', 'success'); await loadMembersTable(); await loadAdminData(); }
+        }
+
+        function showAdminTab(tab) {
+            document.querySelectorAll('.admin-tab').forEach(function(t) { t.classList.remove('active'); });
+            event.target.classList.add('active');
+            document.getElementById('panel-members').style.display = tab === 'members' ? 'block' : 'none';
+            document.getElementById('panel-content').style.display = tab === 'content' ? 'block' : 'none';
+            document.getElementById('panel-import').style.display = tab === 'import' ? 'block' : 'none';
+        }
+
+        function showAlert(id, msg, type) {
+            var el = document.getElementById(id);
+            el.style.display = 'block';
+            el.style.background = type === 'success' ? '#dcfce7' : '#fee2e2';
+            el.style.color = type === 'success' ? '#16a34a' : '#dc2626';
+            el.style.padding = '12px'; el.style.borderRadius = '8px';
+            el.textContent = msg;
+            setTimeout(function() { el.style.display = 'none'; }, 4000);
+        }
+
+        async function handleLogout() { await signOut(); }
+    </script>
+</body>
+</html>

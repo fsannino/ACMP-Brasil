@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Área do Associado - ACMP Brasil</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="icon" type="image/png" href="../img/logo-acmp-brasil.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body { background: var(--bg-light); }
+        .member-header { background: var(--primary-dark); padding: 14px 0; }
+        .member-header-inner { display: flex; justify-content: space-between; align-items: center; }
+        .member-header .user-info { display: flex; align-items: center; gap: 12px; color: white; font-size: 0.88rem; }
+        .member-header .user-avatar { width: 36px; height: 36px; background: rgba(255,255,255,0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; }
+        .member-header .header-actions { display: flex; gap: 10px; }
+        .member-header .header-actions a, .member-header .header-actions button { color: rgba(255,255,255,0.8); background: none; border: 1px solid rgba(255,255,255,0.2); padding: 6px 14px; border-radius: var(--radius-sm); font-size: 0.8rem; cursor: pointer; text-decoration: none; font-family: var(--font-main); transition: all 0.2s; }
+        .member-header .header-actions a:hover, .member-header .header-actions button:hover { background: rgba(255,255,255,0.1); color: white; }
+        .dashboard { max-width: 1100px; margin: 0 auto; padding: 30px 20px; }
+        .welcome-banner { background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: white; border-radius: var(--radius-lg); padding: 30px 36px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; }
+        .welcome-banner h1 { font-size: 1.5rem; font-weight: 700; }
+        .welcome-banner p { opacity: 0.9; font-size: 0.92rem; margin-top: 6px; }
+        .status-badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 16px; border-radius: 50px; font-size: 0.8rem; font-weight: 600; }
+        .status-active { background: rgba(255,255,255,0.2); color: white; }
+        .status-pending { background: #fef3c7; color: #92400e; }
+        .section-title { font-size: 1.15rem; font-weight: 700; color: var(--text-dark); margin: 30px 0 16px; display: flex; align-items: center; gap: 10px; }
+        .section-title i { color: var(--primary); }
+        .content-filters { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+        .filter-btn { padding: 8px 16px; border-radius: 50px; border: 1px solid var(--border); background: var(--bg-white); color: var(--text-body); font-size: 0.82rem; font-weight: 500; cursor: pointer; font-family: var(--font-main); transition: all 0.2s; }
+        .filter-btn.active, .filter-btn:hover { background: var(--primary); color: white; border-color: var(--primary); }
+        .content-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
+        .content-card { background: var(--bg-white); border-radius: var(--radius-md); padding: 24px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-light); transition: all 0.3s; cursor: pointer; }
+        .content-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+        .content-card .card-icon { width: 48px; height: 48px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; color: white; margin-bottom: 14px; }
+        .content-card h3 { font-size: 0.95rem; font-weight: 700; color: var(--text-dark); margin-bottom: 6px; }
+        .content-card p { font-size: 0.82rem; color: var(--text-light); line-height: 1.5; margin-bottom: 12px; }
+        .content-card .card-meta { display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; color: var(--text-light); }
+        .content-card .card-type { padding: 3px 8px; border-radius: 50px; font-weight: 600; font-size: 0.7rem; }
+        .featured-badge { position: absolute; top: 10px; right: 10px; background: var(--secondary); color: var(--primary-dark); padding: 2px 8px; border-radius: 50px; font-size: 0.65rem; font-weight: 700; }
+        .profile-card { background: var(--bg-white); border-radius: var(--radius-lg); padding: 28px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-light); }
+        .profile-field { margin-bottom: 14px; }
+        .profile-field label { display: block; font-size: 0.82rem; font-weight: 600; color: var(--text-dark); margin-bottom: 4px; }
+        .profile-field input { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-family: var(--font-main); font-size: 0.88rem; }
+        .profile-field input:focus { outline: none; border-color: var(--primary); }
+        .empty-state { text-align: center; padding: 60px 20px; color: var(--text-light); }
+        .empty-state i { font-size: 3rem; opacity: 0.2; margin-bottom: 16px; }
+        .loading { text-align: center; padding: 40px; color: var(--text-light); }
+        @media (max-width: 768px) { .welcome-banner { flex-direction: column; text-align: center; } .member-header-inner { flex-direction: column; gap: 10px; } }
+    </style>
+</head>
+<body>
+    <!-- Member Header -->
+    <div class="member-header">
+        <div class="container member-header-inner">
+            <a href="../index.html"><img src="../img/logo-acmp-brasil-white.png" alt="ACMP Brasil" style="height: 32px;"></a>
+            <div class="user-info">
+                <div class="user-avatar"><i class="fas fa-user"></i></div>
+                <span id="user-name">Carregando...</span>
+            </div>
+            <div class="header-actions">
+                <a href="../index.html"><i class="fas fa-home"></i> Site</a>
+                <a href="#perfil" onclick="showSection('profile')"><i class="fas fa-user-cog"></i> Perfil</a>
+                <button onclick="handleLogout()" id="admin-link" style="display:none;"><i class="fas fa-shield-alt"></i> Admin</button>
+                <button onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> Sair</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard">
+        <!-- Welcome Banner -->
+        <div class="welcome-banner">
+            <div>
+                <h1 id="welcome-msg">Bem-vindo!</h1>
+                <p>Acesse conteúdos exclusivos, ferramentas e jogos para membros ACMP Brasil.</p>
+            </div>
+            <div id="membership-status"></div>
+        </div>
+
+        <!-- Content Section -->
+        <div id="content-section">
+            <h2 class="section-title"><i class="fas fa-star"></i> Conteúdo em Destaque</h2>
+            <div id="featured-grid" class="content-grid">
+                <div class="loading"><i class="fas fa-spinner fa-spin"></i> Carregando...</div>
+            </div>
+
+            <h2 class="section-title"><i class="fas fa-folder-open"></i> Biblioteca Completa</h2>
+            <div class="content-filters" id="content-filters">
+                <button class="filter-btn active" onclick="filterContent('all')">Todos</button>
+                <button class="filter-btn" onclick="filterContent('standard')"><i class="fas fa-book"></i> Standard</button>
+                <button class="filter-btn" onclick="filterContent('certificacao')"><i class="fas fa-medal"></i> Certificação</button>
+                <button class="filter-btn" onclick="filterContent('webinars')"><i class="fas fa-video"></i> Webinars</button>
+                <button class="filter-btn" onclick="filterContent('templates')"><i class="fas fa-file-alt"></i> Templates</button>
+                <button class="filter-btn" onclick="filterContent('jogos')"><i class="fas fa-gamepad"></i> Jogos</button>
+                <button class="filter-btn" onclick="filterContent('artigos')"><i class="fas fa-newspaper"></i> Artigos</button>
+            </div>
+            <div id="content-grid" class="content-grid">
+                <div class="loading"><i class="fas fa-spinner fa-spin"></i> Carregando...</div>
+            </div>
+        </div>
+
+        <!-- Profile Section (hidden by default) -->
+        <div id="profile-section" style="display:none;">
+            <h2 class="section-title"><i class="fas fa-user-cog"></i> Meu Perfil</h2>
+            <div class="profile-card" style="max-width: 600px;">
+                <form id="profile-form" onsubmit="handleProfileUpdate(event)">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+                        <div class="profile-field">
+                            <label>Nome completo</label>
+                            <input type="text" id="prof-name">
+                        </div>
+                        <div class="profile-field">
+                            <label>E-mail</label>
+                            <input type="email" id="prof-email" disabled style="background: var(--bg-light);">
+                        </div>
+                        <div class="profile-field">
+                            <label>Cidade</label>
+                            <input type="text" id="prof-city" placeholder="Ex: São Paulo">
+                        </div>
+                        <div class="profile-field">
+                            <label>Estado</label>
+                            <input type="text" id="prof-state" placeholder="Ex: SP">
+                        </div>
+                        <div class="profile-field">
+                            <label>Telefone</label>
+                            <input type="tel" id="prof-phone" placeholder="(11) 99999-9999">
+                        </div>
+                        <div class="profile-field">
+                            <label>LinkedIn</label>
+                            <input type="url" id="prof-linkedin" placeholder="https://linkedin.com/in/...">
+                        </div>
+                        <div class="profile-field">
+                            <label>ID Membro ACMP Global</label>
+                            <input type="text" id="prof-acmpid" placeholder="Se tiver">
+                        </div>
+                        <div class="profile-field">
+                            <label>CCMP Certificado?</label>
+                            <select id="prof-ccmp" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:var(--font-main);">
+                                <option value="false">Não</option>
+                                <option value="true">Sim</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="margin-top: 16px; width: 100%;"><i class="fas fa-save"></i> Salvar Perfil</button>
+                </form>
+                <div id="profile-alert" style="margin-top: 12px; display: none;"></div>
+            </div>
+            <button onclick="showSection('content')" class="btn btn-outline" style="margin-top: 16px;"><i class="fas fa-arrow-left"></i> Voltar ao conteúdo</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../js/supabase-client.js"></script>
+    <script>
+        var currentProfile = null;
+
+        document.addEventListener('DOMContentLoaded', async function() {
+            if (!initSupabase()) return;
+            if (!await requireAuth()) return;
+            await loadDashboard();
+        });
+
+        async function loadDashboard() {
+            currentProfile = await getProfile();
+            var user = await getUser();
+
+            if (currentProfile) {
+                document.getElementById('user-name').textContent = currentProfile.full_name || user.email;
+                document.getElementById('welcome-msg').textContent = 'Olá, ' + (currentProfile.full_name || 'Associado') + '!';
+
+                var statusHTML = currentProfile.membership_status === 'active'
+                    ? '<span class="status-badge status-active"><i class="fas fa-check-circle"></i> Membro Ativo</span>'
+                    : '<span class="status-badge status-pending"><i class="fas fa-clock"></i> Associação Pendente</span>';
+                document.getElementById('membership-status').innerHTML = statusHTML;
+
+                if (currentProfile.role === 'admin') {
+                    var adminLink = document.getElementById('admin-link');
+                    adminLink.style.display = 'inline-flex';
+                    adminLink.onclick = function() { window.location.href = '../admin/index.html'; };
+                }
+
+                // Load profile form
+                document.getElementById('prof-name').value = currentProfile.full_name || '';
+                document.getElementById('prof-email').value = currentProfile.email || '';
+                document.getElementById('prof-city').value = currentProfile.city || '';
+                document.getElementById('prof-state').value = currentProfile.state || '';
+                document.getElementById('prof-phone').value = currentProfile.phone || '';
+                document.getElementById('prof-linkedin').value = currentProfile.linkedin || '';
+                document.getElementById('prof-acmpid').value = currentProfile.acmp_member_id || '';
+                document.getElementById('prof-ccmp').value = currentProfile.ccmp_certified ? 'true' : 'false';
+            }
+
+            await loadFeaturedContent();
+            await loadAllContent('all');
+        }
+
+        async function loadFeaturedContent() {
+            var { data } = await getFeaturedContent();
+            var grid = document.getElementById('featured-grid');
+            if (!data || data.length === 0) {
+                grid.innerHTML = '<div class="empty-state"><i class="fas fa-star"></i><p>Nenhum conteúdo em destaque</p></div>';
+                return;
+            }
+            grid.innerHTML = data.map(renderContentCard).join('');
+        }
+
+        async function loadAllContent(category) {
+            var { data } = await getExclusiveContent(category);
+            var grid = document.getElementById('content-grid');
+            if (!data || data.length === 0) {
+                grid.innerHTML = '<div class="empty-state"><i class="fas fa-folder-open"></i><p>Nenhum conteúdo nesta categoria</p></div>';
+                return;
+            }
+            grid.innerHTML = data.map(renderContentCard).join('');
+        }
+
+        function renderContentCard(item) {
+            var icon = getContentIcon(item.content_type);
+            var color = getContentColor(item.content_type);
+            var url = item.file_url || item.external_url || '#';
+            return '<div class="content-card" onclick="accessContent(' + item.id + ', \'' + url + '\', \'' + item.content_type + '\')" style="position:relative;">' +
+                (item.is_featured ? '<div class="featured-badge"><i class="fas fa-star"></i> Destaque</div>' : '') +
+                '<div class="card-icon" style="background:' + color + ';"><i class="' + icon + '"></i></div>' +
+                '<h3>' + item.title + '</h3>' +
+                '<p>' + (item.description || '') + '</p>' +
+                '<div class="card-meta">' +
+                '<span class="card-type" style="background:' + color + '22;color:' + color + ';">' + getCategoryLabel(item.category) + '</span>' +
+                '<span><i class="fas fa-download"></i> ' + (item.download_count || 0) + '</span>' +
+                '</div></div>';
+        }
+
+        function accessContent(id, url, type) {
+            if (currentProfile && currentProfile.membership_status !== 'active') {
+                alert('Seu acesso está pendente. Aguarde a aprovação ou entre em contato com a ACMP Brasil.');
+                return;
+            }
+            logContentAccess(id, type === 'game' ? 'play' : 'view');
+            if (url && url !== '#') { window.open(url, '_blank'); }
+        }
+
+        function filterContent(category) {
+            document.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); });
+            event.target.classList.add('active');
+            loadAllContent(category);
+        }
+
+        function showSection(section) {
+            document.getElementById('content-section').style.display = section === 'content' ? 'block' : 'none';
+            document.getElementById('profile-section').style.display = section === 'profile' ? 'block' : 'none';
+        }
+
+        async function handleProfileUpdate(e) {
+            e.preventDefault();
+            var { data, error } = await updateProfile({
+                full_name: document.getElementById('prof-name').value,
+                city: document.getElementById('prof-city').value,
+                state: document.getElementById('prof-state').value,
+                phone: document.getElementById('prof-phone').value,
+                linkedin: document.getElementById('prof-linkedin').value,
+                acmp_member_id: document.getElementById('prof-acmpid').value,
+                ccmp_certified: document.getElementById('prof-ccmp').value === 'true'
+            });
+            var alertEl = document.getElementById('profile-alert');
+            if (error) {
+                alertEl.style.display = 'block';
+                alertEl.style.background = '#fee2e2'; alertEl.style.color = '#dc2626'; alertEl.style.padding = '12px'; alertEl.style.borderRadius = '8px';
+                alertEl.textContent = 'Erro: ' + error.message;
+            } else {
+                alertEl.style.display = 'block';
+                alertEl.style.background = '#dcfce7'; alertEl.style.color = '#16a34a'; alertEl.style.padding = '12px'; alertEl.style.borderRadius = '8px';
+                alertEl.textContent = 'Perfil atualizado com sucesso!';
+                setTimeout(function() { alertEl.style.display = 'none'; }, 3000);
+            }
+        }
+
+        async function handleLogout() { await signOut(); }
+    </script>
+</body>
+</html>
