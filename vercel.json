@@ -3,6 +3,9 @@
   "outputDirectory": ".",
   "cleanUrls": true,
   "trailingSlash": false,
+  "rewrites": [
+    { "source": "/((?!pages|css|js|img|.*\\..*).*)", "destination": "/index.html" }
+  ],
   "headers": [
     {
       "source": "/css/(.*)",
