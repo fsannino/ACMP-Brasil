@@ -162,10 +162,15 @@ img {
 .logo {
     display: flex;
     align-items: center;
-    gap: 12px;
     text-decoration: none;
 }
 
+.logo-img {
+    height: 52px;
+    width: auto;
+}
+
+/* Legacy logo classes for sub-pages */
 .logo-icon {
     width: 48px;
     height: 48px;
