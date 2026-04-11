@@ -290,6 +290,98 @@ img {
     padding-left: 18px;
 }
 
+/* --- Search --- */
+.header-search {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-body);
+    font-size: 1rem;
+    padding: 8px;
+    border-radius: var(--radius-sm);
+    transition: all var(--transition);
+}
+
+.search-toggle:hover {
+    color: var(--primary);
+    background: var(--bg-light);
+}
+
+.search-box {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 320px;
+    background: var(--bg-white);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--border);
+    display: none;
+    z-index: 200;
+    margin-top: 8px;
+}
+
+.search-box.active {
+    display: block;
+}
+
+.search-box input {
+    width: 100%;
+    padding: 14px 16px;
+    border: none;
+    border-bottom: 1px solid var(--border-light);
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
+    font-family: var(--font-main);
+    font-size: 0.9rem;
+    outline: none;
+    background: transparent;
+    color: var(--text-dark);
+}
+
+.search-results {
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 4px;
+}
+
+.search-results a {
+    display: block;
+    padding: 10px 14px;
+    font-size: 0.85rem;
+    color: var(--text-body);
+    border-radius: var(--radius-sm);
+    transition: background 0.2s;
+}
+
+.search-results a:hover {
+    background: var(--bg-light);
+    color: var(--primary);
+}
+
+.search-results a strong {
+    color: var(--primary);
+}
+
+.search-results .no-results {
+    padding: 14px;
+    text-align: center;
+    color: var(--text-light);
+    font-size: 0.85rem;
+}
+
+@media (max-width: 768px) {
+    .search-box {
+        width: calc(100vw - 40px);
+        right: -60px;
+    }
+}
+
 /* Mobile Menu Toggle */
 .mobile-menu-toggle {
     display: none;
@@ -1551,6 +1643,104 @@ img {
 
 .translate-remember input {
     cursor: pointer;
+}
+
+/* --- WhatsApp Button --- */
+.whatsapp-btn {
+    position: fixed;
+    bottom: 30px;
+    left: 30px;
+    width: 56px;
+    height: 56px;
+    background: #25d366;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    box-shadow: 0 4px 14px rgba(37, 211, 102, 0.4);
+    transition: all var(--transition);
+    z-index: 999;
+    text-decoration: none;
+}
+
+.whatsapp-btn:hover {
+    background: #20ba5a;
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(37, 211, 102, 0.5);
+}
+
+.whatsapp-tooltip {
+    position: fixed;
+    bottom: 92px;
+    left: 30px;
+    background: white;
+    color: var(--text-dark);
+    padding: 10px 16px;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    font-size: 0.82rem;
+    font-weight: 500;
+    max-width: 220px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: all 0.3s ease;
+    pointer-events: none;
+    z-index: 999;
+}
+
+.whatsapp-tooltip::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: 20px;
+    width: 12px;
+    height: 12px;
+    background: white;
+    transform: rotate(45deg);
+    box-shadow: 2px 2px 4px rgba(0,0,0,0.05);
+}
+
+.whatsapp-btn:hover + .whatsapp-tooltip,
+.whatsapp-tooltip.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+/* --- Countdown Timer --- */
+.event-countdown {
+    display: flex;
+    gap: 12px;
+    margin: 14px 0;
+    flex-wrap: wrap;
+}
+
+.countdown-unit {
+    background: rgba(26, 58, 92, 0.08);
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    text-align: center;
+    min-width: 60px;
+}
+
+.countdown-value {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: var(--primary);
+    line-height: 1;
+}
+
+.countdown-label {
+    font-size: 0.65rem;
+    color: var(--text-light);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 4px;
 }
 
 /* --- External Links Indicator --- */
