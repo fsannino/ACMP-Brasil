@@ -184,10 +184,22 @@
                     showError(result.error.message === 'Invalid login credentials' ? 'E-mail ou senha incorretos.' : result.error.message);
                 } else {
                     // Check membership status before allowing access
+                    console.log('User logged in:', result.data.user.id, result.data.user.email);
                     var profile = await sb.from('member_profiles').select('membership_status, role').eq('id', result.data.user.id).single();
-                    var status = profile.data ? profile.data.membership_status : 'pending';
+                    console.log('Profile query result:', profile);
 
-                    if (status === 'active' || (profile.data && profile.data.role === 'admin')) {
+                    // If profile query fails (RLS issue), try by email
+                    if (!profile.data) {
+                        console.log('Profile not found by ID, trying email...');
+                        profile = await sb.from('member_profiles').select('membership_status, role').eq('email', result.data.user.email).single();
+                        console.log('Profile by email:', profile);
+                    }
+
+                    var status = profile.data ? profile.data.membership_status : 'pending';
+                    var role = profile.data ? profile.data.role : 'member';
+                    console.log('Status:', status, 'Role:', role);
+
+                    if (status === 'active' || role === 'admin') {
                         showSuccess('Login realizado! Redirecionando...');
                         setTimeout(function() { window.location.href = 'index.html'; }, 500);
                         return;
