@@ -7,7 +7,9 @@
     <title>ACMP Brasil - Associação de Profissionais de Gestão de Mudanças</title>
 
     <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="img/logo-acmp-brasil.svg">
+    <link rel="icon" type="image/png" href="img/logo-acmp-brasil.png">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1a3a5c">
 
     <!-- Open Graph / Social Media -->
     <meta property="og:type" content="website">
@@ -20,6 +22,34 @@
     <meta name="twitter:title" content="ACMP Brasil - Gestão de Mudanças">
     <meta name="twitter:description" content="Capítulo brasileiro da ACMP Global. Comunidade de profissionais de Gestão de Mudanças.">
     <meta name="twitter:image" content="https://images.unsplash.com/photo-1552664730-d307ca884978?w=1200&h=630&fit=crop">
+
+    <!-- Schema.org structured data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "ACMP Brasil",
+      "alternateName": "Associação de Profissionais de Gestão de Mudanças - Brasil",
+      "url": "https://acmpbrasil.vercel.app",
+      "logo": "https://acmpbrasil.vercel.app/img/logo-acmp-brasil.png",
+      "description": "Capítulo brasileiro da ACMP Global. Comunidade de profissionais de Gestão de Mudanças no Brasil.",
+      "parentOrganization": {
+        "@type": "Organization",
+        "name": "ACMP Global",
+        "url": "https://www.acmpglobal.org"
+      },
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "São Paulo",
+        "addressRegion": "SP",
+        "addressCountry": "BR"
+      },
+      "sameAs": [
+        "https://www.linkedin.com/company/acmp-brazil",
+        "https://www.facebook.com/acmpbrazil/"
+      ]
+    }
+    </script>
 
     <link rel="stylesheet" href="css/styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -117,6 +147,14 @@
                     </li>
                 </ul>
             </nav>
+
+            <div class="header-search">
+                <button class="search-toggle" id="search-toggle" aria-label="Buscar"><i class="fas fa-search"></i></button>
+                <div class="search-box" id="search-box">
+                    <input type="text" id="search-input" placeholder="Buscar no site..." aria-label="Buscar no site">
+                    <div class="search-results" id="search-results"></div>
+                </div>
+            </div>
 
             <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Abrir menu">
                 <span class="hamburger-line"></span>
@@ -402,6 +440,7 @@
                             <span><i class="fas fa-map-marker-alt"></i> Orlando, FL - EUA</span>
                             <span><i class="fas fa-graduation-cap"></i> 8 trilhas educacionais</span>
                         </div>
+                        <div class="event-countdown" id="orlando-countdown"></div>
                         <a href="pages/change-orlando-2026.html" class="btn btn-primary">Saiba Mais</a>
                     </div>
                 </div>
@@ -717,6 +756,12 @@
         </div>
     </footer>
 
+    <!-- WhatsApp Button -->
+    <a href="https://wa.me/5511999999999?text=Ol%C3%A1!%20Gostaria%20de%20saber%20mais%20sobre%20a%20ACMP%20Brasil." target="_blank" rel="noopener" class="whatsapp-btn" aria-label="Fale conosco pelo WhatsApp">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+    <div class="whatsapp-tooltip" id="whatsapp-tooltip">Fale conosco pelo WhatsApp</div>
+
     <!-- Dark Mode Toggle -->
     <button class="dark-mode-toggle" id="dark-mode-toggle" aria-label="Alternar modo escuro">
         <i class="fas fa-moon"></i>
@@ -728,5 +773,6 @@
     </button>
 
     <script src="js/main.js"></script>
+    <script>if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js');}</script>
 </body>
 </html>

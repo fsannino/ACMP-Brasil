@@ -155,6 +155,109 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
+    // --- Site Search ---
+    (function () {
+        var toggle = document.getElementById('search-toggle');
+        var box = document.getElementById('search-box');
+        var input = document.getElementById('search-input');
+        var results = document.getElementById('search-results');
+        if (!toggle || !box) return;
+
+        var pages = [
+            { title: 'Sobre a ACMP Brasil', desc: 'Missão, visão, valores e história', url: '#sobre' },
+            { title: 'O que é Gestão de Mudanças', desc: 'Disciplina profissional de change management', url: '#gestao-mudancas' },
+            { title: 'Associe-se / Benefícios', desc: 'Networking, certificações, eventos exclusivos', url: '#associe-se' },
+            { title: 'Certificações CCMP e MCMP', desc: 'Credenciais profissionais reconhecidas', url: '#credenciais' },
+            { title: 'Standard ACMP', desc: 'Documento de referência em gestão de mudanças', url: '#standard' },
+            { title: 'Eventos', desc: 'Change Orlando 2026, webinars, conferências', url: '#eventos' },
+            { title: 'Recursos para Membros', desc: 'Biblioteca, white papers, carreiras', url: '#recursos' },
+            { title: 'Diversidade e Inclusão (DEIB)', desc: 'Equidade, pertencimento na comunidade', url: '#deib' },
+            { title: 'Código de Ética', desc: 'Padrões de conduta profissional', url: '#etica' },
+            { title: 'Por que o Brasil?', desc: 'Mercado, oportunidades, contexto brasileiro', url: '#brasil' },
+            { title: 'Nossa História', desc: 'Linha do tempo da ACMP no Brasil', url: 'pages/historia.html' },
+            { title: 'Branches Regionais', desc: 'Capítulos por região do Brasil', url: 'pages/branches.html' },
+            { title: 'Voluntariado', desc: 'Seja voluntário, comitês, formulário', url: 'pages/voluntarios.html' },
+            { title: 'FAQ', desc: 'Perguntas frequentes sobre ACMP e CCMP', url: 'pages/faq.html' },
+            { title: 'Change Orlando 2026', desc: 'Conferência global mai 17-20', url: 'pages/change-orlando-2026.html' },
+            { title: 'Dia Global da Gestão de Mudanças', desc: 'Celebração mundial da profissão', url: 'pages/global-cm-day.html' },
+            { title: 'Podcast', desc: 'The Way Change Works', url: 'pages/podcast.html' },
+            { title: 'QEP - Provedores de Treinamento', desc: 'Qualified Education Provider', url: 'pages/qep.html' },
+            { title: 'Pacotes Corporativos', desc: 'CCMP + associação para empresas', url: 'pages/pacotes-corporativos.html' },
+            { title: 'Standard em Português', desc: 'Tradução do Standard ACMP', url: 'pages/standard-portugues.html' },
+            { title: 'Soluções para Empresas', desc: 'Treinamento, consultoria corporativa', url: 'pages/business-solutions.html' }
+        ];
+
+        toggle.addEventListener('click', function () {
+            box.classList.toggle('active');
+            if (box.classList.contains('active')) {
+                input.focus();
+            }
+        });
+
+        document.addEventListener('click', function (e) {
+            if (!box.contains(e.target) && e.target !== toggle && !toggle.contains(e.target)) {
+                box.classList.remove('active');
+            }
+        });
+
+        input.addEventListener('input', function () {
+            var q = this.value.toLowerCase().trim();
+            if (q.length < 2) {
+                results.innerHTML = '';
+                return;
+            }
+            var matches = pages.filter(function (p) {
+                return p.title.toLowerCase().indexOf(q) > -1 || p.desc.toLowerCase().indexOf(q) > -1;
+            });
+            if (matches.length === 0) {
+                results.innerHTML = '<div class="no-results">Nenhum resultado para "' + q + '"</div>';
+            } else {
+                results.innerHTML = matches.map(function (p) {
+                    return '<a href="' + p.url + '"><strong>' + p.title + '</strong><br><small>' + p.desc + '</small></a>';
+                }).join('');
+            }
+        });
+    })();
+
+    // --- Event Countdown Timer ---
+    (function () {
+        var el = document.getElementById('orlando-countdown');
+        if (!el) return;
+        var target = new Date('2026-05-17T09:00:00-04:00').getTime();
+        function update() {
+            var now = Date.now();
+            var diff = target - now;
+            if (diff <= 0) {
+                el.innerHTML = '<span style="font-weight:700;color:var(--primary);">Evento em andamento!</span>';
+                return;
+            }
+            var d = Math.floor(diff / 86400000);
+            var h = Math.floor((diff % 86400000) / 3600000);
+            var m = Math.floor((diff % 3600000) / 60000);
+            var s = Math.floor((diff % 60000) / 1000);
+            el.innerHTML =
+                '<div class="countdown-unit"><div class="countdown-value">' + d + '</div><div class="countdown-label">dias</div></div>' +
+                '<div class="countdown-unit"><div class="countdown-value">' + h + '</div><div class="countdown-label">horas</div></div>' +
+                '<div class="countdown-unit"><div class="countdown-value">' + m + '</div><div class="countdown-label">min</div></div>' +
+                '<div class="countdown-unit"><div class="countdown-value">' + s + '</div><div class="countdown-label">seg</div></div>';
+        }
+        update();
+        setInterval(update, 1000);
+    })();
+
+    // --- WhatsApp Tooltip auto-show ---
+    (function () {
+        var tooltip = document.getElementById('whatsapp-tooltip');
+        if (!tooltip) return;
+        if (!sessionStorage.getItem('wa-shown')) {
+            setTimeout(function () {
+                tooltip.classList.add('show');
+                setTimeout(function () { tooltip.classList.remove('show'); }, 4000);
+                sessionStorage.setItem('wa-shown', '1');
+            }, 3000);
+        }
+    })();
+
     // --- External Link Translation Interceptor ---
     // Intercepts clicks on acmpglobal.org links and offers Portuguese translation
     (function () {

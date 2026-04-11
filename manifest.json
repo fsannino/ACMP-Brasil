@@ -1,0 +1,17 @@
+{
+  "name": "ACMP Brasil - Gestão de Mudanças",
+  "short_name": "ACMP Brasil",
+  "description": "Associação de Profissionais de Gestão de Mudanças - Capítulo Brasil",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1a3a5c",
+  "icons": [
+    {
+      "src": "img/logo-acmp-brasil.png",
+      "sizes": "659x247",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
