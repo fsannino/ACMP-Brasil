@@ -5,6 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="ACMP Brasil - Associação de Profissionais de Gestão de Mudanças. Capítulo brasileiro da ACMP Global.">
     <title>ACMP Brasil - Associação de Profissionais de Gestão de Mudanças</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231a3a5c'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-family='Arial,sans-serif' font-weight='800' font-size='10' fill='white'%3EACMP%3C/text%3E%3C/svg%3E">
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="ACMP Brasil - Gestão de Mudanças">
+    <meta property="og:description" content="Capítulo brasileiro da Association of Change Management Professionals. Conecte-se com a comunidade de Gestão de Mudanças do Brasil.">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1552664730-d307ca884978?w=1200&h=630&fit=crop">
+    <meta property="og:url" content="https://acmpbrasil.org.br">
+    <meta property="og:locale" content="pt_BR">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="ACMP Brasil - Gestão de Mudanças">
+    <meta name="twitter:description" content="Capítulo brasileiro da ACMP Global. Comunidade de profissionais de Gestão de Mudanças.">
+    <meta name="twitter:image" content="https://images.unsplash.com/photo-1552664730-d307ca884978?w=1200&h=630&fit=crop">
+
     <link rel="stylesheet" href="css/styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -211,6 +227,35 @@
                         <div class="visual-icon"><i class="fas fa-award"></i></div>
                         <h4>Excelência Profissional</h4>
                         <p>Eleve o padrão da prática de mudanças</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Por que o Brasil? Section -->
+    <section class="section brasil-section" id="brasil">
+        <div class="container">
+            <div class="brasil-grid">
+                <div class="brasil-image"></div>
+                <div class="brasil-text">
+                    <span class="section-tag">Capítulo Brasil</span>
+                    <h2>Por que a Gestão de Mudanças no Brasil?</h2>
+                    <p>O Brasil é uma das maiores economias do mundo, com empresas em constante transformação digital, fusões, reestruturações e adoção de novas tecnologias. A demanda por profissionais qualificados em Gestão de Mudanças cresce a cada ano.</p>
+                    <p>A cultura brasileira valoriza relações humanas e colaboração - pilares fundamentais da gestão de mudanças eficaz. O capítulo Brasil da ACMP existe para conectar, capacitar e fortalecer essa comunidade.</p>
+                    <div class="brasil-stats">
+                        <div class="brasil-stat">
+                            <div class="stat-value">US$ 2.1 bi</div>
+                            <div class="stat-desc">Mercado global de CM em 2026</div>
+                        </div>
+                        <div class="brasil-stat">
+                            <div class="stat-value">88%</div>
+                            <div class="stat-desc">Taxa de sucesso com CM estruturado</div>
+                        </div>
+                        <div class="brasil-stat">
+                            <div class="stat-value">9%</div>
+                            <div class="stat-desc">Crescimento anual do setor (CAGR)</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -462,8 +507,7 @@
             </div>
             <div class="news-grid">
                 <div class="news-card">
-                    <div class="news-image">
-                        <div class="news-placeholder"><i class="fas fa-calendar-check"></i></div>
+                    <div class="news-image" style="background: url('https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=600&h=360&fit=crop') center/cover no-repeat;">
                     </div>
                     <div class="news-content">
                         <span class="news-date">Conferência ACMP</span>
@@ -473,8 +517,7 @@
                     </div>
                 </div>
                 <div class="news-card">
-                    <div class="news-image">
-                        <div class="news-placeholder"><i class="fas fa-robot"></i></div>
+                    <div class="news-image" style="background: url('https://images.unsplash.com/photo-1677442136019-21780ecad995?w=600&h=360&fit=crop') center/cover no-repeat;">
                     </div>
                     <div class="news-content">
                         <span class="news-date">Tendências do Setor</span>
@@ -484,8 +527,7 @@
                     </div>
                 </div>
                 <div class="news-card">
-                    <div class="news-image">
-                        <div class="news-placeholder"><i class="fas fa-chart-bar"></i></div>
+                    <div class="news-image" style="background: url('https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&h=360&fit=crop') center/cover no-repeat;">
                     </div>
                     <div class="news-content">
                         <span class="news-date">Pesquisa Prosci</span>
@@ -608,6 +650,7 @@
                         <li><a href="#standard">Standard</a></li>
                         <li><a href="#eventos">Eventos</a></li>
                         <li><a href="#recursos">Recursos</a></li>
+                        <li><a href="pages/faq.html">FAQ</a></li>
                     </ul>
                 </div>
                 <div class="footer-col">
@@ -628,8 +671,8 @@
                         <li><i class="fas fa-map-marker-alt"></i> São Paulo, SP - Brasil</li>
                     </ul>
                     <h4>Newsletter</h4>
-                    <form class="newsletter-form" onsubmit="return false;">
-                        <input type="email" placeholder="Seu e-mail" aria-label="E-mail para newsletter">
+                    <form class="newsletter-form" action="https://formspree.io/f/xpwdqjkl" method="POST">
+                        <input type="email" name="email" placeholder="Seu e-mail" aria-label="E-mail para newsletter" required>
                         <button type="submit" class="btn btn-primary">Inscrever</button>
                     </form>
                 </div>
@@ -645,6 +688,11 @@
             </div>
         </div>
     </footer>
+
+    <!-- Dark Mode Toggle -->
+    <button class="dark-mode-toggle" id="dark-mode-toggle" aria-label="Alternar modo escuro">
+        <i class="fas fa-moon"></i>
+    </button>
 
     <!-- Back to Top Button -->
     <button class="back-to-top" id="back-to-top" aria-label="Voltar ao topo">

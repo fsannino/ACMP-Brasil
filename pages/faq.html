@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAQ - ACMP Brasil</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231a3a5c'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-family='Arial,sans-serif' font-weight='800' font-size='10' fill='white'%3EACMP%3C/text%3E%3C/svg%3E">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .faq-list { max-width: 800px; margin: 0 auto; }
+        .faq-item { background: var(--bg-white); border: 1px solid var(--border-light); border-radius: var(--radius-md); margin-bottom: 12px; overflow: hidden; transition: all var(--transition); }
+        .faq-item:hover { box-shadow: var(--shadow-sm); }
+        .faq-question { display: flex; justify-content: space-between; align-items: center; padding: 20px 24px; cursor: pointer; font-weight: 600; font-size: 1rem; color: var(--text-dark); background: none; border: none; width: 100%; text-align: left; font-family: var(--font-main); }
+        .faq-question i { color: var(--primary); transition: transform 0.3s; font-size: 0.8rem; }
+        .faq-item.open .faq-question i { transform: rotate(180deg); }
+        .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
+        .faq-answer-inner { padding: 0 24px 20px; line-height: 1.7; color: var(--text-body); font-size: 0.92rem; }
+        .faq-answer-inner a { color: var(--primary); font-weight: 600; }
+        .faq-item.open .faq-answer { max-height: 300px; }
+        .faq-category { font-size: 1.3rem; font-weight: 700; color: var(--primary); margin: 40px 0 20px; padding-bottom: 10px; border-bottom: 2px solid var(--border); }
+        .faq-category:first-child { margin-top: 0; }
+        .page-hero { background: linear-gradient(135deg, var(--primary-dark), var(--primary)); color: white; padding: 80px 0 50px; text-align: center; }
+        .page-hero h1 { font-size: 2.2rem; font-weight: 800; margin-bottom: 12px; }
+        .page-hero p { opacity: 0.9; font-size: 1.05rem; max-width: 600px; margin: 0 auto; }
+        .page-content { padding: 60px 0; }
+        .back-link { display: inline-flex; align-items: center; gap: 6px; color: var(--primary); font-weight: 600; font-size: 0.9rem; margin-bottom: 30px; }
+        .back-link:hover { gap: 10px; }
+    </style>
+</head>
+<body>
+    <section class="page-hero">
+        <div class="container">
+            <h1><i class="fas fa-question-circle"></i> Perguntas Frequentes</h1>
+            <p>Tire suas dúvidas sobre a ACMP Brasil, certificações e gestão de mudanças.</p>
+        </div>
+    </section>
+
+    <section class="page-content">
+        <div class="container">
+            <a href="../index.html" class="back-link"><i class="fas fa-arrow-left"></i> Voltar para a página inicial</a>
+
+            <div class="faq-list">
+                <h3 class="faq-category">Sobre a ACMP Brasil</h3>
+
+                <div class="faq-item">
+                    <button class="faq-question">O que é a ACMP Brasil? <i class="fas fa-chevron-down"></i></button>
+                    <div class="faq-answer"><div class="faq-answer-inner">
+                        A ACMP Brasil é o capítulo brasileiro da Association of Change Management Professionals (ACMP), a maior associação global dedicada à profissão de Gestão de Mudanças. Nosso objetivo é fortalecer a disciplina no Brasil, conectar profissionais e promover melhores práticas.
+                    </div></div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question">Preciso saber inglês para participar? <i class="fas fa-chevron-down"></i></button>
+                    <div class="faq-answer"><div class="faq-answer-inner">
+                        Não obrigatoriamente. A ACMP Brasil oferece conteúdo em português e trabalha na tradução do Standard. No entanto, o exame CCMP é em inglês, e muitos recursos da ACMP Global estão nesse idioma. Conhecimento básico de inglês ajuda a aproveitar mais os benefícios da associação.
+                    </div></div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question">Quanto custa a associação? <i class="fas fa-chevron-down"></i></button>
+                    <div class="faq-answer"><div class="faq-answer-inner">
+                        Os valores de associação são definidos pela ACMP Global. Existem categorias para profissionais individuais e organizações corporativas, com descontos para países emergentes como o Brasil. Consulte os valores atualizados em <a href="https://www.acmpglobal.org/page/join_acmp" target="_blank" rel="noopener">acmpglobal.org/join</a>.
+                    </div></div>
+                </div>
+
+                <h3 class="faq-category">Certificações (CCMP / MCMP)</h3>
+
+                <div class="faq-item">
+                    <button class="faq-question">O CCMP é reconhecido no Brasil? <i class="fas fa-chevron-down"></i></button>
+                    <div class="faq-answer"><div class="faq-answer-inner">
+                        Sim. O CCMP (Certified Change Management Professional) é a certificação mais reconhecida mundialmente em Gestão de Mudanças. Empresas multinacionais e consultorias no Brasil valorizam essa credencial. Organizações com excelência em gestão de mudanças atingem 88% de sucesso em seus projetos.
+                    </div></div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question">Quais são os requisitos para o CCMP? <i class="fas fa-chevron-down"></i></button>
+                    <div class="faq-answer"><div class="faq-answer-inner">
+                        Para se candidatar ao CCMP, você precisa: mínimo de 21 horas de treinamento em gestão de mudanças por um QEP (Qualified Education Provider), experiência profissional na área, e aprovação no exame. Detalhes completos em <a href="https://www.acmpglobal.org/page/apply-and-prepare-ccmp" target="_blank" rel="noopener">CCMP Apply & Prepare</a>.
+                    </div></div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question">Posso fazer o exame em português? <i class="fas fa-chevron-down"></i></button>
+                    <div class="faq-answer"><div class="faq-answer-inner">
+                        Atualmente, o exame CCMP está disponível apenas em inglês. A ACMP Brasil está trabalhando para expandir o suporte ao português em materiais preparatórios e conteúdo educacional.
+                    </div></div>
+                </div>
+
+                <h3 class="faq-category">Gestão de Mudanças</h3>
+
+                <div class="faq-item">
+                    <button class="faq-question">O que é Gestão de Mudanças? <i class="fas fa-chevron-down"></i></button>
+                    <div class="faq-answer"><div class="faq-answer-inner">
+                        Gestão de Mudanças é a disciplina profissional que aplica abordagens estruturadas para conduzir indivíduos, equipes e organizações de um estado atual para um estado futuro desejado. Foca no lado humano das transformações organizacionais, garantindo adoção sustentável de novas práticas, processos e tecnologias.
+                    </div></div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question">Qual a diferença entre Gestão de Mudanças e Gestão de Projetos? <i class="fas fa-chevron-down"></i></button>
+                    <div class="faq-answer"><div class="faq-answer-inner">
+                        Gestão de Projetos foca no lado técnico (escopo, prazo, custo). Gestão de Mudanças foca no lado humano (adoção, resistência, comunicação, engajamento). As duas são complementares: um projeto pode ser entregue no prazo, mas sem gestão de mudanças, as pessoas podem não adotar a nova solução.
+                    </div></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+    document.querySelectorAll('.faq-question').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var item = this.parentElement;
+            var wasOpen = item.classList.contains('open');
+            document.querySelectorAll('.faq-item.open').forEach(function(el) { el.classList.remove('open'); });
+            if (!wasOpen) item.classList.add('open');
+        });
+    });
+    </script>
+</body>
+</html>

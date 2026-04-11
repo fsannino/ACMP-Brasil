@@ -155,15 +155,25 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // --- Newsletter Form ---
-    var newsletterForm = document.querySelector('.newsletter-form');
-    if (newsletterForm) {
-        newsletterForm.addEventListener('submit', function (e) {
-            e.preventDefault();
-            var input = this.querySelector('input[type="email"]');
-            if (input && input.value) {
-                alert('Obrigado por se inscrever! Você receberá nossas novidades em ' + input.value);
-                input.value = '';
+    // --- Dark Mode Toggle ---
+    var darkToggle = document.getElementById('dark-mode-toggle');
+    if (darkToggle) {
+        var savedTheme = localStorage.getItem('acmp-theme');
+        if (savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            darkToggle.querySelector('i').classList.replace('fa-moon', 'fa-sun');
+        }
+
+        darkToggle.addEventListener('click', function () {
+            var icon = darkToggle.querySelector('i');
+            if (document.documentElement.getAttribute('data-theme') === 'dark') {
+                document.documentElement.removeAttribute('data-theme');
+                icon.classList.replace('fa-sun', 'fa-moon');
+                localStorage.setItem('acmp-theme', 'light');
+            } else {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                icon.classList.replace('fa-moon', 'fa-sun');
+                localStorage.setItem('acmp-theme', 'dark');
             }
         });
     }
