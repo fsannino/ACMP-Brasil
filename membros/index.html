@@ -151,20 +151,38 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-    <script src="../js/supabase-client.js"></script>
     <script>
+        var SUPA_URL = 'https://yaumzlssybzoipwmllqy.supabase.co';
+        var SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlhdW16bHNzeWJ6b2lwd21sbHF5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU5MTcwMTEsImV4cCI6MjA5MTQ5MzAxMX0.GWK1jnlEmgxWmeWk1VGwR25fLBvquWtrkQ4ipq_A3RU';
+        var sb = null;
         var currentProfile = null;
 
-        document.addEventListener('DOMContentLoaded', async function() {
-            if (!initSupabase()) return;
-            if (!await requireAuth()) return;
-            await loadDashboard();
-        });
+        // Load SDK with fallback
+        var cdns = [
+            'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js',
+            'https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.min.js'
+        ];
+        var ci = 0;
+        function loadSDK() {
+            if (ci >= cdns.length) { document.getElementById('welcome-msg').textContent = 'Erro ao carregar. Recarregue a página.'; return; }
+            var s = document.createElement('script');
+            s.src = cdns[ci];
+            s.onload = function() {
+                sb = window.supabase.createClient(SUPA_URL, SUPA_KEY);
+                initDashboard();
+            };
+            s.onerror = function() { ci++; loadSDK(); };
+            document.head.appendChild(s);
+        }
+        loadSDK();
 
-        async function loadDashboard() {
-            currentProfile = await getProfile();
-            var user = await getUser();
+        async function initDashboard() {
+            var sess = await sb.auth.getSession();
+            if (!sess.data.session) { window.location.href = 'login.html'; return; }
+
+            var user = sess.data.session.user;
+            var prof = await sb.from('member_profiles').select('*').eq('id', user.id).single();
+            currentProfile = prof.data;
 
             if (currentProfile) {
                 document.getElementById('user-name').textContent = currentProfile.full_name || user.email;
@@ -181,7 +199,6 @@
                     adminLink.onclick = function() { window.location.href = '../admin/index.html'; };
                 }
 
-                // Load profile form
                 document.getElementById('prof-name').value = currentProfile.full_name || '';
                 document.getElementById('prof-email').value = currentProfile.email || '';
                 document.getElementById('prof-city').value = currentProfile.city || '';
@@ -197,47 +214,43 @@
         }
 
         async function loadFeaturedContent() {
-            var { data } = await getFeaturedContent();
+            var { data } = await sb.from('exclusive_content').select('*').eq('is_featured', true).order('created_at', { ascending: false }).limit(4);
             var grid = document.getElementById('featured-grid');
-            if (!data || data.length === 0) {
-                grid.innerHTML = '<div class="empty-state"><i class="fas fa-star"></i><p>Nenhum conteúdo em destaque</p></div>';
-                return;
-            }
+            if (!data || data.length === 0) { grid.innerHTML = '<div class="empty-state"><i class="fas fa-star"></i><p>Nenhum conteúdo em destaque</p></div>'; return; }
             grid.innerHTML = data.map(renderContentCard).join('');
         }
 
         async function loadAllContent(category) {
-            var { data } = await getExclusiveContent(category);
+            var query = sb.from('exclusive_content').select('*').order('is_featured', { ascending: false }).order('created_at', { ascending: false });
+            if (category && category !== 'all') query = query.eq('category', category);
+            var { data } = await query;
             var grid = document.getElementById('content-grid');
-            if (!data || data.length === 0) {
-                grid.innerHTML = '<div class="empty-state"><i class="fas fa-folder-open"></i><p>Nenhum conteúdo nesta categoria</p></div>';
-                return;
-            }
+            if (!data || data.length === 0) { grid.innerHTML = '<div class="empty-state"><i class="fas fa-folder-open"></i><p>Nenhum conteúdo nesta categoria</p></div>'; return; }
             grid.innerHTML = data.map(renderContentCard).join('');
         }
 
         function renderContentCard(item) {
-            var icon = getContentIcon(item.content_type);
-            var color = getContentColor(item.content_type);
+            var icons = { pdf:'fas fa-file-pdf', video:'fas fa-play-circle', article:'fas fa-newspaper', webinar:'fas fa-video', game:'fas fa-gamepad', template:'fas fa-file-alt', tool:'fas fa-tools' };
+            var colors = { pdf:'#e74c3c', video:'#9b59b6', article:'#3498db', webinar:'#2ecc71', game:'#e67e22', template:'#1abc9c', tool:'#95a5a6' };
+            var cats = { standard:'Standard ACMP', certificacao:'Certificação', webinars:'Webinars', ferramentas:'Ferramentas', jogos:'Jogos', artigos:'Artigos', templates:'Templates' };
+            var icon = icons[item.content_type] || 'fas fa-file';
+            var color = colors[item.content_type] || '#666';
             var url = item.file_url || item.external_url || '#';
-            return '<div class="content-card" onclick="accessContent(' + item.id + ', \'' + url + '\', \'' + item.content_type + '\')" style="position:relative;">' +
+            return '<div class="content-card" onclick="accessContent(' + item.id + ',\'' + url + '\',\'' + item.content_type + '\')" style="position:relative;">' +
                 (item.is_featured ? '<div class="featured-badge"><i class="fas fa-star"></i> Destaque</div>' : '') +
                 '<div class="card-icon" style="background:' + color + ';"><i class="' + icon + '"></i></div>' +
-                '<h3>' + item.title + '</h3>' +
-                '<p>' + (item.description || '') + '</p>' +
-                '<div class="card-meta">' +
-                '<span class="card-type" style="background:' + color + '22;color:' + color + ';">' + getCategoryLabel(item.category) + '</span>' +
-                '<span><i class="fas fa-download"></i> ' + (item.download_count || 0) + '</span>' +
-                '</div></div>';
+                '<h3>' + item.title + '</h3><p>' + (item.description || '') + '</p>' +
+                '<div class="card-meta"><span class="card-type" style="background:' + color + '22;color:' + color + ';">' + (cats[item.category] || item.category) + '</span>' +
+                '<span><i class="fas fa-download"></i> ' + (item.download_count || 0) + '</span></div></div>';
         }
 
         function accessContent(id, url, type) {
-            if (currentProfile && currentProfile.membership_status !== 'active') {
-                alert('Seu acesso está pendente. Aguarde a aprovação ou entre em contato com a ACMP Brasil.');
+            if (currentProfile && currentProfile.membership_status !== 'active' && currentProfile.role !== 'admin') {
+                alert('Seu acesso está pendente de aprovação.');
                 return;
             }
-            logContentAccess(id, type === 'game' ? 'play' : 'view');
-            if (url && url !== '#') { window.open(url, '_blank'); }
+            sb.from('content_access_log').insert({ user_id: currentProfile.id, content_id: id, action: type === 'game' ? 'play' : 'view' });
+            if (url && url !== '#') window.open(url, '_blank');
         }
 
         function filterContent(category) {
@@ -253,29 +266,27 @@
 
         async function handleProfileUpdate(e) {
             e.preventDefault();
-            var { data, error } = await updateProfile({
+            var { error } = await sb.from('member_profiles').update({
                 full_name: document.getElementById('prof-name').value,
                 city: document.getElementById('prof-city').value,
                 state: document.getElementById('prof-state').value,
                 phone: document.getElementById('prof-phone').value,
                 linkedin: document.getElementById('prof-linkedin').value,
                 acmp_member_id: document.getElementById('prof-acmpid').value,
-                ccmp_certified: document.getElementById('prof-ccmp').value === 'true'
-            });
+                ccmp_certified: document.getElementById('prof-ccmp').value === 'true',
+                updated_at: new Date().toISOString()
+            }).eq('id', currentProfile.id);
             var alertEl = document.getElementById('profile-alert');
-            if (error) {
-                alertEl.style.display = 'block';
-                alertEl.style.background = '#fee2e2'; alertEl.style.color = '#dc2626'; alertEl.style.padding = '12px'; alertEl.style.borderRadius = '8px';
-                alertEl.textContent = 'Erro: ' + error.message;
-            } else {
-                alertEl.style.display = 'block';
-                alertEl.style.background = '#dcfce7'; alertEl.style.color = '#16a34a'; alertEl.style.padding = '12px'; alertEl.style.borderRadius = '8px';
-                alertEl.textContent = 'Perfil atualizado com sucesso!';
-                setTimeout(function() { alertEl.style.display = 'none'; }, 3000);
-            }
+            alertEl.style.display = 'block';
+            alertEl.style.padding = '12px'; alertEl.style.borderRadius = '8px';
+            if (error) { alertEl.style.background = '#fee2e2'; alertEl.style.color = '#dc2626'; alertEl.textContent = 'Erro: ' + error.message; }
+            else { alertEl.style.background = '#dcfce7'; alertEl.style.color = '#16a34a'; alertEl.textContent = 'Perfil atualizado!'; setTimeout(function() { alertEl.style.display = 'none'; }, 3000); }
         }
 
-        async function handleLogout() { await signOut(); }
+        async function handleLogout() {
+            await sb.auth.signOut();
+            window.location.href = 'login.html';
+        }
     </script>
 </body>
 </html>
