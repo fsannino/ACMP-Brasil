@@ -189,26 +189,46 @@
         </div>
     </div>
 
-    <script src="/js/supabase.min.js"></script>
     <script>
         var SUPA_URL = 'https://yaumzlssybzoipwmllqy.supabase.co';
         var SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlhdW16bHNzeWJ6b2lwd21sbHF5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU5MTcwMTEsImV4cCI6MjA5MTQ5MzAxMX0.GWK1jnlEmgxWmeWk1VGwR25fLBvquWtrkQ4ipq_A3RU';
-        var sb = null;
 
-        sb = window.supabase.createClient(SUPA_URL, SUPA_KEY);
-        initAdmin();
+        function getToken() { return localStorage.getItem('sb-token'); }
+        function getUser() { try { return JSON.parse(localStorage.getItem('sb-user')); } catch(e) { return null; } }
+        async function supaQ(table, filters) {
+            var url = SUPA_URL + '/rest/v1/' + table + '?select=*'; if (filters) url += '&' + filters;
+            var res = await fetch(url, { headers: { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + (getToken()||SUPA_KEY) } });
+            return await res.json();
+        }
+        async function supaCount(table, filters) {
+            var url = SUPA_URL + '/rest/v1/' + table + '?select=id'; if (filters) url += '&' + filters;
+            var res = await fetch(url, { headers: { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + (getToken()||SUPA_KEY), 'Prefer': 'count=exact' } });
+            var count = res.headers.get('content-range');
+            return count ? parseInt(count.split('/')[1]) : 0;
+        }
+        async function supaPatch(table, filters, data) {
+            return (await fetch(SUPA_URL+'/rest/v1/'+table+'?'+filters, { method:'PATCH', headers:{'Content-Type':'application/json','apikey':SUPA_KEY,'Authorization':'Bearer '+(getToken()||SUPA_KEY),'Prefer':'return=minimal'}, body:JSON.stringify(data) })).ok;
+        }
+        async function supaPost(table, data) {
+            return await fetch(SUPA_URL+'/rest/v1/'+table, { method:'POST', headers:{'Content-Type':'application/json','apikey':SUPA_KEY,'Authorization':'Bearer '+(getToken()||SUPA_KEY),'Prefer':'return=representation'}, body:JSON.stringify(data) });
+        }
+        async function supaDel(table, filters) {
+            return (await fetch(SUPA_URL+'/rest/v1/'+table+'?'+filters, { method:'DELETE', headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+(getToken()||SUPA_KEY)} })).ok;
+        }
+
+        var token = getToken(); var user = getUser();
+        if (!token || !user) { window.location.href = '/membros/login'; }
+        else { initAdmin(); }
 
         var currentRole = 'member';
 
         async function initAdmin() {
-            var sess = await sb.auth.getSession();
-            if (!sess.data.session) { window.location.href = '../membros/login.html'; return; }
-            var user = sess.data.session.user;
-            var prof = await sb.from('member_profiles').select('role').eq('id', user.id).single();
-            if (!prof.data || (prof.data.role !== 'admin' && prof.data.role !== 'moderator')) {
-                window.location.href = '../membros/'; return;
+            var profiles = await supaQ('member_profiles', 'email=eq.' + encodeURIComponent(user.email));
+            var prof = profiles && profiles.length > 0 ? profiles[0] : null;
+            if (!prof || (prof.role !== 'admin' && prof.role !== 'moderator')) {
+                window.location.href = '/membros/'; return;
             }
-            currentRole = prof.data.role;
+            currentRole = prof.role;
 
             // Moderators: hide delete buttons, content management, import
             if (currentRole === 'moderator') {
@@ -223,19 +243,20 @@
         }
 
         async function loadAdminData() {
-            var { count: total } = await sb.from('member_profiles').select('*', { count: 'exact', head: true });
-            var { count: active } = await sb.from('member_profiles').select('*', { count: 'exact', head: true }).eq('membership_status', 'active');
-            var { data: contentList } = await sb.from('exclusive_content').select('*');
-            document.getElementById('stat-total').textContent = total || 0;
-            document.getElementById('stat-active').textContent = active || 0;
-            document.getElementById('stat-pending').textContent = (total || 0) - (active || 0);
+            var allMembers = await supaQ('member_profiles', 'order=created_at.desc');
+            var contentList = await supaQ('exclusive_content', 'order=created_at.desc');
+            var total = allMembers ? allMembers.length : 0;
+            var active = allMembers ? allMembers.filter(function(m){return m.membership_status==='active';}).length : 0;
+            document.getElementById('stat-total').textContent = total;
+            document.getElementById('stat-active').textContent = active;
+            document.getElementById('stat-pending').textContent = total - active;
             document.getElementById('stat-content').textContent = contentList ? contentList.length : 0;
             await loadMembersTable();
             await loadContentTable();
         }
 
         async function loadMembersTable() {
-            var { data } = await sb.from('member_profiles').select('*').order('created_at', { ascending: false });
+            var data = await supaQ('member_profiles', 'order=created_at.desc');
             var tbody = document.getElementById('members-tbody');
             if (!data || data.length === 0) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">Nenhum membro</td></tr>'; return; }
             tbody.innerHTML = data.map(function(m) {
@@ -254,7 +275,7 @@
         }
 
         async function loadContentTable() {
-            var { data } = await sb.from('exclusive_content').select('*').order('created_at', { ascending: false });
+            var data = await supaQ('exclusive_content', 'order=created_at.desc');
             var tbody = document.getElementById('content-tbody');
             if (!data || data.length === 0) { tbody.innerHTML = '<tr><td colspan="6">Nenhum conteúdo</td></tr>'; return; }
             var icons = { pdf:'fas fa-file-pdf', video:'fas fa-play-circle', article:'fas fa-newspaper', webinar:'fas fa-video', game:'fas fa-gamepad', template:'fas fa-file-alt', tool:'fas fa-tools' };
@@ -270,7 +291,7 @@
         }
 
         async function setStatus(userId, status) {
-            await sb.from('member_profiles').update({ membership_status: status, updated_at: new Date().toISOString() }).eq('id', userId);
+            await supaPatch('member_profiles', 'id=eq.' + userId, { membership_status: status, updated_at: new Date().toISOString() });
             showAlert('admin-alert', 'Status atualizado!', 'success');
             await loadMembersTable();
             await loadAdminData();
@@ -278,7 +299,7 @@
 
         async function handleAddContent(e) {
             e.preventDefault();
-            var { error } = await sb.from('exclusive_content').insert({
+            var res = await supaPost('exclusive_content', {
                 title: document.getElementById('ct-title').value,
                 content_type: document.getElementById('ct-type').value,
                 category: document.getElementById('ct-category').value,
@@ -287,13 +308,13 @@
                 file_url: document.getElementById('ct-url').value,
                 is_featured: document.getElementById('ct-featured').value === 'true'
             });
-            if (error) { showAlert('content-alert', 'Erro: ' + error.message, 'error'); }
+            if (!res.ok) { showAlert('content-alert', 'Erro ao adicionar conteúdo', 'error'); }
             else { showAlert('content-alert', 'Conteúdo adicionado!', 'success'); e.target.reset(); await loadContentTable(); await loadAdminData(); }
         }
 
         async function removeContent(id) {
             if (!confirm('Remover este conteúdo?')) return;
-            await sb.from('exclusive_content').delete().eq('id', id);
+            await supaDel('exclusive_content', 'id=eq.' + id);
             await loadContentTable(); await loadAdminData();
         }
 
@@ -308,17 +329,19 @@
                     var vals = lines[i].split(',').map(function(v){return v.trim();});
                     var rec = {}; header.forEach(function(h,idx){rec[h]=vals[idx]||'';}); if(rec.email) records.push(rec);
                 }
-                var { error } = await sb.from('imported_members').upsert(records, { onConflict: 'email' });
-                if (error) showAlert('import-alert', 'Erro: ' + error.message, 'error');
+                var res = await supaPost('imported_members', records);
+                if (!res.ok) showAlert('import-alert', 'Erro ao importar', 'error');
                 else showAlert('import-alert', records.length + ' membros importados!', 'success');
             };
             reader.readAsText(file);
         }
 
         async function handleSync() {
-            var { data, error } = await sb.rpc('sync_imported_members');
-            if (error) showAlert('import-alert', 'Erro: ' + error.message, 'error');
-            else { showAlert('import-alert', (data||0) + ' membros sincronizados!', 'success'); await loadMembersTable(); await loadAdminData(); }
+            var res = await fetch(SUPA_URL + '/rest/v1/rpc/sync_imported_members', {
+                method: 'POST', headers: { 'Content-Type': 'application/json', 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + (getToken()||SUPA_KEY) }, body: '{}'
+            });
+            if (!res.ok) showAlert('import-alert', 'Erro ao sincronizar', 'error');
+            else { var data = await res.json(); showAlert('import-alert', (data||0) + ' membros sincronizados!', 'success'); await loadMembersTable(); await loadAdminData(); }
         }
 
         function showAdminTab(tab) {
@@ -337,7 +360,7 @@
             setTimeout(function(){el.style.display='none';}, 4000);
         }
 
-        async function handleLogout() { await sb.auth.signOut(); window.location.href = '../membros/login.html'; }
+        function handleLogout() { localStorage.removeItem('sb-token'); localStorage.removeItem('sb-user'); window.location.href = '/membros/login'; }
     </script>
 </body>
 </html>

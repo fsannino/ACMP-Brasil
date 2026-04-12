@@ -151,25 +151,46 @@
         </div>
     </div>
 
-    <script src="/js/supabase.min.js"></script>
     <script>
         var SUPA_URL = 'https://yaumzlssybzoipwmllqy.supabase.co';
         var SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlhdW16bHNzeWJ6b2lwd21sbHF5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU5MTcwMTEsImV4cCI6MjA5MTQ5MzAxMX0.GWK1jnlEmgxWmeWk1VGwR25fLBvquWtrkQ4ipq_A3RU';
-        var sb = null;
         var currentProfile = null;
 
-        // Load SDK with fallback
-        // SDK loaded via local file above
-        sb = window.supabase.createClient(SUPA_URL, SUPA_KEY);
-        initDashboard();
+        // REST API helpers (no SDK)
+        function getToken() { return localStorage.getItem('sb-token'); }
+        function getUser() { try { return JSON.parse(localStorage.getItem('sb-user')); } catch(e) { return null; } }
+
+        async function supaQuery(table, filters) {
+            var url = SUPA_URL + '/rest/v1/' + table + '?select=*';
+            if (filters) url += '&' + filters;
+            var res = await fetch(url, { headers: { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + (getToken() || SUPA_KEY) } });
+            return await res.json();
+        }
+
+        async function supaUpdate(table, filters, data) {
+            var res = await fetch(SUPA_URL + '/rest/v1/' + table + '?' + filters, {
+                method: 'PATCH', headers: { 'Content-Type': 'application/json', 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + (getToken() || SUPA_KEY), 'Prefer': 'return=minimal' },
+                body: JSON.stringify(data)
+            });
+            return res.ok;
+        }
+
+        async function supaInsert(table, data) {
+            await fetch(SUPA_URL + '/rest/v1/' + table, {
+                method: 'POST', headers: { 'Content-Type': 'application/json', 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + (getToken() || SUPA_KEY), 'Prefer': 'return=minimal' },
+                body: JSON.stringify(data)
+            });
+        }
+
+        // Check auth
+        var token = getToken();
+        var user = getUser();
+        if (!token || !user) { window.location.href = '/membros/login'; }
+        else { initDashboard(); }
 
         async function initDashboard() {
-            var sess = await sb.auth.getSession();
-            if (!sess.data.session) { window.location.href = 'login.html'; return; }
-
-            var user = sess.data.session.user;
-            var prof = await sb.from('member_profiles').select('*').eq('id', user.id).single();
-            currentProfile = prof.data;
+            var profiles = await supaQuery('member_profiles', 'email=eq.' + encodeURIComponent(user.email));
+            currentProfile = profiles && profiles.length > 0 ? profiles[0] : null;
 
             if (currentProfile) {
                 document.getElementById('user-name').textContent = currentProfile.full_name || user.email;
@@ -204,16 +225,16 @@
         }
 
         async function loadFeaturedContent() {
-            var { data } = await sb.from('exclusive_content').select('*').eq('is_featured', true).order('created_at', { ascending: false }).limit(4);
+            var data = await supaQuery('exclusive_content', 'is_featured=eq.true&order=created_at.desc&limit=4');
             var grid = document.getElementById('featured-grid');
             if (!data || data.length === 0) { grid.innerHTML = '<div class="empty-state"><i class="fas fa-star"></i><p>Nenhum conteúdo em destaque</p></div>'; return; }
             grid.innerHTML = data.map(renderContentCard).join('');
         }
 
         async function loadAllContent(category) {
-            var query = sb.from('exclusive_content').select('*').order('is_featured', { ascending: false }).order('created_at', { ascending: false });
-            if (category && category !== 'all') query = query.eq('category', category);
-            var { data } = await query;
+            var filters = 'order=created_at.desc';
+            if (category && category !== 'all') filters += '&category=eq.' + category;
+            var data = await supaQuery('exclusive_content', filters);
             var grid = document.getElementById('content-grid');
             if (!data || data.length === 0) { grid.innerHTML = '<div class="empty-state"><i class="fas fa-folder-open"></i><p>Nenhum conteúdo nesta categoria</p></div>'; return; }
             grid.innerHTML = data.map(renderContentCard).join('');
@@ -250,7 +271,7 @@
                 alert('Seu acesso está pendente de aprovação.');
                 return;
             }
-            sb.from('content_access_log').insert({ user_id: currentProfile.id, content_id: id, action: type === 'game' ? 'play' : 'view' });
+            supaInsert('content_access_log', { user_id: currentProfile.id, content_id: id, action: type === 'game' ? 'play' : 'view' });
             if (url && url !== '#') window.open(url, '_blank');
         }
 
@@ -267,7 +288,7 @@
 
         async function handleProfileUpdate(e) {
             e.preventDefault();
-            var { error } = await sb.from('member_profiles').update({
+            var ok = await supaUpdate('member_profiles', 'id=eq.' + currentProfile.id, {
                 full_name: document.getElementById('prof-name').value,
                 city: document.getElementById('prof-city').value,
                 state: document.getElementById('prof-state').value,
@@ -276,17 +297,18 @@
                 acmp_member_id: document.getElementById('prof-acmpid').value,
                 ccmp_certified: document.getElementById('prof-ccmp').value === 'true',
                 updated_at: new Date().toISOString()
-            }).eq('id', currentProfile.id);
+            });
             var alertEl = document.getElementById('profile-alert');
             alertEl.style.display = 'block';
             alertEl.style.padding = '12px'; alertEl.style.borderRadius = '8px';
-            if (error) { alertEl.style.background = '#fee2e2'; alertEl.style.color = '#dc2626'; alertEl.textContent = 'Erro: ' + error.message; }
+            if (!ok) { alertEl.style.background = '#fee2e2'; alertEl.style.color = '#dc2626'; alertEl.textContent = 'Erro ao salvar.'; }
             else { alertEl.style.background = '#dcfce7'; alertEl.style.color = '#16a34a'; alertEl.textContent = 'Perfil atualizado!'; setTimeout(function() { alertEl.style.display = 'none'; }, 3000); }
         }
 
-        async function handleLogout() {
-            await sb.auth.signOut();
-            window.location.href = 'login.html';
+        function handleLogout() {
+            localStorage.removeItem('sb-token');
+            localStorage.removeItem('sb-user');
+            window.location.href = '/membros/login';
         }
     </script>
 </body>
