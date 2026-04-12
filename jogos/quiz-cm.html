@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Gestão de Mudanças - ACMP Brasil</title>
+    <link rel="icon" type="image/png" href="/img/logo-acmp-brasil.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root { --primary: #1a3a5c; --primary-light: #2a5a8c; --secondary: #e8a838; --accent: #28a745; --text-dark: #1a1a2e; --text-body: #4a4a5a; --text-light: #6b7280; --bg-white: #fff; --bg-light: #f8f9fc; --border: #e2e8f0; --radius-sm: 6px; --radius-md: 10px; --radius-lg: 16px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg-light); min-height: 100vh; }
+        .quiz-header { background: var(--primary); padding: 14px 0; text-align: center; }
+        .quiz-header a { display: inline-flex; align-items: center; gap: 8px; color: rgba(255,255,255,0.8); font-size: 0.85rem; text-decoration: none; }
+        .quiz-container { max-width: 700px; margin: 30px auto; padding: 0 20px 60px; }
+        .quiz-card { background: var(--bg-white); border-radius: var(--radius-lg); padding: 36px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        .quiz-progress { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+        .progress-bar-bg { flex: 1; height: 8px; background: var(--bg-light); border-radius: 50px; overflow: hidden; }
+        .progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--primary), var(--primary-light)); border-radius: 50px; transition: width 0.5s ease; }
+        .progress-text { font-size: 0.8rem; color: var(--text-light); font-weight: 600; white-space: nowrap; }
+        .quiz-question { font-size: 1.15rem; font-weight: 700; color: var(--text-dark); margin-bottom: 24px; line-height: 1.5; }
+        .quiz-options { display: flex; flex-direction: column; gap: 12px; }
+        .quiz-option { padding: 16px 20px; border: 2px solid var(--border); border-radius: var(--radius-md); cursor: pointer; font-size: 0.92rem; color: var(--text-body); transition: all 0.2s; display: flex; align-items: flex-start; gap: 12px; }
+        .quiz-option:hover { border-color: var(--primary); background: rgba(26,58,92,0.03); }
+        .quiz-option.selected { border-color: var(--primary); background: rgba(26,58,92,0.06); color: var(--text-dark); font-weight: 500; }
+        .quiz-option.correct { border-color: var(--accent); background: #dcfce7; }
+        .quiz-option.wrong { border-color: #dc2626; background: #fee2e2; }
+        .quiz-option .opt-letter { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; background: var(--bg-light); font-weight: 700; font-size: 0.8rem; color: var(--text-light); flex-shrink: 0; }
+        .quiz-option.selected .opt-letter { background: var(--primary); color: white; }
+        .quiz-option.correct .opt-letter { background: var(--accent); color: white; }
+        .quiz-option.wrong .opt-letter { background: #dc2626; color: white; }
+        .quiz-explanation { margin-top: 16px; padding: 16px; background: #f0f9ff; border: 1px solid #bae6fd; border-radius: var(--radius-sm); font-size: 0.85rem; color: #0369a1; line-height: 1.6; display: none; }
+        .quiz-btn { padding: 14px 32px; background: var(--primary); color: white; border: none; border-radius: var(--radius-sm); font-family: 'Inter', sans-serif; font-size: 0.92rem; font-weight: 600; cursor: pointer; transition: background 0.2s; margin-top: 20px; }
+        .quiz-btn:hover { background: var(--primary-light); }
+        .quiz-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .quiz-score { text-align: center; padding: 20px 0; }
+        .score-circle { width: 140px; height: 140px; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 0 auto 20px; font-weight: 800; }
+        .score-value { font-size: 2.5rem; line-height: 1; }
+        .score-label { font-size: 0.8rem; opacity: 0.8; }
+        .score-msg { font-size: 1.1rem; font-weight: 600; color: var(--text-dark); margin-bottom: 8px; }
+        .score-detail { font-size: 0.9rem; color: var(--text-light); margin-bottom: 24px; }
+        .score-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+        .score-actions a, .score-actions button { padding: 12px 24px; border-radius: var(--radius-sm); font-family: 'Inter', sans-serif; font-size: 0.88rem; font-weight: 600; cursor: pointer; text-decoration: none; border: 2px solid var(--primary); }
+        .btn-replay { background: var(--primary); color: white; }
+        .btn-back { background: transparent; color: var(--primary); }
+        /* Start screen */
+        .quiz-start { text-align: center; }
+        .quiz-start h1 { font-size: 1.8rem; font-weight: 800; color: var(--text-dark); margin-bottom: 12px; }
+        .quiz-start p { color: var(--text-light); margin-bottom: 24px; line-height: 1.7; }
+        .quiz-start .start-icon { font-size: 4rem; color: var(--secondary); margin-bottom: 20px; }
+        .quiz-start .stats { display: flex; gap: 20px; justify-content: center; margin-bottom: 24px; }
+        .quiz-start .stat { text-align: center; }
+        .quiz-start .stat strong { display: block; font-size: 1.3rem; color: var(--primary); }
+        .quiz-start .stat span { font-size: 0.78rem; color: var(--text-light); }
+    </style>
+</head>
+<body>
+    <div class="quiz-header">
+        <a href="/membros/"><i class="fas fa-arrow-left"></i> Voltar à Área do Associado</a>
+    </div>
+
+    <div class="quiz-container">
+        <div class="quiz-card" id="quiz-card">
+            <!-- Start Screen -->
+            <div class="quiz-start" id="quiz-start">
+                <div class="start-icon"><i class="fas fa-gamepad"></i></div>
+                <h1>Quiz: Gestão de Mudanças</h1>
+                <p>Teste seus conhecimentos sobre os fundamentos da Gestão de Mudanças baseado no ACMP Standard.</p>
+                <div class="stats">
+                    <div class="stat"><strong>15</strong><span>Perguntas</span></div>
+                    <div class="stat"><strong>~5 min</strong><span>Duração</span></div>
+                    <div class="stat"><strong>4</strong><span>Opções cada</span></div>
+                </div>
+                <button class="quiz-btn" onclick="startQuiz()"><i class="fas fa-play"></i> Começar Quiz</button>
+            </div>
+
+            <!-- Question Screen (hidden initially) -->
+            <div id="quiz-game" style="display:none;">
+                <div class="quiz-progress">
+                    <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-fill"></div></div>
+                    <span class="progress-text" id="progress-text">1/15</span>
+                </div>
+                <div class="quiz-question" id="question-text"></div>
+                <div class="quiz-options" id="options-container"></div>
+                <div class="quiz-explanation" id="explanation"></div>
+                <button class="quiz-btn" id="next-btn" onclick="nextQuestion()" style="display:none;">Próxima <i class="fas fa-arrow-right"></i></button>
+            </div>
+
+            <!-- Score Screen (hidden initially) -->
+            <div id="quiz-result" style="display:none;"></div>
+        </div>
+    </div>
+
+    <script>
+    var questions = [
+        { q: "Segundo o ACMP Standard, qual é o foco principal da Gestão de Mudanças?", o: ["Gerenciar o cronograma do projeto", "Preparar e apoiar pessoas na adoção de mudanças", "Reduzir custos operacionais", "Implementar novas tecnologias"], c: 1, e: "A Gestão de Mudanças foca no lado humano das transformações, preparando, equipando e apoiando pessoas para adotar mudanças com sucesso." },
+        { q: "O que é o ACMP Standard for Change Management?", o: ["Um software de gestão de projetos", "O corpo de conhecimento e melhores práticas da disciplina de CM", "Um certificado de treinamento", "Uma metodologia ágil"], c: 1, e: "O Standard é o documento de referência que define as melhores práticas e o corpo de conhecimento da disciplina." },
+        { q: "Qual certificação da ACMP é a mais reconhecida mundialmente?", o: ["PMP", "CCMP", "Scrum Master", "Six Sigma"], c: 1, e: "O CCMP (Certified Change Management Professional) é a certificação profissional mais reconhecida em Gestão de Mudanças." },
+        { q: "Segundo pesquisa da Prosci, organizações com excelência em CM atingem qual taxa de sucesso?", o: ["45%", "65%", "88%", "95%"], c: 2, e: "Organizações com excelência em gestão de mudanças atingem 88% de sucesso vs. 13% sem práticas estruturadas." },
+        { q: "O que é 'resistência à mudança' no contexto de CM?", o: ["Um defeito de personalidade", "Uma reação natural das pessoas diante do desconhecido", "Falta de competência técnica", "Desobediência organizacional"], c: 1, e: "A resistência é uma reação humana natural. Profissionais de CM devem entender e gerenciar essa resistência, não eliminá-la." },
+        { q: "Qual é o papel do 'sponsor' (patrocinador) em um projeto de mudança?", o: ["Desenvolver o software", "Prover apoio visível e ativo à mudança", "Treinar a equipe técnica", "Elaborar o orçamento"], c: 1, e: "O sponsor é o líder executivo que apoia visivelmente a mudança. 73% dos projetos com sponsor ativo têm sucesso." },
+        { q: "O que significa ADKAR no contexto de gestão de mudanças?", o: ["Um framework de TI", "Awareness, Desire, Knowledge, Ability, Reinforcement", "Um tipo de certificação", "Uma metodologia ágil"], c: 1, e: "ADKAR é um modelo da Prosci que descreve as 5 etapas da mudança individual: Consciência, Desejo, Conhecimento, Habilidade e Reforço." },
+        { q: "Qual é a principal diferença entre Gestão de Mudanças e Gestão de Projetos?", o: ["Não há diferença", "CM foca nas pessoas, GP foca na entrega técnica", "CM é mais rápida", "GP é mais estratégica"], c: 1, e: "Gestão de Projetos cuida do lado técnico (escopo, prazo, custo). Gestão de Mudanças cuida do lado humano (adoção, engajamento)." },
+        { q: "O que é 'change readiness' (prontidão para mudança)?", o: ["Velocidade de implementação", "Avaliação de quanto a organização está preparada para a mudança", "Tipo de treinamento", "Fase final do projeto"], c: 1, e: "Change readiness é a avaliação de quão preparada a organização e seus stakeholders estão para abraçar uma mudança." },
+        { q: "Quantas horas de treinamento são necessárias para se candidatar ao CCMP?", o: ["10 horas", "21 horas", "40 horas", "100 horas"], c: 1, e: "O CCMP exige mínimo de 21 horas de treinamento em programa aprovado por um QEP (Qualified Education Provider)." },
+        { q: "O que é um QEP na ACMP?", o: ["Um tipo de certificação", "Qualified Education Provider - provedor de treinamento aprovado", "Um software de CM", "Um cargo executivo"], c: 1, e: "QEP (Qualified Education Provider) é uma organização aprovada pela ACMP para oferecer treinamento preparatório para o CCMP." },
+        { q: "Segundo o Standard, qual é uma das primeiras atividades em um processo de mudança?", o: ["Implementar a solução", "Avaliar o impacto da mudança e identificar stakeholders", "Celebrar os resultados", "Treinar toda a organização"], c: 1, e: "Avaliar o impacto e identificar stakeholders são atividades iniciais fundamentais para planejar a abordagem de mudança." },
+        { q: "O mercado global de consultoria em Gestão de Mudanças está projetado para atingir quanto até 2031?", o: ["US$ 500 milhões", "US$ 1,5 bilhão", "US$ 3,29 bilhões", "US$ 10 bilhões"], c: 2, e: "O mercado deve crescer de US$ 1,96 bi (2025) para US$ 3,29 bi (2031), com CAGR de 9,02%." },
+        { q: "Qual % das organizações já utiliza IA em alguma função de negócio?", o: ["25%", "50%", "75%", "88%"], c: 3, e: "88% das organizações já usam IA em pelo menos uma função de negócio, mas apenas um terço conseguiu escalar com sucesso." },
+        { q: "Em que ano a ACMP foi fundada?", o: ["2005", "2008", "2011", "2015"], c: 2, e: "A ACMP foi fundada em 2011 como organização global sem fins lucrativos dedicada à profissão de Gestão de Mudanças." }
+    ];
+
+    var currentQ = 0, score = 0, answered = false;
+
+    function startQuiz() {
+        currentQ = 0; score = 0;
+        shuffle(questions);
+        document.getElementById('quiz-start').style.display = 'none';
+        document.getElementById('quiz-game').style.display = 'block';
+        document.getElementById('quiz-result').style.display = 'none';
+        showQuestion();
+    }
+
+    function shuffle(arr) {
+        for (var i = arr.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var t = arr[i]; arr[i] = arr[j]; arr[j] = t;
+        }
+    }
+
+    function showQuestion() {
+        answered = false;
+        var q = questions[currentQ];
+        document.getElementById('question-text').textContent = q.q;
+        document.getElementById('progress-text').textContent = (currentQ + 1) + '/' + questions.length;
+        document.getElementById('progress-fill').style.width = ((currentQ + 1) / questions.length * 100) + '%';
+        document.getElementById('explanation').style.display = 'none';
+        document.getElementById('next-btn').style.display = 'none';
+        var letters = ['A', 'B', 'C', 'D'];
+        var html = '';
+        for (var i = 0; i < q.o.length; i++) {
+            html += '<div class="quiz-option" onclick="selectOption(this, ' + i + ')">' +
+                '<span class="opt-letter">' + letters[i] + '</span>' +
+                '<span>' + q.o[i] + '</span></div>';
+        }
+        document.getElementById('options-container').innerHTML = html;
+    }
+
+    function selectOption(el, idx) {
+        if (answered) return;
+        answered = true;
+        var q = questions[currentQ];
+        var opts = document.querySelectorAll('.quiz-option');
+        opts.forEach(function(o, i) {
+            if (i === q.c) o.classList.add('correct');
+            if (i === idx && i !== q.c) o.classList.add('wrong');
+        });
+        el.classList.add('selected');
+        if (idx === q.c) score++;
+        document.getElementById('explanation').textContent = q.e;
+        document.getElementById('explanation').style.display = 'block';
+        var nextBtn = document.getElementById('next-btn');
+        nextBtn.style.display = 'inline-flex';
+        nextBtn.textContent = currentQ === questions.length - 1 ? 'Ver Resultado' : 'Próxima ';
+    }
+
+    function nextQuestion() {
+        currentQ++;
+        if (currentQ >= questions.length) {
+            showResult();
+        } else {
+            showQuestion();
+        }
+    }
+
+    function showResult() {
+        document.getElementById('quiz-game').style.display = 'none';
+        var pct = Math.round(score / questions.length * 100);
+        var color = pct >= 80 ? '#16a34a' : pct >= 60 ? '#d97706' : '#dc2626';
+        var msg = pct >= 80 ? 'Excelente! Você domina Gestão de Mudanças!' : pct >= 60 ? 'Bom trabalho! Mas ainda há espaço para melhorar.' : 'Continue estudando! Recomendamos revisar o ACMP Standard.';
+        document.getElementById('quiz-result').style.display = 'block';
+        document.getElementById('quiz-result').innerHTML =
+            '<div class="quiz-score">' +
+            '<div class="score-circle" style="background:' + color + '22;color:' + color + ';">' +
+            '<div class="score-value">' + pct + '%</div><div class="score-label">' + score + '/' + questions.length + ' corretas</div></div>' +
+            '<div class="score-msg">' + msg + '</div>' +
+            '<div class="score-detail">Você acertou ' + score + ' de ' + questions.length + ' perguntas sobre Gestão de Mudanças.</div>' +
+            '<div class="score-actions">' +
+            '<button class="btn-replay" onclick="startQuiz()"><i class="fas fa-redo"></i> Jogar Novamente</button>' +
+            '<a href="/membros/" class="btn-back"><i class="fas fa-arrow-left"></i> Voltar</a>' +
+            '</div></div>';
+    }
+    </script>
+</body>
+</html>
