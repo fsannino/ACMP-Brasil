@@ -128,14 +128,35 @@
         var SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlhdW16bHNzeWJ6b2lwd21sbHF5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU5MTcwMTEsImV4cCI6MjA5MTQ5MzAxMX0.GWK1jnlEmgxWmeWk1VGwR25fLBvquWtrkQ4ipq_A3RU';
         var sb = null;
 
-        // Init immediately - SDK is loaded locally
+        // Debug: show what's available
+        var dbg = 'supabase type: ' + typeof window.supabase;
+        if (window.supabase) {
+            dbg += ', createClient: ' + typeof window.supabase.createClient;
+        }
+
         try {
-            sb = window.supabase.createClient(SUPA_URL, SUPA_KEY);
+            if (typeof window.supabase === 'undefined') {
+                throw new Error('SDK not loaded. supabase.min.js may have failed.');
+            }
+            if (typeof window.supabase.createClient !== 'function') {
+                // Try as default export
+                if (typeof window.supabase.default !== 'undefined' && typeof window.supabase.default.createClient === 'function') {
+                    sb = window.supabase.default.createClient(SUPA_URL, SUPA_KEY);
+                } else {
+                    throw new Error('createClient not found. SDK format: ' + Object.keys(window.supabase).join(','));
+                }
+            } else {
+                sb = window.supabase.createClient(SUPA_URL, SUPA_KEY);
+            }
             document.getElementById('loading-msg').style.display = 'none';
             document.getElementById('login-content').style.display = 'block';
             checkSession();
         } catch(e) {
-            document.getElementById('loading-msg').innerHTML = '<span style="color:#dc2626;">Erro: ' + e.message + '. <a href="javascript:location.reload()">Recarregar</a></span>';
+            document.getElementById('loading-msg').innerHTML =
+                '<span style="color:#dc2626;">Erro: ' + e.message + '</span><br>' +
+                '<span style="font-size:0.75rem;color:#999;">Debug: ' + dbg + '</span><br>' +
+                '<a href="javascript:location.reload()" style="color:#1a3a5c;font-weight:600;">Recarregar</a>';
+            document.getElementById('login-content').style.display = 'block';
         }
 
         async function checkSession() {
