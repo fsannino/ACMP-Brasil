@@ -121,50 +121,75 @@
         </div>
     </div>
 
-    <script src="/js/supabase.min.js"></script>
     <script>
-        // ===== INLINE SUPABASE CONFIG =====
+        // ===== SUPABASE REST API CLIENT (no SDK needed) =====
         var SUPA_URL = 'https://yaumzlssybzoipwmllqy.supabase.co';
         var SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlhdW16bHNzeWJ6b2lwd21sbHF5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU5MTcwMTEsImV4cCI6MjA5MTQ5MzAxMX0.GWK1jnlEmgxWmeWk1VGwR25fLBvquWtrkQ4ipq_A3RU';
-        var sb = null;
 
-        // Debug: show what's available
-        var dbg = 'supabase type: ' + typeof window.supabase;
-        if (window.supabase) {
-            dbg += ', createClient: ' + typeof window.supabase.createClient;
+        // Direct REST API functions (no SDK dependency)
+        async function supaSignIn(email, password) {
+            var res = await fetch(SUPA_URL + '/auth/v1/token?grant_type=password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'apikey': SUPA_KEY },
+                body: JSON.stringify({ email: email, password: password })
+            });
+            var data = await res.json();
+            if (!res.ok) return { error: data };
+            localStorage.setItem('sb-token', data.access_token);
+            localStorage.setItem('sb-user', JSON.stringify(data.user));
+            return { data: data };
         }
 
-        try {
-            if (typeof window.supabase === 'undefined') {
-                throw new Error('SDK not loaded. supabase.min.js may have failed.');
+        async function supaSignUp(email, password, fullName) {
+            var res = await fetch(SUPA_URL + '/auth/v1/signup', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'apikey': SUPA_KEY },
+                body: JSON.stringify({ email: email, password: password, data: { full_name: fullName } })
+            });
+            var data = await res.json();
+            if (!res.ok) return { error: data };
+            return { data: data };
+        }
+
+        async function supaQuery(table, filters, token) {
+            var url = SUPA_URL + '/rest/v1/' + table + '?select=*';
+            if (filters) url += '&' + filters;
+            var headers = { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + (token || SUPA_KEY) };
+            var res = await fetch(url, { headers: headers });
+            return await res.json();
+        }
+
+        async function supaUpdate(table, filters, data, token) {
+            var url = SUPA_URL + '/rest/v1/' + table + '?' + filters;
+            var res = await fetch(url, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json', 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + (token || SUPA_KEY), 'Prefer': 'return=minimal' },
+                body: JSON.stringify(data)
+            });
+            return res.ok;
+        }
+
+        async function supaResetPassword(email) {
+            var res = await fetch(SUPA_URL + '/auth/v1/recover', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'apikey': SUPA_KEY },
+                body: JSON.stringify({ email: email })
+            });
+            return res.ok;
+        }
+
+        // Init: show login form immediately
+        document.getElementById('loading-msg').style.display = 'none';
+        document.getElementById('login-content').style.display = 'block';
+
+        // Check existing session
+        (function() {
+            var token = localStorage.getItem('sb-token');
+            var user = localStorage.getItem('sb-user');
+            if (token && user) {
+                window.location.href = '/membros/';
             }
-            if (typeof window.supabase.createClient !== 'function') {
-                // Try as default export
-                if (typeof window.supabase.default !== 'undefined' && typeof window.supabase.default.createClient === 'function') {
-                    sb = window.supabase.default.createClient(SUPA_URL, SUPA_KEY);
-                } else {
-                    throw new Error('createClient not found. SDK format: ' + Object.keys(window.supabase).join(','));
-                }
-            } else {
-                sb = window.supabase.createClient(SUPA_URL, SUPA_KEY);
-            }
-            document.getElementById('loading-msg').style.display = 'none';
-            document.getElementById('login-content').style.display = 'block';
-            checkSession();
-        } catch(e) {
-            document.getElementById('loading-msg').innerHTML =
-                '<span style="color:#dc2626;">Erro: ' + e.message + '</span><br>' +
-                '<span style="font-size:0.75rem;color:#999;">Debug: ' + dbg + '</span><br>' +
-                '<a href="javascript:location.reload()" style="color:#1a3a5c;font-weight:600;">Recarregar</a>';
-            document.getElementById('login-content').style.display = 'block';
-        }
-
-        async function checkSession() {
-            try {
-                var result = await sb.auth.getSession();
-                if (result.data.session) { window.location.href = 'index.html'; }
-            } catch(e) { console.log('No session'); }
-        }
+        })();
 
         function showTab(tab) {
             document.getElementById('login-form').style.display = tab === 'login' ? 'block' : 'none';
@@ -180,44 +205,36 @@
 
         async function handleLogin(e) {
             e.preventDefault();
-            if (!sb) { showError('Sistema não carregado. Recarregue a página.'); return; }
             var btn = document.getElementById('btn-login');
             btn.disabled = true; btn.textContent = 'Entrando...';
             try {
-                var result = await sb.auth.signInWithPassword({
-                    email: document.getElementById('login-email').value,
-                    password: document.getElementById('login-password').value
-                });
-                console.log('Login result:', result);
+                var result = await supaSignIn(
+                    document.getElementById('login-email').value,
+                    document.getElementById('login-password').value
+                );
                 if (result.error) {
-                    showError(result.error.message === 'Invalid login credentials' ? 'E-mail ou senha incorretos.' : result.error.message);
+                    var msg = result.error.error_description || result.error.msg || result.error.message || 'Erro ao fazer login';
+                    if (msg.includes('Invalid login')) msg = 'E-mail ou senha incorretos.';
+                    showError(msg);
                 } else {
-                    // Check membership status before allowing access
-                    console.log('User logged in:', result.data.user.id, result.data.user.email);
-                    var profile = await sb.from('member_profiles').select('membership_status, role').eq('id', result.data.user.id).single();
-                    console.log('Profile query result:', profile);
-
-                    // If profile query fails (RLS issue), try by email
-                    if (!profile.data) {
-                        console.log('Profile not found by ID, trying email...');
-                        profile = await sb.from('member_profiles').select('membership_status, role').eq('email', result.data.user.email).single();
-                        console.log('Profile by email:', profile);
-                    }
-
-                    var status = profile.data ? profile.data.membership_status : 'pending';
-                    var role = profile.data ? profile.data.role : 'member';
-                    console.log('Status:', status, 'Role:', role);
+                    var token = result.data.access_token;
+                    var user = result.data.user;
+                    var profiles = await supaQuery('member_profiles', 'email=eq.' + encodeURIComponent(user.email), token);
+                    var profile = profiles && profiles.length > 0 ? profiles[0] : null;
+                    var status = profile ? profile.membership_status : 'pending';
+                    var role = profile ? profile.role : 'member';
 
                     if (status === 'active' || status === 'community' || role === 'admin') {
                         showSuccess('Login realizado! Redirecionando...');
-                        setTimeout(function() { window.location.href = 'index.html'; }, 500);
+                        setTimeout(function() { window.location.href = '/membros/'; }, 500);
                         return;
                     } else if (status === 'rejected') {
-                        await sb.auth.signOut();
-                        showError('Sua solicitação de acesso não foi aprovada. Entre em contato com contato@acmpbrasil.org.br para mais informações.');
+                        localStorage.removeItem('sb-token');
+                        localStorage.removeItem('sb-user');
+                        showError('Sua solicitação não foi aprovada. Contate contato@acmpbrasil.org.br.');
                     } else {
-                        // pending
-                        await sb.auth.signOut();
+                        localStorage.removeItem('sb-token');
+                        localStorage.removeItem('sb-user');
                         document.getElementById('login-content').innerHTML =
                             '<div style="text-align:center;padding:20px 0;">' +
                             '<div style="font-size:3rem;color:#d97706;margin-bottom:16px;"><i class="fas fa-hourglass-half"></i></div>' +
@@ -239,7 +256,7 @@
 
         async function handleRegister(e) {
             e.preventDefault();
-            if (!sb) { showError('Sistema não carregado.'); return; }
+            // No SDK check needed - using REST API directly
             var pw1 = document.getElementById('reg-password').value;
             var pw2 = document.getElementById('reg-password2').value;
             if (pw1 !== pw2) { showError('As senhas não coincidem.'); return; }
@@ -247,18 +264,23 @@
             var btn = document.getElementById('btn-register');
             btn.disabled = true; btn.textContent = 'Criando conta...';
             try {
-                var result = await sb.auth.signUp({
-                    email: document.getElementById('reg-email').value,
-                    password: pw1,
-                    options: { data: { full_name: document.getElementById('reg-name').value, reg_type: regType } }
-                });
+                var result = await supaSignUp(
+                    document.getElementById('reg-email').value, pw1,
+                    document.getElementById('reg-name').value
+                );
                 if (result.error) {
-                    showError(result.error.message);
+                    showError(result.error.msg || result.error.message || 'Erro ao criar conta');
                 } else {
-                    // Both types get community access immediately
-                    if (result.data.user) {
-                        await sb.from('member_profiles').update({ membership_status: 'community' }).eq('id', result.data.user.id);
-                    }
+                    // Set community access - login first to get token, then update
+                    try {
+                        var loginRes = await supaSignIn(document.getElementById('reg-email').value, pw1);
+                        if (loginRes.data) {
+                            await supaUpdate('member_profiles', 'email=eq.' + encodeURIComponent(document.getElementById('reg-email').value),
+                                { membership_status: 'community' }, loginRes.data.access_token);
+                            localStorage.removeItem('sb-token');
+                            localStorage.removeItem('sb-user');
+                        }
+                    } catch(ex) { console.log('Could not set community status:', ex); }
 
                     if (regType === 'community') {
                         document.getElementById('login-content').innerHTML =
@@ -296,13 +318,11 @@
 
         async function handleForgot(e) {
             e.preventDefault();
-            if (!sb) return;
             var email = document.getElementById('login-email').value;
             if (!email) { showError('Digite seu e-mail primeiro.'); return; }
-            try {
-                await sb.auth.resetPasswordForEmail(email);
-                showSuccess('E-mail de recuperação enviado para ' + email);
-            } catch(err) { showError(err.message); }
+            var ok = await supaResetPassword(email);
+            if (ok) showSuccess('E-mail de recuperação enviado para ' + email);
+            else showError('Erro ao enviar e-mail de recuperação.');
         }
     </script>
 </body>
