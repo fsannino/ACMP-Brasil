@@ -1,25 +1,9 @@
-var CACHE_NAME = 'acmp-brasil-v1';
-var URLS = [
-    '/',
-    '/index.html',
-    '/css/styles.css',
-    '/js/main.js',
-    '/img/logo-acmp-brasil.png',
-    '/img/logo-acmp-brasil-white.png'
-];
-
-self.addEventListener('install', function (e) {
+// Service worker disabled - unregister any existing ones
+self.addEventListener('install', function() { self.skipWaiting(); });
+self.addEventListener('activate', function(e) {
     e.waitUntil(
-        caches.open(CACHE_NAME).then(function (cache) {
-            return cache.addAll(URLS);
-        })
-    );
-});
-
-self.addEventListener('fetch', function (e) {
-    e.respondWith(
-        caches.match(e.request).then(function (response) {
-            return response || fetch(e.request);
-        })
+        caches.keys().then(function(names) {
+            return Promise.all(names.map(function(name) { return caches.delete(name); }));
+        }).then(function() { return self.clients.claim(); })
     );
 });
