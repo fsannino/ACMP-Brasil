@@ -179,6 +179,23 @@
             return res.ok;
         }
 
+        // Notify admin via Formspree when a new user registers
+        async function notifyAdminNewUser(name, email, type) {
+            try {
+                await fetch('https://formspree.io/f/mbdqrbkp', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                    body: JSON.stringify({
+                        _subject: '[ACMP Brasil] Novo cadastro: ' + name,
+                        nome: name,
+                        email: email,
+                        tipo: type === 'member' ? 'Associado ACMP (requer aprovação)' : 'Comunidade',
+                        mensagem: 'Novo usuário cadastrado no portal ACMP Brasil.\n\nNome: ' + name + '\nE-mail: ' + email + '\nTipo: ' + (type === 'member' ? 'Associado ACMP Global (aguardando aprovação)' : 'Comunidade/Voluntário') + '\n\nAcesse o painel admin para gerenciar: https://acmpbrasil.org.br/admin'
+                    })
+                });
+            } catch(e) { console.log('Admin notification failed:', e); }
+        }
+
         // Init: show login form immediately
         document.getElementById('loading-msg').style.display = 'none';
         document.getElementById('login-content').style.display = 'block';
@@ -273,15 +290,20 @@
                     showError(result.error.msg || result.error.message || 'Erro ao criar conta');
                 } else {
                     // Set community access - login first to get token, then update
+                    var regName = document.getElementById('reg-name').value;
+                    var regEmail = document.getElementById('reg-email').value;
                     try {
-                        var loginRes = await supaSignIn(document.getElementById('reg-email').value, pw1);
+                        var loginRes = await supaSignIn(regEmail, pw1);
                         if (loginRes.data) {
-                            await supaUpdate('member_profiles', 'email=eq.' + encodeURIComponent(document.getElementById('reg-email').value),
+                            await supaUpdate('member_profiles', 'email=eq.' + encodeURIComponent(regEmail),
                                 { membership_status: 'community' }, loginRes.data.access_token);
                             localStorage.removeItem('sb-token');
                             localStorage.removeItem('sb-user');
                         }
                     } catch(ex) { console.log('Could not set community status:', ex); }
+
+                    // Notify admin about the new registration
+                    notifyAdminNewUser(regName, regEmail, regType);
 
                     if (regType === 'community') {
                         document.getElementById('login-content').innerHTML =
