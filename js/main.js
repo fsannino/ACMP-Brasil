@@ -201,7 +201,7 @@ document.addEventListener('DOMContentLoaded', function () {
             '<div class="exit-icon"><i class="fas fa-hand-paper"></i></div>' +
             '<h3>Espere! Antes de sair...</h3>' +
             '<p>Inscreva-se na newsletter da ACMP Brasil e receba conteúdos exclusivos sobre Gestão de Mudanças.</p>' +
-            '<form class="exit-form" action="https://formspree.io/f/xpwdqjkl" method="POST">' +
+            '<form class="exit-form" action="https://formspree.io/f/mbdqrbkp" method="POST">' +
             '<input type="hidden" name="_subject" value="Newsletter via Exit Popup - ACMP Brasil">' +
             '<input type="email" name="email" placeholder="Seu melhor e-mail" required>' +
             '<button type="submit" class="btn btn-primary">Quero Receber</button>' +
