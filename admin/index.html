@@ -145,7 +145,16 @@
                     </select>
                 </div>
                 <div class="full"><label>Descrição</label><textarea id="ct-desc" rows="2"></textarea></div>
-                <div><label>URL do arquivo / link externo</label><input type="url" id="ct-url" placeholder="https://..."></div>
+                <div><label>URL do arquivo / link externo</label><input type="url" id="ct-url" placeholder="https://...">
+                    <div style="margin-top:8px;">
+                        <label style="display:inline-flex;align-items:center;gap:6px;cursor:pointer;background:var(--bg-light);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 14px;font-size:0.82rem;color:var(--primary);font-weight:600;">
+                            <i class="fas fa-cloud-upload-alt"></i> Ou fazer upload de arquivo
+                            <input type="file" id="ct-file-upload" style="display:none;" onchange="handleFileUpload(event)" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.png,.jpg,.jpeg,.gif,.mp4,.zip">
+                        </label>
+                        <span id="upload-status" style="font-size:0.78rem;color:var(--text-light);margin-left:8px;"></span>
+                    </div>
+                    <p style="font-size:0.72rem;color:var(--text-light);margin-top:4px;">PDF, DOC, XLS, PPT, imagens, vídeos, ZIP (máx. 50MB)</p>
+                </div>
                 <div><label>Destaque?</label>
                     <select id="ct-featured"><option value="false">Não</option><option value="true">Sim</option></select>
                 </div>
@@ -358,6 +367,50 @@
             el.style.color = type === 'success' ? '#16a34a' : '#dc2626';
             el.style.padding = '12px'; el.style.borderRadius = '8px'; el.textContent = msg;
             setTimeout(function(){el.style.display='none';}, 4000);
+        }
+
+        // File upload to Supabase Storage
+        async function handleFileUpload(e) {
+            var file = e.target.files[0];
+            if (!file) return;
+            if (file.size > 50 * 1024 * 1024) {
+                showAlert('content-alert', 'Arquivo muito grande (máx. 50MB)', 'error');
+                return;
+            }
+            var statusEl = document.getElementById('upload-status');
+            statusEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+
+            // Generate safe filename: timestamp + sanitized name
+            var safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+            var path = Date.now() + '_' + safeName;
+
+            try {
+                var res = await fetch(SUPA_URL + '/storage/v1/object/content-files/' + path, {
+                    method: 'POST',
+                    headers: {
+                        'apikey': SUPA_KEY,
+                        'Authorization': 'Bearer ' + (getToken() || SUPA_KEY),
+                        'Content-Type': file.type || 'application/octet-stream',
+                        'x-upsert': 'true'
+                    },
+                    body: file
+                });
+                if (res.ok) {
+                    var publicUrl = SUPA_URL + '/storage/v1/object/public/content-files/' + path;
+                    document.getElementById('ct-url').value = publicUrl;
+                    statusEl.innerHTML = '<i class="fas fa-check-circle" style="color:#16a34a;"></i> <span style="color:#16a34a;">Upload concluído!</span>';
+                } else {
+                    var err = await res.json().catch(function() { return {}; });
+                    var msg = err.message || err.error || 'Erro no upload';
+                    statusEl.innerHTML = '<i class="fas fa-exclamation-circle" style="color:#dc2626;"></i> <span style="color:#dc2626;">' + msg + '</span>';
+                    // If bucket doesn't exist yet, show instructions
+                    if (res.status === 404 || msg.includes('not found')) {
+                        statusEl.innerHTML += '<br><span style="font-size:0.72rem;color:var(--text-light);">Crie o bucket "content-files" no Supabase Storage (Storage > New Bucket > "content-files" > público).</span>';
+                    }
+                }
+            } catch(err) {
+                statusEl.innerHTML = '<i class="fas fa-exclamation-circle" style="color:#dc2626;"></i> <span style="color:#dc2626;">Erro: ' + err.message + '</span>';
+            }
         }
 
         function handleLogout() { localStorage.removeItem('sb-token'); localStorage.removeItem('sb-user'); window.location.href = '/membros/login'; }
