@@ -22,4 +22,11 @@ e cai para iniciais quando o arquivo não existe.
 
 ## Fundadores
 
-A definir — slugs de arquivo seguem o mesmo padrão: `nome-sobrenome.jpg`.
+Reusam as mesmas fotos das outras seções:
+
+- `isis-moda-pires.jpg` — Isis Moda Pires
+- `fabiano-sannino.jpg` — Fabiano Sannino
+- `armando-kokitsu.jpg` — Armando Kokitsu
+- `daniel-druwe-araujo.jpg` — Daniel Druwe Araujo
+- `geni-elisabeth-esteves.jpg` — Geni Elisabeth Esteves
+- `emerson-zuccherato.jpg` — Emerson Zuccherato
