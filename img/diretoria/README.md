@@ -15,9 +15,9 @@ e cai para iniciais quando o arquivo não existe.
 - `emerson-zuccherato.jpg` — Emerson Zuccherato
 - `isis-moda-pires.jpg` — Isis Moda Pires (mesma foto da diretoria atual)
 - `daniel-druwe-araujo.jpg` — Daniel Druwe Araujo
-- `armando-koktsu.jpg` — Armando Koktsu
+- `armando-kokitsu.jpg` — Armando Kokitsu
 - `geni-elisabeth-esteves.jpg` — Geni Elisabeth Esteves
-- `adrina-ferraz.jpg` — Adrina Ferraz
+- `adrian-ferraz.jpg` — Adrian Ferraz
 - `fabiano-sannino.jpg` — Fabiano Sannino (mesma foto da diretoria atual)
 
 ## Fundadores
