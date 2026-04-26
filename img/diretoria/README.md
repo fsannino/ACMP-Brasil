@@ -6,19 +6,19 @@ e cai para iniciais quando o arquivo não existe.
 
 ## Diretoria Atual
 
-- `michel-arruda.jpg` — Michel Arruda (Presidente)
-- `isis-pires.jpg` — Isis Pires (Diretora de Marketing e Eventos)
-- `felipe-sannino.jpg` — Felipe Sannino (Diretor Financeiro)
+- `michel-de-arruda-pires.jpg` — Michel de Arruda Pires (Presidente)
+- `isis-moda-pires.jpg` — Isis Moda Pires (Diretora de Marketing e Eventos)
+- `fabiano-sannino.jpg` — Fabiano Sannino (Diretor Financeiro)
 
 ## Diretorias Anteriores
 
-- `emerzuc.jpg` — Emerzuc (linkedin.com/in/emerzuc) — confirmar nome completo
-- `isis-pires.jpg` — Isis Pires (mesma foto da diretoria atual)
+- `emerson-zuccherato.jpg` — Emerson Zuccherato
+- `isis-moda-pires.jpg` — Isis Moda Pires (mesma foto da diretoria atual)
 - `daniel-druwe-araujo.jpg` — Daniel Druwe Araujo
-- `armando-kokitsu.jpg` — Armando Kokitsu
-- `elisabeth-esteves.jpg` — Elisabeth Esteves
-- `adrian-ferraz.jpg` — Adrian Ferraz
-- `felipe-sannino.jpg` — Felipe Sannino (mesma foto da diretoria atual)
+- `armando-koktsu.jpg` — Armando Koktsu
+- `geni-elisabeth-esteves.jpg` — Geni Elisabeth Esteves
+- `adrina-ferraz.jpg` — Adrina Ferraz
+- `fabiano-sannino.jpg` — Fabiano Sannino (mesma foto da diretoria atual)
 
 ## Fundadores
 
