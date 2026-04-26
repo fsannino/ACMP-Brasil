@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nossa Diretoria - ACMP Brasil</title>
+    <meta name="description" content="Conheça a diretoria da ACMP Brasil: diretores atuais, ex-diretores e fundadores do capítulo brasileiro da Association of Change Management Professionals.">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="icon" type="image/svg+xml" href="../img/logo-acmp-brasil.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .page-hero { background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 50%, var(--primary-light) 100%); padding: 80px 0 60px; color: white; text-align: center; position: relative; overflow: hidden; }
+        .page-hero::before { content: ''; position: absolute; inset: 0; background: url('https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=1600&q=80') center/cover no-repeat; opacity: 0.12; }
+        .page-hero h1 { font-size: 2.5rem; font-weight: 800; margin-bottom: 16px; position: relative; }
+        .page-hero p { font-size: 1.1rem; opacity: 0.9; max-width: 700px; margin: 0 auto; position: relative; }
+        .page-content { padding: 60px 0; max-width: 1100px; margin: 0 auto; }
+        .page-content > p { font-size: 1rem; line-height: 1.8; color: var(--text-body); margin-bottom: 20px; max-width: 850px; }
+        .page-content h2 { font-size: 1.6rem; font-weight: 700; color: var(--text-dark); margin: 50px 0 8px; }
+        .page-content .section-sub { color: var(--text-light); font-size: 0.95rem; margin-bottom: 28px; }
+        .back-link { display: inline-flex; align-items: center; gap: 8px; color: var(--primary); font-weight: 600; font-size: 0.9rem; margin-bottom: 30px; }
+        .back-link:hover { gap: 12px; }
+
+        /* Tabs */
+        .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin: 30px 0; border-bottom: 2px solid var(--border-light); padding-bottom: 0; }
+        .tab-btn { background: transparent; border: 0; padding: 12px 22px; font-family: var(--font-main); font-size: 0.95rem; font-weight: 600; color: var(--text-light); cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all 0.2s ease; }
+        .tab-btn:hover { color: var(--primary); }
+        .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* People grid */
+        .people-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px; margin: 20px 0 30px; }
+        .person-card { background: var(--bg-white); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); border: 1px solid var(--border-light); overflow: hidden; transition: all 0.3s ease; display: flex; flex-direction: column; }
+        .person-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+        .person-photo { width: 100%; aspect-ratio: 1 / 1; background: linear-gradient(135deg, var(--primary-dark), var(--primary), var(--primary-light)); display: flex; align-items: center; justify-content: center; color: white; font-size: 3rem; position: relative; overflow: hidden; }
+        .person-photo img { width: 100%; height: 100%; object-fit: cover; }
+        .person-photo .photo-placeholder { font-size: 2.5rem; opacity: 0.5; }
+        .person-body { padding: 20px 22px 22px; flex: 1; display: flex; flex-direction: column; }
+        .person-name { font-size: 1.1rem; font-weight: 700; color: var(--text-dark); margin-bottom: 4px; }
+        .person-role { display: inline-block; background: rgba(26, 58, 92, 0.08); color: var(--primary); padding: 3px 10px; border-radius: 50px; font-size: 0.75rem; font-weight: 600; margin-bottom: 12px; align-self: flex-start; }
+        .person-role.role-founder { background: #fff3e0; color: #e65100; }
+        .person-role.role-past { background: #eceff1; color: #455a64; }
+        .person-bio { font-size: 0.85rem; color: var(--text-body); line-height: 1.6; margin-bottom: 14px; flex: 1; }
+        .person-links { display: flex; gap: 10px; }
+        .person-links a { width: 32px; height: 32px; border-radius: 50%; background: var(--bg-light); display: inline-flex; align-items: center; justify-content: center; color: var(--primary); transition: all 0.2s ease; font-size: 0.85rem; }
+        .person-links a:hover { background: var(--primary); color: white; transform: translateY(-2px); }
+
+        /* Empty state */
+        .empty-state { background: var(--bg-light); border: 2px dashed var(--border); border-radius: var(--radius-lg); padding: 40px 24px; text-align: center; color: var(--text-light); margin: 20px 0; }
+        .empty-state i { font-size: 2rem; color: var(--primary); opacity: 0.4; margin-bottom: 12px; }
+        .empty-state p { font-size: 0.95rem; margin: 0; }
+
+        /* CTA */
+        .page-cta { background: linear-gradient(135deg, var(--primary-dark), var(--primary)); color: white; border-radius: var(--radius-lg); padding: 40px; text-align: center; margin: 50px 0 0; }
+        .page-cta h3 { font-size: 1.3rem; font-weight: 700; margin-bottom: 12px; }
+        .page-cta p { opacity: 0.9; margin-bottom: 22px; }
+        .page-cta .btn { background: white; color: var(--primary); }
+        .page-cta .btn:hover { background: var(--bg-light); }
+
+        @media (max-width: 768px) {
+            .page-hero h1 { font-size: 1.9rem; }
+            .people-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <div class="container top-bar-content">
+            <div class="top-bar-left">
+                <a href="https://www.acmpglobal.org/" target="_blank" rel="noopener"><i class="fas fa-globe"></i> ACMP Global</a>
+                <a href="https://www.acmpglobal.org/page/acmp-connect" target="_blank" rel="noopener"><i class="fas fa-users"></i> ACMP Connect</a>
+            </div>
+            <div class="top-bar-right">
+                <a href="https://www.acmpglobal.org/page/join_acmp" target="_blank" rel="noopener" class="btn-join">Associe-se</a>
+            </div>
+        </div>
+    </div>
+    <header class="main-header">
+        <div class="container header-content">
+            <a href="../index.html" class="logo">
+                <img src="../img/logo-acmp-brasil.png" alt="ACMP Brasil" style="height: 44px; width: auto; display: block;">
+            </a>
+        </div>
+    </header>
+
+    <section class="page-hero">
+        <div class="container">
+            <h1><i class="fas fa-user-tie"></i> Nossa Diretoria</h1>
+            <p>Conheça os profissionais que lideram, lideraram e fundaram a ACMP Brasil — o capítulo brasileiro da Association of Change Management Professionals.</p>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container page-content">
+            <a href="../index.html" class="back-link"><i class="fas fa-arrow-left"></i> Voltar para a página inicial</a>
+
+            <p>A ACMP Brasil é dirigida por uma equipe voluntária de profissionais reconhecidos no mercado brasileiro de Gestão de Mudanças. Nossa diretoria é composta por especialistas que dedicam tempo e expertise para fortalecer a comunidade, promover a profissão e conectar o Brasil à rede global da ACMP.</p>
+
+            <p>Nesta página você encontra a diretoria atual, os ex-diretores que ajudaram a construir o capítulo ao longo dos anos e os fundadores que tornaram este projeto possível.</p>
+
+            <div class="tabs" role="tablist">
+                <button class="tab-btn active" data-tab="atual" role="tab" aria-selected="true">Diretoria Atual</button>
+                <button class="tab-btn" data-tab="anteriores" role="tab" aria-selected="false">Diretorias Anteriores</button>
+                <button class="tab-btn" data-tab="fundadores" role="tab" aria-selected="false">Fundadores</button>
+            </div>
+
+            <div id="tab-atual" class="tab-panel active" role="tabpanel">
+                <h2>Diretoria Atual</h2>
+                <p class="section-sub">Profissionais que lideram a ACMP Brasil no mandato vigente.</p>
+
+                <div class="people-grid">
+                    <article class="person-card">
+                        <div class="person-photo"><span class="photo-placeholder"><i class="fas fa-user"></i></span></div>
+                        <div class="person-body">
+                            <h3 class="person-name">Nome do(a) Presidente</h3>
+                            <span class="person-role">Presidente</span>
+                            <p class="person-bio">Profissional sênior em Gestão de Mudanças com atuação em transformações organizacionais de larga escala. Breve biografia a ser preenchida com o currículo oficial.</p>
+                            <div class="person-links">
+                                <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                                <a href="#" aria-label="E-mail"><i class="fas fa-envelope"></i></a>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="person-card">
+                        <div class="person-photo"><span class="photo-placeholder"><i class="fas fa-user"></i></span></div>
+                        <div class="person-body">
+                            <h3 class="person-name">Nome do(a) Vice-Presidente</h3>
+                            <span class="person-role">Vice-Presidente</span>
+                            <p class="person-bio">Especialista em Gestão de Mudanças com experiência em projetos de transformação digital. Breve biografia a ser preenchida com o currículo oficial.</p>
+                            <div class="person-links">
+                                <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                                <a href="#" aria-label="E-mail"><i class="fas fa-envelope"></i></a>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="person-card">
+                        <div class="person-photo"><span class="photo-placeholder"><i class="fas fa-user"></i></span></div>
+                        <div class="person-body">
+                            <h3 class="person-name">Nome do(a) Diretor(a) de Eventos</h3>
+                            <span class="person-role">Diretoria de Eventos</span>
+                            <p class="person-bio">Responsável pela curadoria e organização dos encontros, workshops e conferências da ACMP Brasil. Breve biografia a ser preenchida.</p>
+                            <div class="person-links">
+                                <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                                <a href="#" aria-label="E-mail"><i class="fas fa-envelope"></i></a>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="person-card">
+                        <div class="person-photo"><span class="photo-placeholder"><i class="fas fa-user"></i></span></div>
+                        <div class="person-body">
+                            <h3 class="person-name">Nome do(a) Diretor(a) de Comunicação</h3>
+                            <span class="person-role">Diretoria de Comunicação</span>
+                            <p class="person-bio">Responsável pela estratégia de conteúdo, redes sociais e relacionamento com a comunidade. Breve biografia a ser preenchida.</p>
+                            <div class="person-links">
+                                <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                                <a href="#" aria-label="E-mail"><i class="fas fa-envelope"></i></a>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="person-card">
+                        <div class="person-photo"><span class="photo-placeholder"><i class="fas fa-user"></i></span></div>
+                        <div class="person-body">
+                            <h3 class="person-name">Nome do(a) Diretor(a) de Educação</h3>
+                            <span class="person-role">Diretoria de Educação</span>
+                            <p class="person-bio">Lidera as iniciativas de capacitação, certificação CCMP e formação contínua dos associados. Breve biografia a ser preenchida.</p>
+                            <div class="person-links">
+                                <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                                <a href="#" aria-label="E-mail"><i class="fas fa-envelope"></i></a>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="person-card">
+                        <div class="person-photo"><span class="photo-placeholder"><i class="fas fa-user"></i></span></div>
+                        <div class="person-body">
+                            <h3 class="person-name">Nome do(a) Diretor(a) Financeiro</h3>
+                            <span class="person-role">Diretoria Financeira</span>
+                            <p class="person-bio">Responsável pela gestão financeira, prestação de contas e sustentabilidade do capítulo. Breve biografia a ser preenchida.</p>
+                            <div class="person-links">
+                                <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                                <a href="#" aria-label="E-mail"><i class="fas fa-envelope"></i></a>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </div>
+
+            <div id="tab-anteriores" class="tab-panel" role="tabpanel">
+                <h2>Diretorias Anteriores</h2>
+                <p class="section-sub">Profissionais que conduziram a ACMP Brasil em mandatos passados e contribuíram para o seu crescimento.</p>
+
+                <div class="people-grid">
+                    <article class="person-card">
+                        <div class="person-photo"><span class="photo-placeholder"><i class="fas fa-user-clock"></i></span></div>
+                        <div class="person-body">
+                            <h3 class="person-name">Nome do(a) Ex-Presidente</h3>
+                            <span class="person-role role-past">Presidente — Mandato Anterior</span>
+                            <p class="person-bio">Liderou a ACMP Brasil em ciclo anterior, contribuindo para a expansão do capítulo e fortalecimento da comunidade. Breve biografia a ser preenchida.</p>
+                            <div class="person-links">
+                                <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="person-card">
+                        <div class="person-photo"><span class="photo-placeholder"><i class="fas fa-user-clock"></i></span></div>
+                        <div class="person-body">
+                            <h3 class="person-name">Nome do(a) Ex-Diretor(a)</h3>
+                            <span class="person-role role-past">Diretoria — Mandato Anterior</span>
+                            <p class="person-bio">Atuou na diretoria em ciclo anterior, deixando legado em iniciativas estratégicas do capítulo. Breve biografia a ser preenchida.</p>
+                            <div class="person-links">
+                                <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="person-card">
+                        <div class="person-photo"><span class="photo-placeholder"><i class="fas fa-user-clock"></i></span></div>
+                        <div class="person-body">
+                            <h3 class="person-name">Nome do(a) Ex-Diretor(a)</h3>
+                            <span class="person-role role-past">Diretoria — Mandato Anterior</span>
+                            <p class="person-bio">Atuou na diretoria em ciclo anterior, contribuindo para a estruturação dos comitês e atividades. Breve biografia a ser preenchida.</p>
+                            <div class="person-links">
+                                <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </div>
+
+            <div id="tab-fundadores" class="tab-panel" role="tabpanel">
+                <h2>Fundadores</h2>
+                <p class="section-sub">Profissionais visionários que tornaram possível a criação do capítulo brasileiro da ACMP.</p>
+
+                <div class="people-grid">
+                    <article class="person-card">
+                        <div class="person-photo"><span class="photo-placeholder"><i class="fas fa-star"></i></span></div>
+                        <div class="person-body">
+                            <h3 class="person-name">Nome do(a) Fundador(a)</h3>
+                            <span class="person-role role-founder">Fundador(a)</span>
+                            <p class="person-bio">Um dos profissionais pioneiros que articularam a criação do capítulo brasileiro da ACMP, conectando a comunidade local à rede global. Breve biografia a ser preenchida.</p>
+                            <div class="person-links">
+                                <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="person-card">
+                        <div class="person-photo"><span class="photo-placeholder"><i class="fas fa-star"></i></span></div>
+                        <div class="person-body">
+                            <h3 class="person-name">Nome do(a) Fundador(a)</h3>
+                            <span class="person-role role-founder">Fundador(a)</span>
+                            <p class="person-bio">Co-fundador(a) da ACMP Brasil, atuou na concepção da missão, visão e valores que guiam o capítulo. Breve biografia a ser preenchida.</p>
+                            <div class="person-links">
+                                <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="person-card">
+                        <div class="person-photo"><span class="photo-placeholder"><i class="fas fa-star"></i></span></div>
+                        <div class="person-body">
+                            <h3 class="person-name">Nome do(a) Fundador(a)</h3>
+                            <span class="person-role role-founder">Fundador(a)</span>
+                            <p class="person-bio">Co-fundador(a) da ACMP Brasil, contribuiu para os primeiros passos institucionais do capítulo no país. Breve biografia a ser preenchida.</p>
+                            <div class="person-links">
+                                <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </div>
+
+            <div class="page-cta">
+                <h3>Quer fazer parte da história da ACMP Brasil?</h3>
+                <p>Associe-se ou candidate-se ao trabalho voluntário e construa esta comunidade conosco.</p>
+                <div style="display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;">
+                    <a href="https://www.acmpglobal.org/page/join_acmp" target="_blank" rel="noopener" class="btn btn-lg"><i class="fas fa-user-plus"></i> Associe-se</a>
+                    <a href="voluntarios.html" class="btn btn-lg"><i class="fas fa-hands-helping"></i> Seja Voluntário</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="main-footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <div class="footer-bottom-content">
+                    <p>&copy; 2026 ACMP Brasil - Associação de Profissionais de Gestão de Mudanças.</p>
+                    <div class="footer-bottom-links">
+                        <a href="../index.html">Página Inicial</a>
+                        <a href="https://www.acmpglobal.org/page/about_acmp" target="_blank" rel="noopener">Sobre a ACMP Global</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../js/main.js"></script>
+    <script>
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const target = btn.dataset.tab;
+                document.querySelectorAll('.tab-btn').forEach(b => {
+                    b.classList.remove('active');
+                    b.setAttribute('aria-selected', 'false');
+                });
+                document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+                btn.classList.add('active');
+                btn.setAttribute('aria-selected', 'true');
+                document.getElementById('tab-' + target).classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>
