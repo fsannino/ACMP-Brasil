@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nosso Estatuto - ACMP Brasil</title>
+    <meta name="description" content="Estatuto Social da ACMP Brasil — capítulo brasileiro da Association of Change Management Professionals. Conheça as regras, missão e governança da associação.">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="icon" type="image/svg+xml" href="../img/logo-acmp-brasil.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .page-hero { background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 50%, var(--primary-light) 100%); padding: 80px 0 60px; color: white; text-align: center; position: relative; overflow: hidden; }
+        .page-hero::before { content: ''; position: absolute; inset: 0; background: url('https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=1600&q=80') center/cover no-repeat; opacity: 0.12; }
+        .page-hero h1 { font-size: 2.5rem; font-weight: 800; margin-bottom: 16px; position: relative; }
+        .page-hero p { font-size: 1.1rem; opacity: 0.9; max-width: 700px; margin: 0 auto; position: relative; }
+        .page-content { padding: 60px 0; max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 240px 1fr; gap: 40px; }
+        .back-link { display: inline-flex; align-items: center; gap: 8px; color: var(--primary); font-weight: 600; font-size: 0.9rem; margin-bottom: 30px; grid-column: 1 / -1; }
+        .back-link:hover { gap: 12px; }
+
+        /* Sidebar / TOC */
+        .toc { position: sticky; top: 20px; align-self: start; background: var(--bg-light); border-radius: var(--radius-md); padding: 20px; border: 1px solid var(--border-light); }
+        .toc h4 { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-light); font-weight: 700; margin-bottom: 12px; }
+        .toc ol { list-style: none; padding: 0; margin: 0; counter-reset: toc; }
+        .toc ol li { counter-increment: toc; margin-bottom: 4px; }
+        .toc ol li a { display: block; padding: 8px 12px; border-radius: var(--radius-sm); font-size: 0.85rem; color: var(--text-body); font-weight: 500; transition: all 0.2s ease; }
+        .toc ol li a::before { content: counter(toc, upper-roman) ". "; color: var(--primary); font-weight: 700; }
+        .toc ol li a:hover { background: white; color: var(--primary); }
+
+        /* Article */
+        .estatuto-article { font-size: 0.96rem; line-height: 1.8; color: var(--text-body); }
+        .estatuto-article > p { margin-bottom: 18px; }
+        .estatuto-article h2 { font-size: 1.5rem; font-weight: 700; color: var(--text-dark); margin: 40px 0 16px; padding-top: 16px; border-top: 1px solid var(--border-light); display: flex; align-items: center; gap: 10px; scroll-margin-top: 80px; }
+        .estatuto-article h2:first-of-type { border-top: 0; padding-top: 0; margin-top: 0; }
+        .estatuto-article h2 .num { background: var(--primary); color: white; font-size: 0.75rem; padding: 4px 10px; border-radius: 50px; font-weight: 700; min-width: 60px; text-align: center; }
+        .estatuto-article h3 { font-size: 1.1rem; font-weight: 700; color: var(--text-dark); margin: 24px 0 10px; }
+        .estatuto-article .article { margin-bottom: 18px; padding-left: 18px; border-left: 3px solid var(--border-light); }
+        .estatuto-article .article strong { color: var(--text-dark); display: block; margin-bottom: 4px; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--primary); }
+        .estatuto-article ul { margin: 12px 0 18px 22px; }
+        .estatuto-article ul li { margin-bottom: 6px; }
+
+        /* Meta box */
+        .meta-box { background: var(--bg-white); border: 1px solid var(--border-light); border-left: 4px solid var(--primary); border-radius: var(--radius-md); padding: 18px 22px; margin-bottom: 28px; box-shadow: var(--shadow-sm); display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+        .meta-box .meta-item { font-size: 0.85rem; color: var(--text-body); }
+        .meta-box .meta-item strong { color: var(--text-dark); display: block; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 2px; }
+        .meta-box .meta-actions { margin-left: auto; display: flex; gap: 10px; }
+
+        /* Disclaimer */
+        .disclaimer { background: #fff8e1; border: 1px solid #ffe082; border-radius: var(--radius-sm); padding: 14px 18px; margin: 24px 0; font-size: 0.85rem; color: #6d4c00; display: flex; gap: 10px; }
+        .disclaimer i { color: #f57c00; font-size: 1.1rem; flex-shrink: 0; margin-top: 2px; }
+
+        /* CTA */
+        .page-cta { background: linear-gradient(135deg, var(--primary-dark), var(--primary)); color: white; border-radius: var(--radius-lg); padding: 36px; text-align: center; margin: 40px 0 0; grid-column: 1 / -1; }
+        .page-cta h3 { font-size: 1.2rem; font-weight: 700; margin-bottom: 10px; }
+        .page-cta p { opacity: 0.9; margin-bottom: 18px; }
+        .page-cta .btn { background: white; color: var(--primary); }
+        .page-cta .btn:hover { background: var(--bg-light); }
+
+        @media (max-width: 900px) {
+            .page-content { grid-template-columns: 1fr; }
+            .toc { position: static; }
+        }
+        @media (max-width: 768px) {
+            .page-hero h1 { font-size: 1.9rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <div class="container top-bar-content">
+            <div class="top-bar-left">
+                <a href="https://www.acmpglobal.org/" target="_blank" rel="noopener"><i class="fas fa-globe"></i> ACMP Global</a>
+                <a href="https://www.acmpglobal.org/page/acmp-connect" target="_blank" rel="noopener"><i class="fas fa-users"></i> ACMP Connect</a>
+            </div>
+            <div class="top-bar-right">
+                <a href="https://www.acmpglobal.org/page/join_acmp" target="_blank" rel="noopener" class="btn-join">Associe-se</a>
+            </div>
+        </div>
+    </div>
+    <header class="main-header">
+        <div class="container header-content">
+            <a href="../index.html" class="logo">
+                <img src="../img/logo-acmp-brasil.png" alt="ACMP Brasil" style="height: 44px; width: auto; display: block;">
+            </a>
+        </div>
+    </header>
+
+    <section class="page-hero">
+        <div class="container">
+            <h1><i class="fas fa-balance-scale"></i> Nosso Estatuto</h1>
+            <p>Conheça o Estatuto Social da ACMP Brasil — o documento que rege a estrutura, governança e funcionamento do capítulo brasileiro da ACMP.</p>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container page-content">
+            <a href="../index.html" class="back-link"><i class="fas fa-arrow-left"></i> Voltar para a página inicial</a>
+
+            <aside class="toc" aria-label="Sumário">
+                <h4>Sumário</h4>
+                <ol>
+                    <li><a href="#cap-1">Da Associação</a></li>
+                    <li><a href="#cap-2">Dos Objetivos</a></li>
+                    <li><a href="#cap-3">Dos Associados</a></li>
+                    <li><a href="#cap-4">Da Administração</a></li>
+                    <li><a href="#cap-5">Do Patrimônio</a></li>
+                    <li><a href="#cap-6">Disposições Gerais</a></li>
+                </ol>
+            </aside>
+
+            <article class="estatuto-article">
+                <div class="meta-box">
+                    <div class="meta-item">
+                        <strong>Versão</strong>
+                        Estatuto Social vigente
+                    </div>
+                    <div class="meta-item">
+                        <strong>Última atualização</strong>
+                        A definir
+                    </div>
+                    <div class="meta-actions">
+                        <a href="#" class="btn btn-outline btn-sm" download><i class="fas fa-file-pdf"></i> Baixar PDF</a>
+                        <a href="#" class="btn btn-secondary btn-sm" onclick="window.print(); return false;"><i class="fas fa-print"></i> Imprimir</a>
+                    </div>
+                </div>
+
+                <p>A ACMP Brasil é o capítulo brasileiro da <strong>Association of Change Management Professionals (ACMP)</strong>, organização global sem fins lucrativos dedicada a fortalecer a disciplina de Gestão de Mudanças. Este Estatuto Social estabelece as regras de constituição, finalidades, governança e funcionamento da associação, em conformidade com a legislação brasileira e os princípios da ACMP Global.</p>
+
+                <div class="disclaimer">
+                    <i class="fas fa-info-circle"></i>
+                    <div>
+                        <strong>Conteúdo em revisão.</strong> O texto integral do Estatuto Social está em processo de publicação nesta página. Em caso de dúvidas, entre em contato pelo e-mail <a href="mailto:contato@acmpbrasil.org.br" style="color: var(--primary); font-weight: 600;">contato@acmpbrasil.org.br</a>.
+                    </div>
+                </div>
+
+                <h2 id="cap-1"><span class="num">Cap. I</span> Da Associação</h2>
+                <div class="article">
+                    <strong>Art. 1º</strong>
+                    <p>A ACMP Brasil é uma associação civil sem fins lucrativos, de duração indeterminada, constituída como capítulo local da Association of Change Management Professionals (ACMP), com sede e foro a serem definidos no estatuto registrado.</p>
+                </div>
+                <div class="article">
+                    <strong>Art. 2º</strong>
+                    <p>A associação reger-se-á por este Estatuto Social, pelos princípios e diretrizes da ACMP Global e pela legislação brasileira aplicável às associações civis.</p>
+                </div>
+
+                <h2 id="cap-2"><span class="num">Cap. II</span> Dos Objetivos</h2>
+                <div class="article">
+                    <strong>Art. 3º — Missão</strong>
+                    <p>Servir como fonte independente e confiável de excelência profissional em Gestão de Mudanças, promovendo a disciplina e fortalecendo a comunidade brasileira.</p>
+                </div>
+                <div class="article">
+                    <strong>Art. 4º — Finalidades</strong>
+                    <p>São finalidades da ACMP Brasil:</p>
+                    <ul>
+                        <li>Promover o desenvolvimento e o reconhecimento da profissão de Gestão de Mudanças no Brasil;</li>
+                        <li>Fomentar a comunidade de profissionais por meio de eventos, capacitação e networking;</li>
+                        <li>Apoiar a certificação CCMP&reg; e demais credenciais da ACMP Global;</li>
+                        <li>Traduzir, adaptar e difundir o ACMP Standard for Change Management&copy; em português;</li>
+                        <li>Atuar como ponte entre a comunidade brasileira e a rede global da ACMP.</li>
+                    </ul>
+                </div>
+
+                <h2 id="cap-3"><span class="num">Cap. III</span> Dos Associados</h2>
+                <div class="article">
+                    <strong>Art. 5º — Categorias</strong>
+                    <p>A ACMP Brasil reconhece as categorias de associados conforme política da ACMP Global, incluindo, entre outras: associados individuais, corporativos, estudantes e membros honorários.</p>
+                </div>
+                <div class="article">
+                    <strong>Art. 6º — Direitos e deveres</strong>
+                    <p>São direitos do associado: participar dos eventos e iniciativas, votar e ser votado nas eleições da diretoria (conforme regras específicas) e ter acesso aos benefícios oferecidos. São deveres: respeitar este Estatuto, o Código de Ética da ACMP e contribuir, quando aplicável, com as anuidades estabelecidas pela ACMP Global.</p>
+                </div>
+
+                <h2 id="cap-4"><span class="num">Cap. IV</span> Da Administração</h2>
+                <div class="article">
+                    <strong>Art. 7º — Estrutura</strong>
+                    <p>A ACMP Brasil é administrada por uma Diretoria Executiva eleita entre os associados, composta minimamente por Presidente, Vice-Presidente e diretorias temáticas (Eventos, Comunicação, Educação, Financeira), além de comitês de voluntários e líderes de branches regionais.</p>
+                </div>
+                <div class="article">
+                    <strong>Art. 8º — Mandato</strong>
+                    <p>O mandato da Diretoria Executiva tem duração definida em regimento interno, sendo permitida a recondução conforme as regras da ACMP Global e deste Estatuto.</p>
+                </div>
+                <div class="article">
+                    <strong>Art. 9º — Voluntariado</strong>
+                    <p>O exercício de cargos na Diretoria, comitês e branches é voluntário e não remunerado, em consonância com o caráter associativo e sem fins lucrativos da entidade.</p>
+                </div>
+
+                <h2 id="cap-5"><span class="num">Cap. V</span> Do Patrimônio</h2>
+                <div class="article">
+                    <strong>Art. 10 — Receitas</strong>
+                    <p>O patrimônio da ACMP Brasil é constituído por contribuições de associados, repasses da ACMP Global, patrocínios, doações e receitas oriundas de eventos e parcerias institucionais, sempre aplicados nas finalidades da associação.</p>
+                </div>
+                <div class="article">
+                    <strong>Art. 11 — Aplicação</strong>
+                    <p>Todos os recursos arrecadados serão integralmente aplicados nas finalidades estatutárias da ACMP Brasil, sendo vedada qualquer forma de distribuição de resultados, dividendos ou bonificações entre associados, diretores ou conselheiros.</p>
+                </div>
+
+                <h2 id="cap-6"><span class="num">Cap. VI</span> Disposições Gerais</h2>
+                <div class="article">
+                    <strong>Art. 12 — Reforma estatutária</strong>
+                    <p>Este Estatuto poderá ser reformado por deliberação da Assembleia Geral, observados os procedimentos previstos em regimento interno e as diretrizes da ACMP Global.</p>
+                </div>
+                <div class="article">
+                    <strong>Art. 13 — Casos omissos</strong>
+                    <p>Os casos omissos neste Estatuto serão resolvidos pela Diretoria, à luz da legislação aplicável, do Código de Ética da ACMP e das melhores práticas da governança associativa.</p>
+                </div>
+
+                <p style="margin-top: 30px; font-size: 0.85rem; color: var(--text-light); font-style: italic;">Este resumo apresenta os capítulos principais. O texto completo, com todos os artigos, parágrafos e incisos, está disponível para download em PDF.</p>
+            </article>
+
+            <div class="page-cta">
+                <h3>Dúvidas sobre o Estatuto?</h3>
+                <p>A diretoria está à disposição para esclarecimentos sobre o estatuto, estrutura e governança da ACMP Brasil.</p>
+                <a href="mailto:contato@acmpbrasil.org.br" class="btn btn-lg"><i class="fas fa-envelope"></i> Fale com a diretoria</a>
+            </div>
+        </div>
+    </section>
+
+    <footer class="main-footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <div class="footer-bottom-content">
+                    <p>&copy; 2026 ACMP Brasil - Associação de Profissionais de Gestão de Mudanças.</p>
+                    <div class="footer-bottom-links">
+                        <a href="../index.html">Página Inicial</a>
+                        <a href="https://www.acmpglobal.org/page/about_acmp" target="_blank" rel="noopener">Sobre a ACMP Global</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <script src="../js/main.js"></script>
+</body>
+</html>

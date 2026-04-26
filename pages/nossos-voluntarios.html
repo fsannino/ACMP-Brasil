@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nossos Voluntários - ACMP Brasil</title>
+    <meta name="description" content="Conheça os voluntários atuantes da ACMP Brasil — profissionais que dedicam seu tempo e talento para fortalecer a Gestão de Mudanças no país.">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="icon" type="image/svg+xml" href="../img/logo-acmp-brasil.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .page-hero { background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 50%, #2e7d32 100%); padding: 80px 0 60px; color: white; text-align: center; position: relative; overflow: hidden; }
+        .page-hero::before { content: ''; position: absolute; inset: 0; background: url('https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=1600&q=80') center/cover no-repeat; opacity: 0.12; }
+        .page-hero h1 { font-size: 2.5rem; font-weight: 800; margin-bottom: 16px; position: relative; }
+        .page-hero p { font-size: 1.1rem; opacity: 0.9; max-width: 700px; margin: 0 auto; position: relative; }
+        .page-content { padding: 60px 0; max-width: 1100px; margin: 0 auto; }
+        .page-content > p { font-size: 1rem; line-height: 1.8; color: var(--text-body); margin-bottom: 20px; max-width: 850px; }
+        .page-content h2 { font-size: 1.6rem; font-weight: 700; color: var(--text-dark); margin: 50px 0 8px; }
+        .page-content .section-sub { color: var(--text-light); font-size: 0.95rem; margin-bottom: 28px; }
+        .back-link { display: inline-flex; align-items: center; gap: 8px; color: var(--primary); font-weight: 600; font-size: 0.9rem; margin-bottom: 30px; }
+        .back-link:hover { gap: 12px; }
+
+        /* Stats */
+        .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin: 30px 0 20px; }
+        .stat-block { background: var(--bg-white); border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 22px; text-align: center; box-shadow: var(--shadow-sm); }
+        .stat-block .stat-num { font-size: 2rem; font-weight: 800; color: var(--primary); display: block; }
+        .stat-block .stat-lbl { font-size: 0.82rem; color: var(--text-light); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+
+        /* Filters */
+        .filters { display: flex; gap: 8px; flex-wrap: wrap; margin: 24px 0; }
+        .filter-btn { background: var(--bg-light); border: 1px solid var(--border-light); padding: 8px 16px; border-radius: 50px; font-family: var(--font-main); font-size: 0.85rem; font-weight: 600; color: var(--text-body); cursor: pointer; transition: all 0.2s ease; }
+        .filter-btn:hover { background: var(--primary); color: white; border-color: var(--primary); }
+        .filter-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+        /* Volunteer grid */
+        .vol-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin: 20px 0; }
+        .vol-card { background: var(--bg-white); border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 24px 20px; text-align: center; box-shadow: var(--shadow-sm); transition: all 0.3s ease; }
+        .vol-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+        .vol-avatar { width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--primary-light)); margin: 0 auto 14px; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.6rem; font-weight: 700; overflow: hidden; }
+        .vol-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .vol-name { font-size: 1rem; font-weight: 700; color: var(--text-dark); margin-bottom: 4px; }
+        .vol-city { font-size: 0.8rem; color: var(--text-light); margin-bottom: 10px; }
+        .vol-tags { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-bottom: 12px; }
+        .vol-tag { font-size: 0.7rem; padding: 3px 9px; border-radius: 50px; font-weight: 600; background: rgba(26, 58, 92, 0.08); color: var(--primary); }
+        .vol-tag.tag-eventos { background: #e3f2fd; color: #1565c0; }
+        .vol-tag.tag-comunicacao { background: #fff3e0; color: #e65100; }
+        .vol-tag.tag-educacao { background: #e8f5e9; color: #2e7d32; }
+        .vol-tag.tag-traducao { background: #f3e5f5; color: #6a1b9a; }
+        .vol-tag.tag-branches { background: #fce4ec; color: #c2185b; }
+        .vol-link { display: inline-flex; align-items: center; gap: 6px; color: var(--primary); font-size: 0.82rem; font-weight: 600; }
+        .vol-link:hover { text-decoration: underline; }
+
+        /* Committees overview */
+        .committees-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin: 24px 0 30px; }
+        .committee-card { background: var(--bg-white); border: 1px solid var(--border-light); border-left: 4px solid var(--primary); border-radius: var(--radius-md); padding: 22px; box-shadow: var(--shadow-sm); }
+        .committee-card .com-icon { width: 44px; height: 44px; border-radius: var(--radius-sm); background: linear-gradient(135deg, var(--primary), var(--primary-light)); display: inline-flex; align-items: center; justify-content: center; color: white; font-size: 1.1rem; margin-bottom: 12px; }
+        .committee-card h3 { font-size: 1.05rem; font-weight: 700; color: var(--text-dark); margin-bottom: 6px; }
+        .committee-card p { font-size: 0.85rem; color: var(--text-body); line-height: 1.6; margin: 0; }
+
+        /* CTA */
+        .page-cta { background: linear-gradient(135deg, var(--primary-dark), var(--primary)); color: white; border-radius: var(--radius-lg); padding: 40px; text-align: center; margin: 50px 0 0; }
+        .page-cta h3 { font-size: 1.3rem; font-weight: 700; margin-bottom: 12px; }
+        .page-cta p { opacity: 0.9; margin-bottom: 22px; }
+        .page-cta .btn { background: white; color: var(--primary); }
+        .page-cta .btn:hover { background: var(--bg-light); }
+
+        @media (max-width: 768px) {
+            .page-hero h1 { font-size: 1.9rem; }
+            .vol-grid { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 480px) {
+            .vol-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <div class="container top-bar-content">
+            <div class="top-bar-left">
+                <a href="https://www.acmpglobal.org/" target="_blank" rel="noopener"><i class="fas fa-globe"></i> ACMP Global</a>
+                <a href="https://www.acmpglobal.org/page/acmp-connect" target="_blank" rel="noopener"><i class="fas fa-users"></i> ACMP Connect</a>
+            </div>
+            <div class="top-bar-right">
+                <a href="https://www.acmpglobal.org/page/join_acmp" target="_blank" rel="noopener" class="btn-join">Associe-se</a>
+            </div>
+        </div>
+    </div>
+    <header class="main-header">
+        <div class="container header-content">
+            <a href="../index.html" class="logo">
+                <img src="../img/logo-acmp-brasil.png" alt="ACMP Brasil" style="height: 44px; width: auto; display: block;">
+            </a>
+        </div>
+    </header>
+
+    <section class="page-hero">
+        <div class="container">
+            <h1><i class="fas fa-hands-helping"></i> Nossos Voluntários</h1>
+            <p>Os profissionais que constroem a ACMP Brasil no dia a dia — voluntários atuantes nos comitês, branches regionais e iniciativas do capítulo.</p>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container page-content">
+            <a href="../index.html" class="back-link"><i class="fas fa-arrow-left"></i> Voltar para a página inicial</a>
+
+            <p>A ACMP Brasil é movida por voluntários. Cada evento, conteúdo, tradução ou iniciativa do capítulo é fruto da dedicação de profissionais que escolhem doar seu tempo, conhecimento e energia para fortalecer a Gestão de Mudanças no país. Esta página reconhece e apresenta os voluntários atuantes em nossos comitês e branches regionais.</p>
+
+            <div class="stats-row">
+                <div class="stat-block"><span class="stat-num">—</span><span class="stat-lbl">Voluntários Ativos</span></div>
+                <div class="stat-block"><span class="stat-num">4</span><span class="stat-lbl">Comitês</span></div>
+                <div class="stat-block"><span class="stat-num">5</span><span class="stat-lbl">Branches Regionais</span></div>
+                <div class="stat-block"><span class="stat-num">—</span><span class="stat-lbl">Estados Representados</span></div>
+            </div>
+
+            <h2>Comitês de Atuação</h2>
+            <p class="section-sub">Os voluntários da ACMP Brasil atuam em quatro comitês principais, além das branches regionais.</p>
+
+            <div class="committees-grid">
+                <div class="committee-card">
+                    <div class="com-icon"><i class="fas fa-calendar-alt"></i></div>
+                    <h3>Comitê de Eventos</h3>
+                    <p>Organização de meetups, workshops, conferências e encontros da comunidade brasileira.</p>
+                </div>
+                <div class="committee-card">
+                    <div class="com-icon"><i class="fas fa-bullhorn"></i></div>
+                    <h3>Comitê de Comunicação</h3>
+                    <p>Conteúdo, redes sociais, newsletter e presença digital do capítulo.</p>
+                </div>
+                <div class="committee-card">
+                    <div class="com-icon"><i class="fas fa-graduation-cap"></i></div>
+                    <h3>Comitê de Educação</h3>
+                    <p>Materiais educacionais, curadoria de webinars e programas de capacitação.</p>
+                </div>
+                <div class="committee-card">
+                    <div class="com-icon"><i class="fas fa-language"></i></div>
+                    <h3>Comitê de Tradução do Standard</h3>
+                    <p>Força-tarefa dedicada à tradução do ACMP Standard for Change Management para o português.</p>
+                </div>
+            </div>
+
+            <h2>Voluntários Atuantes</h2>
+            <p class="section-sub">Filtre por comitê para conhecer quem está construindo cada frente da ACMP Brasil.</p>
+
+            <div class="filters" role="tablist">
+                <button class="filter-btn active" data-filter="all">Todos</button>
+                <button class="filter-btn" data-filter="eventos">Eventos</button>
+                <button class="filter-btn" data-filter="comunicacao">Comunicação</button>
+                <button class="filter-btn" data-filter="educacao">Educação</button>
+                <button class="filter-btn" data-filter="traducao">Tradução</button>
+                <button class="filter-btn" data-filter="branches">Branches</button>
+            </div>
+
+            <div class="vol-grid">
+                <article class="vol-card" data-tags="eventos">
+                    <div class="vol-avatar">NV</div>
+                    <h3 class="vol-name">Nome do Voluntário</h3>
+                    <p class="vol-city"><i class="fas fa-map-marker-alt"></i> Cidade, UF</p>
+                    <div class="vol-tags"><span class="vol-tag tag-eventos">Eventos</span></div>
+                    <a href="#" class="vol-link"><i class="fab fa-linkedin"></i> LinkedIn</a>
+                </article>
+                <article class="vol-card" data-tags="comunicacao">
+                    <div class="vol-avatar">NV</div>
+                    <h3 class="vol-name">Nome do Voluntário</h3>
+                    <p class="vol-city"><i class="fas fa-map-marker-alt"></i> Cidade, UF</p>
+                    <div class="vol-tags"><span class="vol-tag tag-comunicacao">Comunicação</span></div>
+                    <a href="#" class="vol-link"><i class="fab fa-linkedin"></i> LinkedIn</a>
+                </article>
+                <article class="vol-card" data-tags="educacao">
+                    <div class="vol-avatar">NV</div>
+                    <h3 class="vol-name">Nome do Voluntário</h3>
+                    <p class="vol-city"><i class="fas fa-map-marker-alt"></i> Cidade, UF</p>
+                    <div class="vol-tags"><span class="vol-tag tag-educacao">Educação</span></div>
+                    <a href="#" class="vol-link"><i class="fab fa-linkedin"></i> LinkedIn</a>
+                </article>
+                <article class="vol-card" data-tags="traducao">
+                    <div class="vol-avatar">NV</div>
+                    <h3 class="vol-name">Nome do Voluntário</h3>
+                    <p class="vol-city"><i class="fas fa-map-marker-alt"></i> Cidade, UF</p>
+                    <div class="vol-tags"><span class="vol-tag tag-traducao">Tradução</span></div>
+                    <a href="#" class="vol-link"><i class="fab fa-linkedin"></i> LinkedIn</a>
+                </article>
+                <article class="vol-card" data-tags="branches">
+                    <div class="vol-avatar">NV</div>
+                    <h3 class="vol-name">Nome do Voluntário</h3>
+                    <p class="vol-city"><i class="fas fa-map-marker-alt"></i> Cidade, UF</p>
+                    <div class="vol-tags"><span class="vol-tag tag-branches">Branch Regional</span></div>
+                    <a href="#" class="vol-link"><i class="fab fa-linkedin"></i> LinkedIn</a>
+                </article>
+                <article class="vol-card" data-tags="eventos comunicacao">
+                    <div class="vol-avatar">NV</div>
+                    <h3 class="vol-name">Nome do Voluntário</h3>
+                    <p class="vol-city"><i class="fas fa-map-marker-alt"></i> Cidade, UF</p>
+                    <div class="vol-tags">
+                        <span class="vol-tag tag-eventos">Eventos</span>
+                        <span class="vol-tag tag-comunicacao">Comunicação</span>
+                    </div>
+                    <a href="#" class="vol-link"><i class="fab fa-linkedin"></i> LinkedIn</a>
+                </article>
+                <article class="vol-card" data-tags="educacao traducao">
+                    <div class="vol-avatar">NV</div>
+                    <h3 class="vol-name">Nome do Voluntário</h3>
+                    <p class="vol-city"><i class="fas fa-map-marker-alt"></i> Cidade, UF</p>
+                    <div class="vol-tags">
+                        <span class="vol-tag tag-educacao">Educação</span>
+                        <span class="vol-tag tag-traducao">Tradução</span>
+                    </div>
+                    <a href="#" class="vol-link"><i class="fab fa-linkedin"></i> LinkedIn</a>
+                </article>
+                <article class="vol-card" data-tags="branches">
+                    <div class="vol-avatar">NV</div>
+                    <h3 class="vol-name">Nome do Voluntário</h3>
+                    <p class="vol-city"><i class="fas fa-map-marker-alt"></i> Cidade, UF</p>
+                    <div class="vol-tags"><span class="vol-tag tag-branches">Branch Regional</span></div>
+                    <a href="#" class="vol-link"><i class="fab fa-linkedin"></i> LinkedIn</a>
+                </article>
+            </div>
+
+            <p style="font-size: 0.85rem; color: var(--text-light); text-align: center; margin-top: 24px;"><i class="fas fa-info-circle"></i> A lista de voluntários é mantida e atualizada periodicamente. Está faltando alguém? <a href="mailto:contato@acmpbrasil.org.br" style="color: var(--primary); font-weight: 600;">Avise-nos</a>.</p>
+
+            <div class="page-cta">
+                <h3>Quer entrar para esta lista?</h3>
+                <p>Junte-se aos profissionais que estão construindo a ACMP Brasil. Voluntários são bem-vindos em qualquer fase da carreira.</p>
+                <a href="voluntarios.html" class="btn btn-lg"><i class="fas fa-hands-helping"></i> Quero ser voluntário</a>
+            </div>
+        </div>
+    </section>
+
+    <footer class="main-footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <div class="footer-bottom-content">
+                    <p>&copy; 2026 ACMP Brasil - Associação de Profissionais de Gestão de Mudanças.</p>
+                    <div class="footer-bottom-links">
+                        <a href="../index.html">Página Inicial</a>
+                        <a href="https://www.acmpglobal.org/page/about_acmp" target="_blank" rel="noopener">Sobre a ACMP Global</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../js/main.js"></script>
+    <script>
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const filter = btn.dataset.filter;
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                document.querySelectorAll('.vol-card').forEach(card => {
+                    const tags = (card.dataset.tags || '').split(/\s+/);
+                    card.style.display = (filter === 'all' || tags.includes(filter)) ? '' : 'none';
+                });
+            });
+        });
+    </script>
+</body>
+</html>
