@@ -23,7 +23,61 @@
 
     var STORAGE_KEY = 'acmp_player_v1';
     var FEEDBACK_SESSION_KEY = 'acmp_feedback_done_v1';
+    var PENDING_INVITE_KEY = 'acmp_pending_invite_v1';
     var STORED_TTL_DAYS = 30;
+    var INVITE_TTL_DAYS = 30;
+
+    /* Captura ?invite=<id> da URL e armazena pra usar no momento da
+       identificação do jogador (tracking de aceite). */
+    (function captureInviteFromUrl() {
+        try {
+            if (typeof window === 'undefined' || !window.location) return;
+            var p = new URLSearchParams(window.location.search);
+            var id = p.get('invite');
+            if (id && /^\d+$/.test(id)) {
+                localStorage.setItem(PENDING_INVITE_KEY, JSON.stringify({
+                    id: parseInt(id, 10),
+                    at: Date.now()
+                }));
+            }
+        } catch (e) {}
+    })();
+
+    function getPendingInvite() {
+        try {
+            var raw = localStorage.getItem(PENDING_INVITE_KEY);
+            if (!raw) return null;
+            var obj = JSON.parse(raw);
+            if (!obj || !obj.id) return null;
+            if (obj.at && (Date.now() - obj.at) > INVITE_TTL_DAYS * 24 * 3600 * 1000) {
+                localStorage.removeItem(PENDING_INVITE_KEY);
+                return null;
+            }
+            return obj.id;
+        } catch (e) { return null; }
+    }
+
+    function clearPendingInvite() {
+        try { localStorage.removeItem(PENDING_INVITE_KEY); } catch (e) {}
+    }
+
+    function tryAcceptInvite(email) {
+        if (!email) return;
+        var id = getPendingInvite();
+        if (!id) return;
+        fetch(SUPA_URL + '/functions/v1/accept-invite', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'apikey': SUPA_KEY,
+                'Authorization': 'Bearer ' + SUPA_KEY
+            },
+            body: JSON.stringify({ invite_id: id, email: email })
+        })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (data) { if (data) clearPendingInvite(); })
+        .catch(function () {});
+    }
 
     function isTokenValid(t) {
         if (!t) return false;
@@ -226,6 +280,7 @@
             };
             setStoredPlayer(player);
             savePlayerToSupa(player, opts.gameId);
+            tryAcceptInvite(player.email);
             closeModal();
             if (typeof opts.onReady === 'function') opts.onReady(player);
         });
@@ -450,12 +505,14 @@
                 };
                 setStoredPlayer(player);
                 savePlayerToSupa(player, opts.gameId);
+                tryAcceptInvite(player.email);
                 if (typeof opts.onReady === 'function') opts.onReady(player);
                 return;
             }
             // 2) cached player (under TTL)
             var stored = getStoredPlayer();
             if (stored) {
+                if (stored.email && !stored.anonymous) tryAcceptInvite(stored.email);
                 if (typeof opts.onReady === 'function') opts.onReady(stored);
                 return;
             }
