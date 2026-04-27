@@ -486,6 +486,64 @@ body::before{
 .result-actions{display:flex;gap:10px;margin-top:20px}
 
 /* ════════════════════════════════
+   REVIEW SCREEN (questões erradas)
+════════════════════════════════ */
+#reviewScreen{z-index:10}
+.review-box{
+  background:rgba(15,36,64,.95);border:1px solid var(--dimmer);
+  border-radius:8px;padding:24px;max-width:720px;width:100%;
+  animation:fadeUp .35s ease both;max-height:85vh;overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+}
+.review-title{
+  font-family:var(--font-main);font-size:18px;font-weight:800;color:var(--teal);
+  letter-spacing:.04em;text-align:center;margin-bottom:6px;
+}
+.review-subtitle{
+  font-size:12px;color:var(--dim);text-align:center;margin-bottom:20px;letter-spacing:.06em;
+}
+.review-card{
+  background:var(--dark);border:1px solid var(--dimmer);
+  border-left:3px solid var(--red);
+  border-radius:5px;padding:16px 18px;margin-bottom:14px;
+}
+.review-card .review-tag{
+  display:inline-block;font-family:var(--font-mono);font-size:9px;
+  letter-spacing:.18em;color:var(--teal);text-transform:uppercase;
+  margin-bottom:8px;
+}
+.review-card .review-q{
+  font-size:14px;font-weight:600;color:var(--cream);line-height:1.5;margin-bottom:12px;
+}
+.review-card .review-q strong{color:var(--teal)}
+.review-card .review-opt{
+  display:flex;align-items:flex-start;gap:10px;
+  padding:8px 12px;margin-bottom:6px;
+  border-radius:4px;font-size:12px;line-height:1.4;
+}
+.review-card .review-opt.correct{
+  background:rgba(40,167,69,.12);border:1px solid rgba(40,167,69,.4);color:var(--cream);
+}
+.review-card .review-opt.chosen{
+  background:rgba(220,53,69,.12);border:1px solid rgba(220,53,69,.4);color:var(--cream);
+}
+.review-card .review-opt.timed-out{
+  background:rgba(232,168,56,.1);border:1px solid rgba(232,168,56,.3);color:var(--cream);
+  font-style:italic;
+}
+.review-card .review-opt-key{
+  flex-shrink:0;font-weight:700;font-family:var(--font-mono);font-size:11px;
+}
+.review-card .review-explanation{
+  margin-top:10px;padding:10px 12px;
+  background:rgba(91,155,213,.08);border:1px solid rgba(91,155,213,.2);
+  border-radius:4px;font-size:12px;color:var(--cream);line-height:1.6;
+}
+.review-card .review-explanation strong{color:var(--teal)}
+.review-actions{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+.review-actions button{flex:1;min-width:140px}
+
+/* ════════════════════════════════
    LEADERBOARD SCREEN
 ════════════════════════════════ */
 #lbScreen{z-index:10}
@@ -1235,7 +1293,21 @@ body::before{
     <div class="ach-row" id="achRow"></div>
     <div class="result-actions">
       <button class="btn-back" onclick="goHome()">← Menu</button>
+      <button class="btn-primary" id="reviewBtn" style="display:none" onclick="showReview()">📚 Revisar Erradas</button>
       <button class="btn-primary" onclick="replayGame()">↺ Jogar Novamente</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ REVIEW ═══════════════════════════ -->
+<div class="screen hidden" id="reviewScreen">
+  <div class="review-box">
+    <div class="review-title">📚 Revisar Questões Erradas</div>
+    <div class="review-subtitle" id="reviewCount">0 questões para revisar</div>
+    <div id="reviewContent"></div>
+    <div class="review-actions">
+      <button class="btn-back" onclick="goHome()">← Menu</button>
+      <button class="btn-primary" onclick="showScreen('resultScreen')">Voltar ao Resultado</button>
     </div>
   </div>
 </div>
@@ -1425,6 +1497,7 @@ let gMode='sprint',gDiff='easy',gQuestions=[],gIdx=0,gScore=0,gLives=3;
 let gStreak=0,gMaxStreak=0,gCorrect=0,gTimer=null,gTimeLeft=0;
 let gAnswered=false,gGameOver=false,gEndCalled=false;
 let connectCorrectIdx=-1;
+let gWrongQuestions=[];
 
 const MODE_CONFIG = {
   sprint:{label:'SPRINT',hasTimer:false,maxQ:10,xpMult:1},
@@ -1527,6 +1600,7 @@ function launchGame(){
   }
   gIdx=0;gScore=0;gLives=gMode==='boss'?1:dc.lives;
   gStreak=0;gMaxStreak=0;gCorrect=0;gAnswered=false;gGameOver=false;gEndCalled=false;
+  gWrongQuestions=[];
   showScreen('gameScreen');
   if(gMode==='boss'){showBossIntro();}else{renderQuestion();}
 }
@@ -1602,7 +1676,9 @@ function timeOut(){
   gAnswered=true;
   setProfState('wrong', getRndMsg('timeout'));
   loseLife();
-  highlightAnswer(-1,gQuestions[gIdx].c);
+  const q=gQuestions[gIdx];
+  highlightAnswer(-1,q.c);
+  gWrongQuestions.push({type:'multi',q:q.q,options:q.a.slice(),correctIdx:q.c,chosenIdx:-1,exp:q.exp,tag:q.tag,timedOut:true});
   const expl=document.getElementById('expl');if(expl)expl.classList.add('show');
   const nb=document.getElementById('nextBtn');if(nb&&!gGameOver)nb.classList.add('show');
 }
@@ -1669,6 +1745,7 @@ function answer(idx){
   } else {
     gStreak=0;loseLife();
     const qc=document.getElementById('qCard');if(qc)qc.classList.add('shake');
+    gWrongQuestions.push({type:'multi',q:q.q,options:q.a.slice(),correctIdx:q.c,chosenIdx:idx,exp:q.exp,tag:q.tag});
     // Professor reaction
     setProfState('wrong', getRndMsg('wrong'));
   }
@@ -1756,6 +1833,8 @@ function connectAnswer(el){
   } else {
     gStreak=0;loseLife();
     const qc=document.getElementById('qCard');if(qc)qc.classList.add('shake');
+    const q=gQuestions[gIdx];
+    gWrongQuestions.push({type:'connect',input:q.input,output:q.output,process:q.process,tag:'Connect'});
   }
   updateHUD();
   const expl=document.getElementById('expl');if(expl)expl.classList.add('show');
@@ -1813,8 +1892,45 @@ function endGame(bossFail=false){
   document.getElementById('rsStreak').textContent=gMaxStreak;
   document.getElementById('xpGain').innerHTML='⚡ + '+xpEarned+' XP ganhos';
   document.getElementById('achRow').innerHTML=newAch.map(a=>`<div class="ach-badge">${a}</div>`).join('');
+  const reviewBtn=document.getElementById('reviewBtn');
+  if(reviewBtn) reviewBtn.style.display=gWrongQuestions.length>0?'inline-block':'none';
   updateHomeUI();
   if(newLevel>prevLevel)setTimeout(()=>showLevelUp(newLevel),600);
+}
+
+// ══════════════════════════════════════════════════
+//  REVIEW WRONG ANSWERS
+// ══════════════════════════════════════════════════
+function showReview(){
+  const list=document.getElementById('reviewContent');
+  const count=document.getElementById('reviewCount');
+  count.textContent=`${gWrongQuestions.length} ${gWrongQuestions.length===1?'questão':'questões'} para revisar`;
+  list.innerHTML=gWrongQuestions.map(w=>{
+    if(w.type==='connect'){
+      return `<div class="review-card">
+        <div class="review-tag">${escapeHTML(w.tag||'Connect')}</div>
+        <div class="review-q">📥 <strong>Inputs:</strong> ${escapeHTML(w.input)}</div>
+        <div class="review-opt correct"><span class="review-opt-key">✓</span><span>${escapeHTML(w.process)}</span></div>
+        <div class="review-explanation">📤 <strong>Output:</strong> ${escapeHTML(w.output)}</div>
+      </div>`;
+    }
+    const optsHTML=w.options.map((o,i)=>{
+      let cls='';
+      if(i===w.correctIdx) cls='correct';
+      else if(i===w.chosenIdx) cls='chosen';
+      const key=i===w.correctIdx?'✓':(i===w.chosenIdx?'✗':'ABCD'[i]);
+      return cls?`<div class="review-opt ${cls}"><span class="review-opt-key">${key}</span><span>${o}</span></div>`:'';
+    }).filter(Boolean).join('');
+    const timedOut=w.timedOut?`<div class="review-opt timed-out"><span class="review-opt-key">⏱</span><span>Tempo esgotado</span></div>`:'';
+    return `<div class="review-card">
+      <div class="review-tag">${escapeHTML(w.tag||'Standard')}</div>
+      <div class="review-q">${w.q}</div>
+      ${timedOut}
+      ${optsHTML}
+      ${w.exp?`<div class="review-explanation">${w.exp}</div>`:''}
+    </div>`;
+  }).join('');
+  showScreen('reviewScreen');
 }
 
 // ══════════════════════════════════════════════════
