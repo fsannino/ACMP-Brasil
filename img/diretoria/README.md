@@ -21,5 +21,9 @@ e cai para iniciais quando o arquivo não existe.
 - `fabiano-sannino.jpg` — Fabiano Sannino (mesma foto da diretoria atual)
 
 ## Fundadores
-
-A definir — slugs de arquivo seguem o mesmo padrão: `nome-sobrenome.jpg`.
+- `fabiano-sannino.jpg` — Fabiano Sannino (mesma foto da diretoria atual)
+- `emerson-zuccherato.jpg` — Emerson Zuccherato
+- `isis-moda-pires.jpg` — Isis Moda Pires (mesma foto da diretoria atual)
+- `daniel-druwe-araujo.jpg` — Daniel Druwe Araujo
+- `armando-kokitsu.jpg` — Armando Kokitsu
+- `geni-elisabeth-esteves.jpg` — Geni Elisabeth Esteves.
