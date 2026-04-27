@@ -55,22 +55,24 @@ html,body{
   position:fixed;top:0;left:0;right:0;z-index:30;
   display:flex;align-items:center;justify-content:space-between;
   height:44px;padding:0 18px;
-  background:var(--mid);
-  border-bottom:1px solid rgba(255,255,255,.08);
+  background:#fff;
+  border-bottom:1px solid #e2e8f0;
+  box-shadow:0 1px 3px rgba(0,0,0,.04);
 }
 .quest-topbar a{
   display:inline-flex;align-items:center;gap:8px;
-  color:rgba(255,255,255,.85);text-decoration:none;
-  font-size:13px;font-weight:500;letter-spacing:.02em;
+  color:#1a3a5c;text-decoration:none;
+  font-size:13px;font-weight:600;letter-spacing:.02em;
   transition:color .15s;
 }
-.quest-topbar a:hover{color:var(--white)}
+.quest-topbar a:hover{color:#0f2440}
 .quest-topbar .quest-logo img{height:24px;display:block}
 .quest-topbar .quest-back-arrow{font-size:16px;line-height:1}
 @media (max-width:600px){
   .quest-topbar{height:40px;padding:0 12px}
   .quest-topbar a{font-size:12px}
   .quest-topbar .quest-logo img{height:20px}
+  .quest-topbar .quest-back span:not(.quest-back-arrow){display:none}
 }
 
 /* ─── SUBTLE GRADIENT OVERLAY (institucional) ─── */
@@ -88,7 +90,13 @@ body::before{
   padding:64px 20px 20px;
   transition:opacity .3s,transform .3s;
 }
-@media (max-width:600px){.screen{padding:56px 16px 16px}}
+@media (max-width:600px){
+  .screen{
+    padding:56px 16px 140px;
+    justify-content:flex-start;
+    overflow-y:auto;-webkit-overflow-scrolling:touch;
+  }
+}
 .screen.hidden{opacity:0;pointer-events:none;transform:scale(.97)}
 .screen.active{opacity:1;pointer-events:all;transform:scale(1)}
 
@@ -120,11 +128,12 @@ body::before{
 }
 .game-logo .acmp-badge{
   display:inline-flex;align-items:center;gap:8px;
-  background:rgba(91,155,213,.06);border:1px solid rgba(91,155,213,.2);
-  padding:5px 16px;border-radius:2px;
+  background:#fff;border:1px solid #e2e8f0;
+  padding:6px 16px;border-radius:4px;
   font-family:var(--font-mono);font-size:10px;
-  letter-spacing:.3em;color:var(--teal);text-transform:uppercase;
+  letter-spacing:.3em;color:#1a3a5c;text-transform:uppercase;
   margin-bottom:14px;
+  box-shadow:0 1px 3px rgba(0,0,0,.08);
 }
 .game-logo h1{
   font-family:var(--font-main);font-size:clamp(32px,6vw,64px);
@@ -320,7 +329,13 @@ body::before{
   padding:124px 20px 20px;
   z-index:10;
 }
-@media (max-width:600px){.question-area{padding-top:140px}}
+@media (max-width:600px){
+  .question-area{
+    padding:140px 16px 140px;
+    justify-content:flex-start;
+    overflow-y:auto;-webkit-overflow-scrolling:touch;
+  }
+}
 
 /* CATEGORY TAG */
 .q-category{
@@ -605,7 +620,63 @@ body::before{
   pointer-events: none;
   transition: opacity .3s;
 }
-.prof-wrap.prof-hidden { opacity: 0; }
+.prof-wrap > * { pointer-events: auto; }
+.prof-wrap.prof-hidden { opacity: 0; pointer-events: none; }
+.prof-wrap.prof-hidden > * { pointer-events: none; }
+
+/* Minimize button on the prof wrap */
+.prof-min-btn {
+  position: absolute;
+  top: -6px; right: -6px;
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  background: var(--mid);
+  color: #fff;
+  border: 2px solid #fff;
+  font-size: 14px; line-height: 1;
+  font-family: var(--font-main); font-weight: 700;
+  cursor: pointer;
+  z-index: 10;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0;
+  box-shadow: 0 2px 6px rgba(0,0,0,.4);
+  transition: transform .15s;
+}
+.prof-min-btn:hover { transform: scale(1.1); }
+
+/* Floating reopen button (shown only when minimized) */
+.prof-reopen-btn {
+  position: fixed;
+  bottom: 16px; right: 16px;
+  z-index: 200;
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  background: var(--mid);
+  color: #fff;
+  border: 2px solid var(--teal);
+  font-size: 24px; line-height: 1;
+  cursor: pointer;
+  display: none;
+  align-items: center; justify-content: center;
+  padding: 0;
+  box-shadow: 0 4px 16px rgba(0,0,0,.5);
+  transition: transform .15s, background .15s;
+}
+.prof-reopen-btn:hover { transform: scale(1.05); background: var(--teal2); }
+.prof-reopen-btn.show { display: flex; }
+
+/* When minimized, hide all prof contents */
+.prof-wrap.prof-minimized .speech-bubble,
+.prof-wrap.prof-minimized .prof-figure,
+.prof-wrap.prof-minimized .prof-nametag,
+.prof-wrap.prof-minimized .prof-min-btn { display: none; }
+
+@media (max-width:600px) {
+  .prof-figure { transform: scale(.78); transform-origin: bottom right; }
+  .speech-bubble { max-width: 160px; font-size: 11px; padding: 7px 10px; }
+  .prof-wrap { bottom: 8px; right: 8px; }
+  .prof-reopen-btn { width: 44px; height: 44px; font-size: 22px; bottom: 12px; right: 12px; }
+}
 
 /* ── Speech Bubble ── */
 .speech-bubble {
@@ -1930,8 +2001,33 @@ function getRndMsg(type) {
 
 function showProfessor(visible) {
   const w = document.getElementById('profWrap');
+  const reopenBtn = document.getElementById('profReopenBtn');
   if(w) w.classList.toggle('prof-hidden', !visible);
+  if(reopenBtn) {
+    const isMin = w && w.classList.contains('prof-minimized');
+    reopenBtn.classList.toggle('show', visible && isMin);
+  }
 }
+
+// Minimize/restore Prof. CM
+function setProfMinimized(min) {
+  const w = document.getElementById('profWrap');
+  const btn = document.getElementById('profReopenBtn');
+  if(!w || !btn) return;
+  w.classList.toggle('prof-minimized', min);
+  btn.classList.toggle('show', min);
+  try { localStorage.setItem('acmp_prof_min', min ? '1' : '0'); } catch(e){}
+}
+document.getElementById('profMinBtn').addEventListener('click', () => setProfMinimized(true));
+document.getElementById('profReopenBtn').addEventListener('click', () => setProfMinimized(false));
+
+// Default: minimized on mobile, or restore previous preference
+(function initProfState(){
+  let stored = null;
+  try { stored = localStorage.getItem('acmp_prof_min'); } catch(e){}
+  if(stored === '1') setProfMinimized(true);
+  else if(stored === null && window.innerWidth <= 600) setProfMinimized(true);
+})();
 
 // ══════════════════════════════════════════════════
 //  INIT
@@ -1948,7 +2044,9 @@ if(!player.name||player.name==='Agente')setTimeout(showNameModal,600);
 </script>
 
 <!-- ═══════════════ PROF. CM CHARACTER ═══════════════ -->
+<button class="prof-reopen-btn" id="profReopenBtn" aria-label="Mostrar Prof. CM" title="Mostrar Prof. CM">🎓</button>
 <div class="prof-wrap state-thinking prof-hidden" id="profWrap">
+  <button class="prof-min-btn" id="profMinBtn" aria-label="Ocultar Prof. CM" title="Ocultar Prof. CM">×</button>
   <div class="speech-bubble" id="speechBubble">
     <div class="thought-dots"><span></span><span></span><span></span></div>
     <span id="speechText">Bem-vindo! Prontos para estudar?</span>
