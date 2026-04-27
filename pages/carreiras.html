@@ -193,21 +193,24 @@
                 var tags = '';
                 if (job.is_remote) tags += '<span class="job-tag remote"><i class="fas fa-wifi"></i> Remoto</span>';
                 if (job.is_featured) tags += '<span class="job-tag featured"><i class="fas fa-star"></i> Destaque</span>';
-                if (job.job_type) tags += '<span class="job-tag">' + formatJobType(job.job_type) + '</span>';
+                if (job.job_type) tags += '<span class="job-tag">' + esc(formatJobType(job.job_type)) + '</span>';
+
+                var desc = String(job.description || '').substring(0, 200);
+                if (job.description && job.description.length > 200) desc += '...';
 
                 return '<div class="job-card">' +
                     '<div class="job-icon ' + iconClass + '"><i class="' + iconFA + '"></i></div>' +
                     '<div class="job-body">' +
-                    '<h3>' + job.title + '</h3>' +
-                    '<div class="job-company">' + (job.company || '') + '</div>' +
+                    '<h3>' + esc(job.title) + '</h3>' +
+                    '<div class="job-company">' + esc(job.company || '') + '</div>' +
                     '<div class="job-meta">' +
-                    '<span><i class="fas fa-map-marker-alt"></i> ' + (job.location || 'Não especificado') + '</span>' +
-                    '<span><i class="fas fa-clock"></i> ' + timeAgo(job.posted_at) + '</span>' +
-                    (job.salary_range ? '<span><i class="fas fa-dollar-sign"></i> ' + job.salary_range + '</span>' : '') +
+                    '<span><i class="fas fa-map-marker-alt"></i> ' + esc(job.location || 'Não especificado') + '</span>' +
+                    '<span><i class="fas fa-clock"></i> ' + esc(timeAgo(job.posted_at)) + '</span>' +
+                    (job.salary_range ? '<span><i class="fas fa-dollar-sign"></i> ' + esc(job.salary_range) + '</span>' : '') +
                     '</div>' +
                     '<div class="job-tags">' + tags + '</div>' +
-                    '<p class="job-desc">' + (job.description || '').substring(0, 200) + (job.description && job.description.length > 200 ? '...' : '') + '</p>' +
-                    '<a href="' + (job.source_url || '#') + '" target="_blank" rel="noopener" class="job-apply ' + btnClass + '"><i class="fas fa-external-link-alt"></i> ' + btnText + '</a>' +
+                    '<p class="job-desc">' + esc(desc) + '</p>' +
+                    '<a href="' + safeUrl(job.source_url) + '" target="_blank" rel="noopener" class="job-apply ' + btnClass + '"><i class="fas fa-external-link-alt"></i> ' + btnText + '</a>' +
                     '</div></div>';
             }).join('');
 
@@ -257,6 +260,20 @@
         function formatJobType(type) {
             var types = { 'full-time': 'Tempo integral', 'part-time': 'Meio período', 'contract': 'Contrato', 'freelance': 'Freelance', 'internship': 'Estágio' };
             return types[type] || type;
+        }
+
+        // Escape HTML para evitar XSS via dados do Supabase
+        function esc(s) {
+            return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+                return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c];
+            });
+        }
+        // Permite só http/https em href; bloqueia javascript: e data:
+        function safeUrl(u) {
+            if (!u) return '#';
+            var s = String(u).trim();
+            if (/^https?:\/\//i.test(s) || s.charAt(0) === '/') return esc(s);
+            return '#';
         }
 
         function timeAgo(dateStr) {
