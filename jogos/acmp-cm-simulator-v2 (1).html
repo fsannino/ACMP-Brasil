@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Change Manager Simulator v2 — ACMP Brasil</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@400;500;700;900&display=swap');
+:root{--navy:#0D1E35;--navy2:#112338;--dark:#080F1C;--teal:#009E8E;--gold:#F5A420;--nb:#1B3868;--mu:#2D4A5E;--dim:#1A2E45;--tx:#3D5A72;--lt:#7A98B0;--danger:#E24B4A;--cream:#F5F3EE}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--dark);font-family:'DM Sans',sans-serif;color:#fff;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 70% 50% at 15% 15%,rgba(0,158,142,0.05) 0%,transparent 55%),radial-gradient(ellipse 50% 60% at 85% 85%,rgba(27,56,104,0.08) 0%,transparent 55%);pointer-events:none;z-index:0}
+.game{position:relative;z-index:1;max-width:860px;margin:0 auto;padding:32px 20px 80px}
+.ghead{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}
+.logo-mark{display:flex;align-items:center;gap:6px}
+.logo-mark svg{width:14px;height:12px}
+.logo-mark .lt{font-size:13px;font-weight:900;letter-spacing:0.05em}
+.logo-mark .lb{font-size:7px;font-weight:700;color:var(--teal);letter-spacing:0.2em}
+.game-label{font-size:10px;letter-spacing:0.22em;text-transform:uppercase;color:var(--mu)}
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px}
+.metric{background:var(--navy2);border:1px solid var(--dim);border-radius:10px;padding:14px 16px}
+.metric-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.metric-label{font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:var(--lt)}
+.metric-val{font-size:17px;font-weight:900;letter-spacing:-0.02em;transition:color .3s}
+.metric-bar{height:5px;background:var(--dim);border-radius:3px;overflow:hidden}
+.metric-fill{height:100%;border-radius:3px;transition:width .6s cubic-bezier(.4,0,.2,1)}
+.fill-teal{background:var(--teal)}.fill-warn{background:var(--danger)}.fill-gold{background:var(--gold)}
+.phase-banner{border:1px solid var(--dim);border-radius:8px;padding:14px 20px;margin-bottom:20px;display:flex;align-items:center;gap:14px}
+.phase-num{font-size:11px;font-weight:900;color:var(--teal);letter-spacing:0.15em;white-space:nowrap}
+.phase-title{font-size:13px;font-weight:700;color:#fff}
+.phase-sub{font-size:11px;color:var(--lt);margin-top:1px}
+.phase-steps{display:flex;gap:5px;margin-left:auto}
+.pstep{width:8px;height:8px;border-radius:50%;background:var(--dim);flex-shrink:0;transition:background .3s}
+.pstep.done{background:var(--teal)}.pstep.cur{background:var(--gold)}
+.std-ref{display:inline-block;font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--teal);padding:3px 8px;border:1px solid rgba(0,158,142,0.25);border-radius:3px;margin-top:4px}
+.scenario-card{background:var(--navy);border:1px solid var(--dim);border-radius:12px;padding:24px 26px;margin-bottom:18px;animation:fadeUp .35s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.scene-ctx{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.scene-icon{font-size:20px}.scene-co{font-size:10px;color:var(--teal);font-weight:700;letter-spacing:0.15em;text-transform:uppercase}
+.scene-num{font-size:10px;color:var(--mu);letter-spacing:0.1em;margin-left:auto}
+.scene-title{font-family:'DM Serif Display',serif;font-size:20px;font-weight:400;line-height:1.2;color:#fff;margin-bottom:12px}
+.scene-title em{font-style:italic;color:var(--teal)}
+.scene-body{font-size:13px;color:var(--lt);line-height:1.75}
+.decisions{display:flex;flex-direction:column;gap:10px;margin-bottom:20px}
+.dec{background:rgba(255,255,255,0.02);border:1px solid var(--dim);border-radius:10px;padding:14px 18px;cursor:pointer;transition:all .15s;position:relative;overflow:hidden;animation:fadeUp .35s ease both}
+.dec::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--teal);transform:scaleY(0);transition:transform .2s}
+.dec:hover{border-color:rgba(0,158,142,0.4);background:rgba(0,158,142,0.04)}.dec:hover::before{transform:scaleY(1)}
+.dec:nth-child(2){animation-delay:.05s}.dec:nth-child(3){animation-delay:.1s}
+.dec-letter{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;border:1px solid var(--dim);font-size:10px;font-weight:700;color:var(--teal);margin-right:10px;flex-shrink:0;vertical-align:middle}
+.dec-text{font-size:13px;color:#c0d0dc;line-height:1.55;display:inline}
+.dec.chosen{border-color:var(--teal);background:rgba(0,158,142,0.08);pointer-events:none}.dec.chosen::before{transform:scaleY(1)}
+.dec.unchosen{opacity:0.3;pointer-events:none}
+.impact{display:none;background:var(--navy2);border:1px solid var(--dim);border-radius:10px;padding:16px 20px;margin-bottom:18px;animation:fadeUp .3s ease}
+.impact.show{display:block}
+.impact-head{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+.impact-tag{font-size:10px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase}
+.impact-deltas{display:flex;gap:10px;flex-wrap:wrap}
+.delta{display:flex;align-items:center;gap:4px;font-size:11px;font-weight:700;letter-spacing:0.05em}
+.delta-pos{color:var(--teal)}.delta-neg{color:var(--danger)}.delta-neu{color:var(--mu)}
+.impact-text{font-size:13px;color:var(--lt);line-height:1.65;margin-bottom:8px}
+.impact-std{font-size:11px;color:var(--teal);line-height:1.5;padding:8px 12px;border-left:2px solid rgba(0,158,142,0.3);margin-top:8px;background:rgba(0,158,142,0.04)}
+.btn{padding:12px 26px;font-size:13px;font-weight:700;letter-spacing:0.06em;border:none;border-radius:4px;cursor:pointer;font-family:inherit;transition:all .15s}
+.btn-primary{background:var(--teal);color:var(--navy)}.btn-primary:hover{background:#00b5a4}
+.btn-ghost{background:transparent;border:1px solid var(--dim);color:var(--lt)}.btn-ghost:hover{border-color:var(--teal);color:var(--teal)}
+.btn-wrap{display:flex;justify-content:flex-end;gap:10px}
+/* INTRO */
+.intro-screen{min-height:80vh;display:flex;flex-direction:column;justify-content:center;padding:20px 0}
+.intro-badge{display:inline-block;background:rgba(245,164,32,0.12);border:1px solid rgba(245,164,32,0.3);border-radius:4px;padding:5px 12px;font-size:10px;font-weight:700;color:var(--gold);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:18px}
+.intro-title{font-family:'DM Serif Display',serif;font-size:clamp(30px,4.5vw,46px);font-weight:400;line-height:1.05;margin-bottom:14px}
+.intro-title em{font-style:italic;color:var(--teal)}
+.intro-sub{font-size:14px;color:var(--lt);line-height:1.75;max-width:540px;margin-bottom:28px}
+/* CASE SELECT */
+.case-select{display:none;padding:20px 0}
+.case-select.show{display:block}
+.cs-title{font-family:'DM Serif Display',serif;font-size:28px;margin-bottom:6px}
+.cs-sub{font-size:13px;color:var(--lt);line-height:1.6;margin-bottom:24px}
+.cases-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;margin-bottom:24px}
+.case-card{background:var(--navy);border:1px solid var(--dim);border-radius:12px;padding:20px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.case-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--teal);transform:scaleX(0);transition:transform .2s}
+.case-card:hover{border-color:rgba(0,158,142,0.4)}.case-card:hover::before{transform:scaleX(1)}
+.cc-icon{font-size:28px;margin-bottom:12px}
+.cc-title{font-size:15px;font-weight:700;color:#fff;margin-bottom:4px}
+.cc-type{font-size:11px;color:var(--teal);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:10px}
+.cc-desc{font-size:12px;color:var(--lt);line-height:1.55;margin-bottom:12px}
+.cc-tags{display:flex;gap:5px;flex-wrap:wrap}
+.cc-tag{font-size:10px;padding:2px 7px;border-radius:3px;border:1px solid var(--dim);color:var(--mu)}
+.cc-diff{position:absolute;top:12px;right:14px;font-size:9px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;padding:2px 8px;border-radius:10px}
+.diff-normal{background:rgba(0,158,142,0.12);color:var(--teal)}
+.diff-hard{background:rgba(245,164,32,0.12);color:var(--gold)}
+.diff-expert{background:rgba(226,75,74,0.12);color:var(--danger)}
+/* BRIEFING */
+.briefing{background:var(--navy);border:1px solid var(--dim);border-radius:12px;padding:22px;margin-bottom:24px}
+.briefing-head{font-size:10px;letter-spacing:0.22em;color:var(--teal);text-transform:uppercase;margin-bottom:12px}
+.briefing-row{display:flex;gap:12px;align-items:flex-start;margin-bottom:10px}
+.briefing-key{font-size:11px;color:var(--mu);min-width:85px;letter-spacing:0.08em;flex-shrink:0;padding-top:1px}
+.briefing-val{font-size:13px;color:#c0d0dc;line-height:1.5}
+.briefing-val strong{color:#fff}
+/* ENDING */
+.ending{display:none;text-align:center;padding:40px 0;animation:fadeUp .5s ease}
+.ending.show{display:block}
+.ending-badge{display:inline-block;padding:7px 16px;border-radius:4px;font-size:11px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;margin-bottom:22px}
+.end-gold{background:rgba(245,164,32,0.15);color:var(--gold)}
+.end-teal{background:rgba(0,158,142,0.15);color:var(--teal)}
+.end-warn{background:rgba(245,164,32,0.12);color:var(--gold)}
+.end-red{background:rgba(226,75,74,0.12);color:var(--danger)}
+.ending-title{font-family:'DM Serif Display',serif;font-size:40px;font-weight:400;margin-bottom:10px;line-height:1.1}
+.ending-sub{font-size:14px;color:var(--lt);line-height:1.7;max-width:540px;margin:0 auto 28px}
+.final-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:500px;margin:0 auto 28px}
+.fm{background:var(--navy);border:1px solid var(--dim);border-radius:10px;padding:16px}
+.fm-val{font-size:32px;font-weight:900;margin-bottom:4px}
+.fm-label{font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:var(--lt)}
+.lesson-box{background:var(--navy);border:1px solid var(--dim);border-radius:10px;padding:18px 22px;max-width:540px;margin:0 auto 24px;text-align:left}
+.lesson-title{font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:var(--teal);margin-bottom:10px}
+.lesson-item{display:flex;gap:8px;font-size:12px;color:var(--lt);line-height:1.6;margin-bottom:7px}
+.lesson-item::before{content:'\2192';color:var(--teal);flex-shrink:0}
+/* PHASE TRANSITION */
+.phase-transition{display:none;text-align:center;padding:40px 20px;animation:fadeUp .4s ease}
+.pt-num{font-size:11px;color:var(--teal);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:12px}
+.pt-title{font-family:'DM Serif Display',serif;font-size:32px;margin-bottom:8px}
+.pt-sub{font-size:13px;color:var(--lt);line-height:1.7;max-width:440px;margin:0 auto 10px}
+.pt-std{font-size:11px;color:var(--teal);margin-bottom:22px}
+.pt-bar{width:40px;height:3px;background:var(--teal);margin:0 auto 22px}
+.game-area{display:none}.game-area.active{display:block}
+</style>
+</head>
+<body>
+<div class="game">
+  <div class="ghead" id="ghead" style="display:none">
+    <div class="logo-mark"><svg viewBox="0 0 20 17"><polygon points="10,0 20,17 0,17" fill="#F5A420"/></svg><span class="lt">CMP</span><span class="lb">BRASIL</span></div>
+    <span class="game-label" id="caseLabel">Change Manager Simulator</span>
+  </div>
+
+  <!-- INTRO -->
+  <div id="intro">
+    <div class="intro-screen">
+      <div class="logo-mark" style="margin-bottom:18px"><svg viewBox="0 0 20 17" style="width:16px;height:14px"><polygon points="10,0 20,17 0,17" fill="#F5A420"/></svg><span style="font-size:14px;font-weight:900;letter-spacing:0.05em">CMP</span><span style="font-size:7.5px;font-weight:700;color:var(--teal);letter-spacing:0.2em">BRASIL</span></div>
+      <div class="intro-badge">Change Manager Simulator v2</div>
+      <h1 class="intro-title">Você é o<br><em>Change Manager.</em></h1>
+      <p class="intro-sub">Escolha um caso real de transformação organizacional. Cada decisão é guiada pelas 5 áreas de processo do Standard ACMP para Gestão de Mudanças (2ª edição). Suas escolhas determinam o destino do projeto.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px">
+        <div class="std-ref">5.1 Avaliar Impacto</div>
+        <div class="std-ref">5.2 Formular Estratégia</div>
+        <div class="std-ref">5.3 Desenvolver Planos</div>
+        <div class="std-ref">5.4 Executar Planos</div>
+        <div class="std-ref">5.5 Completar o Esforço</div>
+      </div>
+      <button class="btn btn-primary" onclick="showCaseSelect()" style="font-size:15px;padding:13px 30px">Escolher caso →</button>
+    </div>
+  </div>
+
+  <!-- CASE SELECT -->
+  <div class="case-select" id="caseSelect">
+    <h2 class="cs-title">Escolha seu <em style="color:var(--teal);font-style:italic;font-family:'DM Serif Display',serif">caso.</em></h2>
+    <p class="cs-sub">Cada caso é baseado em situações reais de transformação organizacional. Nomes de empresas e pessoas foram alterados.</p>
+    <div class="cases-grid" id="casesGrid"></div>
+    <button class="btn btn-ghost" onclick="backToIntro()">← Voltar</button>
+  </div>
+
+  <!-- BRIEFING -->
+  <div id="briefingScreen" style="display:none">
+    <div style="font-size:10px;letter-spacing:0.22em;color:var(--teal);text-transform:uppercase;margin-bottom:14px" id="briefCaseType"></div>
+    <h2 style="font-family:'DM Serif Display',serif;font-size:30px;margin-bottom:6px" id="briefCaseTitle"></h2>
+    <p style="font-size:13px;color:var(--lt);line-height:1.7;margin-bottom:20px" id="briefCaseDesc"></p>
+    <div class="briefing" id="briefingBox"></div>
+    <div style="display:flex;gap:12px">
+      <button class="btn btn-ghost" onclick="showCaseSelect()">← Outro caso</button>
+      <button class="btn btn-primary" onclick="startGame()" style="font-size:15px;padding:13px 30px">Iniciar simulação →</button>
+    </div>
+  </div>
+
+  <!-- GAME AREA -->
+  <div class="game-area" id="gameArea">
+    <div class="metrics">
+      <div class="metric"><div class="metric-top"><span class="metric-label">Adoção</span><span class="metric-val" id="mv-ad" style="color:var(--teal)">50</span></div><div class="metric-bar"><div class="metric-fill fill-teal" id="mb-ad" style="width:50%"></div></div></div>
+      <div class="metric"><div class="metric-top"><span class="metric-label">Resistência</span><span class="metric-val" id="mv-re" style="color:var(--danger)">40</span></div><div class="metric-bar"><div class="metric-fill fill-warn" id="mb-re" style="width:40%"></div></div></div>
+      <div class="metric"><div class="metric-top"><span class="metric-label">Patrocinador</span><span class="metric-val" id="mv-sp" style="color:var(--gold)">60</span></div><div class="metric-bar"><div class="metric-fill fill-gold" id="mb-sp" style="width:60%"></div></div></div>
+    </div>
+    <div class="phase-banner" id="phaseBanner"><div><div class="phase-num" id="phaseNum"></div><div class="phase-title" id="phaseTitle"></div><div class="phase-sub" id="phaseSub"></div></div><div class="phase-steps" id="phaseSteps"></div></div>
+    <div class="scenario-card" id="scenCard">
+      <div class="scene-ctx"><span class="scene-icon" id="sceneIcon"></span><span class="scene-co" id="sceneCo"></span><span class="scene-num" id="sceneNum"></span></div>
+      <h2 class="scene-title" id="sceneTitle"></h2>
+      <p class="scene-body" id="sceneBody"></p>
+    </div>
+    <div class="decisions" id="decisions"></div>
+    <div class="impact" id="impactBox">
+      <div class="impact-head"><span class="impact-tag" id="impactTag"></span><div class="impact-deltas" id="impactDeltas"></div></div>
+      <p class="impact-text" id="impactText"></p>
+      <div class="impact-std" id="impactStd"></div>
+    </div>
+    <div class="btn-wrap" id="nextWrap" style="display:none">
+      <button class="btn btn-ghost" onclick="restartGame()">↺ Menu</button>
+      <button class="btn btn-primary" id="nextBtn" onclick="advance()">Próxima →</button>
+    </div>
+  </div>
+
+  <!-- PHASE TRANSITION -->
+  <div class="phase-transition" id="phaseTransition">
+    <div class="pt-num" id="ptNum"></div>
+    <h2 class="pt-title" id="ptTitle"></h2>
+    <div class="pt-std" id="ptStd"></div>
+    <div class="pt-bar"></div>
+    <p class="pt-sub" id="ptSub"></p>
+    <button class="btn btn-primary" onclick="enterPhase()">Continuar →</button>
+  </div>
+
+  <!-- ENDING -->
+  <div class="ending" id="ending">
+    <div class="ending-badge" id="endBadge"></div>
+    <h2 class="ending-title" id="endTitle"></h2>
+    <p class="ending-sub" id="endSub"></p>
+    <div class="final-metrics">
+      <div class="fm"><div class="fm-val" id="ef-ad" style="color:var(--teal)"></div><div class="fm-label">Adoção</div></div>
+      <div class="fm"><div class="fm-val" id="ef-re" style="color:var(--danger)"></div><div class="fm-label">Resistência</div></div>
+      <div class="fm"><div class="fm-val" id="ef-sp" style="color:var(--gold)"></div><div class="fm-label">Patrocinador</div></div>
+    </div>
+    <div class="lesson-box"><div class="lesson-title">Lições do Standard ACMP</div><div id="endLessons"></div></div>
+    <div style="display:flex;gap:12px;justify-content:center">
+      <button class="btn btn-ghost" onclick="restartGame()">← Menu de casos</button>
+      <button class="btn btn-primary" onclick="replayCase()">↺ Jogar mesmo caso</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// ACMP Standard 2nd Edition — Process Areas
+// ═══════════════════════════════════════════════════════
+const STD = {
+  '5.1': 'Avaliar Impacto da Mudança e Prontidão Organizacional',
+  '5.2': 'Formular a Estratégia de Gestão de Mudanças',
+  '5.3': 'Desenvolver o Plano de Gestão de Mudanças',
+  '5.4': 'Executar o Plano de Gestão de Mudanças',
+  '5.5': 'Completar o Esforço de Gestão de Mudanças'
+};
+
+const PHASES_TEMPLATE = [
+  { num:'FASE 1', title:'Avaliar e Formular', sub:'Standard ACMP · Áreas 5.1 e 5.2', stdRef:'5.1 + 5.2' },
+  { num:'FASE 2', title:'Desenvolver e Executar', sub:'Standard ACMP · Áreas 5.3 e 5.4', stdRef:'5.3 + 5.4' },
+  { num:'FASE 3', title:'Completar o Esforço', sub:'Standard ACMP · Área 5.5', stdRef:'5.5' }
+];
+
+const TRANSITIONS = [
+  { num:'FASE 2', title:'Desenvolver e Executar', sub:'A estratégia foi formulada. Agora você desenvolve os planos detalhados e executa — comunicação, treinamento, engajamento de stakeholders.', std:'Standard ACMP — Áreas 5.3 (Desenvolver Planos) e 5.4 (Executar Planos)' },
+  { num:'FASE 3', title:'Completar o Esforço', sub:'A execução está em andamento. Agora é hora de sustentar a mudança, documentar lições e garantir que os resultados perdurem.', std:'Standard ACMP — Área 5.5 (Completar o Esforço de Gestão de Mudanças)' }
+];
+
+const ENDINGS = [
+  { min:80, badge:'Transformação Exemplar', bc:'end-gold', title:'Mestre da Mudança.', sub:'Você aplicou o Standard ACMP com excelência em todas as fases. O projeto atingiu seus objetivos e deixou capacidade instalada na organização.', lessons:['Área 5.1 — Avaliação de impacto antes de qualquer ação reduz riscos sistematicamente','Área 5.2 — Estratégia de GM alinhada ao patrocinador multiplica a eficácia','Área 5.5 — Completar o esforço com lições aprendidas garante valor sustentável'] },
+  { min:60, badge:'Missão Cumprida', bc:'end-teal', title:'Boa execução.', sub:'O projeto foi entregue com resultados satisfatórios. Algumas áreas do Standard poderiam ter sido mais bem exploradas, mas a base foi sólida.', lessons:['Área 5.3 — Planos de comunicação segmentados aumentam a adoção','Área 5.4 — Execução exige monitoramento contínuo e ajustes em tempo real','Área 5.1 — Consultar stakeholders cedo previne resistência tardia'] },
+  { min:40, badge:'Lição Aprendida', bc:'end-warn', title:'Aprendizado real.', sub:'Desafios significativos de adoção. As áreas do Standard que foram negligenciadas geraram impactos visíveis no resultado.', lessons:['Área 5.1 — Sem avaliação de prontidão, a resistência é inevitável','Área 5.2 — Estratégia sem patrocinador ativo é apenas um documento','Área 5.4 — Treinamento nunca pode ser sacrificado ao cronograma'] },
+  { min:0, badge:'Projeto em Risco', bc:'end-red', title:'Alta resistência.', sub:'A mudança técnica foi entregue, mas a mudança organizacional não aconteceu. As 5 áreas do Standard precisam ser revisitadas.', lessons:['Área 5.1 — Definir a mudança claramente é o primeiro passo do Standard','Área 5.3 — Planos de GM devem ser desenvolvidos antes da execução técnica','Área 5.5 — Sem documentação de lições, os mesmos erros se repetem'] }
+];
+
+// ═══════════════════════════════════════════════════════
+// CASE DATA
+// ═══════════════════════════════════════════════════════
+const CASES = {
+  meridian: {
+    id:'meridian', icon:'🏭', title:'Grupo Meridian', type:'Implementação de ERP',
+    diff:'Normal', diffClass:'diff-normal',
+    desc:'Indústria e logística com 3.400 colaboradores implementando novo sistema ERP. 340 usuários impactados, prazo de 6 meses até o go-live.',
+    tags:['ERP','340 usuários','6 meses','Indústria'],
+    briefing:[
+      ['Empresa','Grupo Meridian — Indústria e Logística, 3.400 colaboradores'],
+      ['Projeto','Implementação de novo sistema ERP — 340 usuários impactados'],
+      ['Prazo','6 meses até o go-live'],
+      ['Seu papel','Change Manager responsável pela estratégia e execução de GM']
+    ],
+    initAd:50, initRe:40, initSp:60,
+    scenarios:[
+      { phase:0, icon:'📋', title:'O projeto começa. Por onde?', body:'Você foi designado CM do projeto ERP. O gerente de projetos enviou o cronograma técnico sem nenhuma atividade de GM. São 340 usuários em 12 áreas. O CEO quer go-live em 6 meses.',
+        options:[
+          { label:'Convoco workshop de assessment de impacto com todos os gerentes de área', ad:10, re:-5, sp:5, q:'Excelente', text:'Workshop estruturado mapeou 340 usuários em 12 áreas com dados concretos. Gerentes se sentiram parte do processo.', std:'Standard ACMP 5.1 — "Definir a Mudança" e "Determinar por que a Mudança é Necessária" são os primeiros subprocessos. Seu workshop cobriu ambos antes de qualquer ação.' },
+          { label:'Apresento ao CEO um plano de assessment antes de assumir compromisso de prazo', ad:5, re:0, sp:15, q:'Ótimo', text:'Postura profissional reconhecida. O CEO entendeu que GM é disciplina — não execução reativa.', std:'Standard ACMP 5.1 — "Avaliar Prontidão Organizacional" exige diagnóstico antes de formular estratégia. Você seguiu a sequência correta do Standard.' },
+          { label:'Começo direto com comunicação geral para criar momentum', ad:-5, re:20, sp:-5, q:'Risco', text:'Comunicação sem assessment gerou rumores. As pessoas ficam ansiosas quando não entendem o que muda para elas.', std:'Standard ACMP 5.1 — O Standard orienta que a avaliação de impacto deve preceder a formulação de qualquer estratégia. Comunicar antes de avaliar inverte a sequência.' }
+        ]
+      },
+      { phase:0, icon:'🤝', title:'O patrocinador <em>desapareceu</em>', body:'O Diretor de Operações cancelou 3 reuniões. Sem seu aval, a equipe de GM não tem orçamento nem autoridade. O projeto está parado.',
+        options:[
+          { label:'Escalo para o CEO pedindo intervenção', ad:0, re:10, sp:-15, q:'Risco', text:'O Diretor ficou resentido. Assinou por obrigação — agora é um patrocinador resistente.', std:'Standard ACMP 5.2 — "Desenvolver a Estrutura de Patrocínio" indica que o patrocinador deve ser engajado — não forçado. Escalada política compromete a relação de confiança.' },
+          { label:'Preparo apresentação de 10 min mostrando o risco financeiro sem patrocínio ativo', ad:5, re:0, sp:15, q:'Excelente', text:'Você falou a língua dele: ROI e risco. O Diretor entendeu que patrocínio fraco era o principal risco do projeto.', std:'Standard ACMP 5.2 — "Avaliar Riscos da Mudança" e conectar ao business case é a forma recomendada de engajar patrocinadores segundo o Standard.' },
+          { label:'Avanço o plano sem ele e adapto para não precisar de aprovação', ad:-10, re:15, sp:-20, q:'Crítico', text:'GM sem patrocinador visível é percebido como opcional pela organização.', std:'Standard ACMP 5.2 — O Standard estabelece que a estratégia de GM deve incluir estrutura de patrocínio explícita. Sem ela, o esforço carece de legitimidade organizacional.' }
+        ]
+      },
+      { phase:1, icon:'⚡', title:'Resistência <em>declarada</em> em Finanças', body:'A Gerente de Finanças declara que o sistema "vai criar caos". Sua fala se espalhou para 45 colaboradores. Resistência subindo.',
+        options:[
+          { label:'Peço ao Diretor que convoque a gerente para conversa oficial', ad:0, re:-5, sp:-15, q:'Risco', text:'Silêncio forçado não é adesão. A equipe ficou com medo — não com confiança.', std:'Standard ACMP 5.4 — "Gerenciar Reações à Mudança" orienta diagnóstico individual antes de ação corretiva. Punição aumenta resistência passiva.' },
+          { label:'Agendar 1:1 para identificar o barrier point real dela usando assessment individual', ad:5, re:-15, sp:5, q:'Excelente', text:'Descoberta: ela não acreditava que a equipe teria tempo de aprender. Com isso claro, você ajustou o plano de treinamento.', std:'Standard ACMP 5.4 — "Gerenciar Reações à Mudança" inclui identificar a raiz da resistência antes de intervir. Seu assessment individual seguiu exatamente essa orientação.' },
+          { label:'Criar grupo de trabalho com ela para resolver os problemas técnicos reais', ad:10, re:-10, sp:0, q:'Ótimo', text:'Incluir a resistente no processo foi brilhante. Ela virou defensora do projeto dentro de Finanças.', std:'Standard ACMP 5.3 — "Desenvolver Plano de Engajamento de Stakeholders" recomenda incluir stakeholders críticos como co-criadores da solução.' }
+        ]
+      },
+      { phase:1, icon:'🚨', title:'Go-live em <em>chamas</em>', body:'Dia do go-live: sistema lento, 30 usuários sem acesso, 200 chamados. A diretoria está em pânico.',
+        options:[
+          { label:'Fico na sala de crise de TI acompanhando logs técnicos', ad:-5, re:10, sp:0, q:'Risco', text:'Você ficou no lugar errado. As pessoas estavam perdidas e ninguém as comunicou.', std:'Standard ACMP 5.4 — "Executar Planos de Comunicação" é responsabilidade do CM mesmo (e especialmente) durante crises. O papel do CM é no front — não no back-end.' },
+          { label:'Ativo a rede de suporte e envio comunicado de status imediato para todos', ad:15, re:-10, sp:10, q:'Excelente', text:'Comunicação de crise exemplar. Em 40 minutos o pânico cedeu. O CEO destacou sua atuação.', std:'Standard ACMP 5.4 — "Implementar Ações de Comunicação e Engajamento" inclui comunicação de crise. O Standard orienta transparência e frequência durante momentos de alta incerteza.' },
+          { label:'Recomendo ao CEO adiar o go-live e reverter para o sistema antigo', ad:-25, re:5, sp:-20, q:'Crítico', text:'Rollback técnico disponível, mas a mensagem para a organização foi: "o novo sistema falhou".', std:'Standard ACMP 5.4 — Reversão de mudança tem impacto desproporcional na confiança organizacional. O Standard orienta que o CM avalie consequências de segunda ordem antes de recomendar rollback.' }
+        ]
+      },
+      { phase:2, icon:'📉', title:'Adoção técnica vs. <em>adoção real</em>', body:'30 dias pós go-live: 68% dos usuários acessam o sistema. Mas em logística e faturamento, planilhas paralelas continuam em uso.',
+        options:[
+          { label:'Lanço comunicado do CEO exigindo que parem de usar planilhas', ad:5, re:20, sp:-5, q:'Risco', text:'Coerção gerou compliance superficial. Imposição sem suporte não é mudança — é conformidade frágil.', std:'Standard ACMP 5.5 — "Avaliar Resultados da Mudança" precede qualquer ação corretiva. O Standard orienta diagnosticar a causa raiz da baixa adoção antes de impor mudanças comportamentais.' },
+          { label:'Analiso dados de uso por área e visito presencialmente os times com maior gap', ad:15, re:-10, sp:5, q:'Excelente', text:'As planilhas cobriam um relatório que o ERP não gerava. Você resolveu a causa raiz, não o sintoma.', std:'Standard ACMP 5.5 — "Conduzir Revisão Pós-Implementação" é essencial para identificar gaps entre a mudança planejada e a mudança real. Seu diagnóstico de campo é exatamente isso.' },
+          { label:'Crio gamificação: área com maior adoção ganha reconhecimento público', ad:10, re:-5, sp:5, q:'Bom', text:'Incentivo positivo gerou competição saudável. Adoção cresceu — mas a causa raiz não foi investigada.', std:'Standard ACMP 5.5 — "Sustentar Resultados da Mudança" inclui reforço positivo, mas o Standard orienta que reforço funciona melhor quando as barreiras estruturais já foram removidas.' }
+        ]
+      },
+      { phase:2, icon:'🏆', title:'O projeto <em>acabou</em>. E agora?', body:'O projeto foi concluído. Você tem a oportunidade de documentar aprendizados e celebrar resultados. O orçamento é limitado.',
+        options:[
+          { label:'Pulo a documentação — o time está cansado', ad:0, re:0, sp:0, q:'Neutro', text:'Oportunidade perdida. As lições não foram capturadas. Na próxima transformação, os mesmos erros provavelmente se repetirão.', std:'Standard ACMP 5.5 — "Documentar Lições Aprendidas" é o último subprocesso do Standard. Negligenciá-lo significa que o valor do aprendizado organizacional se perde.' },
+          { label:'Retrospectiva com a equipe, documento quick wins e erros, compartilho com a liderança', ad:10, re:-5, sp:10, q:'Excelente', text:'Relatório apresentado ao CEO. Resultado inesperado: você foi convidado a liderar o próximo projeto.', std:'Standard ACMP 5.5 — "Completar o Esforço" exige documentação formal de lições, transferência de conhecimento e recomendações para futuros esforços. Você fechou o ciclo do Standard.' },
+          { label:'Faço celebração pública dos resultados com Super Users e CEO', ad:15, re:-10, sp:5, q:'Ótimo', text:'Super Users receberam reconhecimento. A cultura de GM ganhou visibilidade na empresa.', std:'Standard ACMP 5.5 — "Sustentar Resultados" inclui mecanismos de reforço e celebração. Reconhecimento público consolida a mudança como parte da identidade organizacional.' }
+        ]
+      }
+    ]
+  },
+
+  floresta: {
+    id:'floresta', icon:'🌿', title:'Grupo Floresta', type:'Mudança de Sede Corporativa',
+    diff:'Difícil', diffClass:'diff-hard',
+    desc:'Empresa de cosméticos com 2.000 colaboradores mudando de prédio. Desafio emocional: apego ao local antigo, perda de benefícios, nova liderança recente.',
+    tags:['2.000 pessoas','Mudança física','Cultura','Cosméticos'],
+    briefing:[
+      ['Empresa','Grupo Floresta — Cosméticos e Bem-estar, 2.000 colaboradores'],
+      ['Projeto','Mudança da sede corporativa do Centro para novo campus no Parque Industrial'],
+      ['Desafio','Apego emocional ao prédio atual, perda de benefícios locais (VR, restaurantes), nova presidência'],
+      ['Diferencial','500 colaboradores já trabalham no novo campus — podem ser aliados ou resistentes']
+    ],
+    initAd:45, initRe:50, initSp:55,
+    scenarios:[
+      { phase:0, icon:'👂', title:'Por onde <em>começar</em> a escuta?', body:'Você precisa entender como as 2.000 pessoas se sentem sobre a mudança. O comitê quer uma pesquisa rápida online. Mas você sabe que a mudança tem forte componente emocional.',
+        options:[
+          { label:'Realizo a pesquisa online rápida conforme o comitê sugeriu', ad:-5, re:5, sp:5, q:'Arriscado', text:'Pesquisa teve 32% de resposta. Dados superficiais. As pessoas não se sentiram ouvidas — apenas consultadas.', std:'Standard ACMP 5.1 — "Avaliar Stakeholders e Impacto da Mudança" requer profundidade no diagnóstico. Pesquisas quantitativas capturam extensão, mas não profundidade emocional.' },
+          { label:'Proponho "Escuta Aberta" — entrevistas presenciais com todos os times impactados', ad:10, re:-10, sp:0, q:'Excelente', text:'240 horas de escuta ativa. Você mapeou medos reais: perda de restaurantes, tempo de deslocamento, medo de perder identidade de equipe. Dados ricos que guiarão toda a estratégia.', std:'Standard ACMP 5.1 — "Identificar Stakeholders e Avaliar Impacto" orienta avaliação qualitativa e quantitativa. Entrevistas presenciais revelam o que pesquisas online não capturam: emoções e medos latentes.' },
+          { label:'Foco primeiro nos 500 que já estão no campus novo — eles são minha base', ad:5, re:-5, sp:-5, q:'Bom', text:'Os 500 têm insights valiosos, mas o comitê ficou insatisfeito que você não ouviu o grupo principal de 1.500.', std:'Standard ACMP 5.1 — O Standard orienta avaliar todos os grupos impactados. Priorizar um segmento sem avaliar os demais cria pontos cegos na estratégia.' }
+        ]
+      },
+      { phase:0, icon:'🎯', title:'A estratégia de <em>engajamento</em>', body:'Sua avaliação revelou alto apego emocional ao prédio atual. 40% das pessoas não veem razão para mudar. O CEO quer velocidade. Como formular a estratégia?',
+        options:[
+          { label:'Crio programa de "Embaixadores" — influenciadores internos que constroem a narrativa da mudança', ad:15, re:-10, sp:5, q:'Excelente', text:'10 eventos com Embaixadores que co-criaram ações de engajamento. A mudança passou a ter "donos" distribuídos pela organização — não apenas o CM.', std:'Standard ACMP 5.2 — "Desenvolver Estrutura de Patrocínio" inclui cascata de influência. Embaixadores são a extensão prática do patrocínio em cada área.' },
+          { label:'Apresento campanha interna de endomarketing mostrando as vantagens do novo campus', ad:5, re:-5, sp:10, q:'Bom', text:'Campanha visual bonita, mas unidirecional. As pessoas viram, mas não participaram. Engajamento passivo.', std:'Standard ACMP 5.2 — "Formular Estratégia de Comunicação" no Standard enfatiza comunicação bidirecional. Campanhas de mão única constroem awareness, mas não desire.' },
+          { label:'Foco em criar urgência: apresento custos do prédio antigo e riscos de permanecer', ad:-5, re:15, sp:-5, q:'Risco', text:'Mensagem de "fuga" gera ansiedade, não desejo. As pessoas sentiram que estavam sendo empurradas, não convidadas.', std:'Standard ACMP 5.2 — O Standard distingue motivação positiva (visão do futuro) de motivação por medo (urgência). Urgência funciona para iniciar — mas visão sustenta o engajamento.' }
+        ]
+      },
+      { phase:1, icon:'🏗️', title:'Os <em>Desbravadores</em> resistem', body:'Os 500 colaboradores do novo campus deveriam ser anfitriões, mas se sentem "invadidos". Resistência inesperada do grupo que deveria ser aliado.',
+        options:[
+          { label:'Ignoro a resistência — eles já estão lá, vão se adaptar', ad:-10, re:15, sp:0, q:'Crítico', text:'Os Desbravadores passaram a boicotar silenciosamente: não ajudam novatos, não compartilham espaços. A integração fracassou.', std:'Standard ACMP 5.4 — "Gerenciar Reações à Mudança" se aplica a todos os grupos impactados — incluindo os que parecem menos afetados. O Standard orienta monitoramento contínuo.' },
+          { label:'Crio comunicação especial para eles: reconheço seu papel de anfitriões e co-criadores', ad:10, re:-10, sp:5, q:'Excelente', text:'Desbravadores receberam identidade própria no projeto. Passaram de "invadidos" a "protagonistas". A resistência virou orgulho.', std:'Standard ACMP 5.3 — "Desenvolver Plano de Engajamento" deve cobrir cada segmento de stakeholder com mensagens e ações customizadas. Um plano genérico não atende necessidades distintas.' },
+          { label:'Realizo eventos de integração entre os 500 existentes e os 1.500 que chegarão', ad:5, re:-5, sp:0, q:'Bom', text:'Eventos ajudaram, mas sem reconhecimento formal do papel dos Desbravadores, a tensão subjacente permaneceu.', std:'Standard ACMP 5.4 — "Implementar Ações de Engajamento" funciona melhor quando precedido de reconhecimento explícito dos papéis de cada grupo no processo de mudança.' }
+        ]
+      },
+      { phase:1, icon:'🥽', title:'Experiência <em>imersiva</em> ou informação?', body:'Faltam 4 semanas para a mudança física. 60% das pessoas nunca visitaram o novo campus. O orçamento permite uma ação grande ou várias pequenas.',
+        options:[
+          { label:'Crio experiência de realidade virtual 360° — levo o novo prédio até as pessoas no prédio antigo', ad:15, re:-15, sp:5, q:'Excelente', text:'Fila de pessoas querendo experimentar os óculos VR. O novo campus deixou de ser abstrato — virou real e desejável. A resistência caiu drasticamente.', std:'Standard ACMP 5.4 — "Executar Plano de Treinamento e Capacitação" inclui familiarização com o novo ambiente. Experiências imersivas criam Knowledge e Ability antes da mudança acontecer.' },
+          { label:'Distribuo cartilha completa + FAQ digital no app do colaborador', ad:5, re:-5, sp:5, q:'Bom', text:'Informação acessível, consultas ágeis. Mas informação não substitui experiência — as pessoas ainda temiam o desconhecido.', std:'Standard ACMP 5.3 — "Desenvolver Plano de Comunicação" orienta múltiplos canais. Cartilhas resolvem Knowledge, mas não Desire. O Standard recomenda combinação de canais.' },
+          { label:'Organizo visitas guiadas ao novo campus em grupos pequenos', ad:10, re:-10, sp:0, q:'Ótimo', text:'Visitas funcionaram bem para quem foi. Problema: com 2.000 pessoas e 4 semanas, só 40% conseguiram visitar.', std:'Standard ACMP 5.4 — Escala importa na execução. O Standard orienta que ações de engajamento alcancem todos os impactados — não apenas os que tiveram oportunidade.' }
+        ]
+      },
+      { phase:2, icon:'📊', title:'Primeira semana no <em>novo campus</em>', body:'Mudança física concluída. Mas as reclamações dominam: falta de sinalização, filas no restaurante, salas de reunião lotadas. Moral caindo.',
+        options:[
+          { label:'Crio "Pulse Check" semanal — pesquisa rápida de temperatura emocional dos times', ad:15, re:-10, sp:10, q:'Excelente', text:'Dados em tempo real mostraram que os problemas eram concentrados em 3 áreas específicas. Correção cirúrgica. Em 2 semanas, a satisfação subiu para nota 9.', std:'Standard ACMP 5.5 — "Avaliar Resultados da Mudança" inclui métricas de satisfação e adoção. O Pulse Check é a forma prática de implementar a avaliação contínua que o Standard exige.' },
+          { label:'Peço ao RH que resolva os problemas operacionais — meu papel como CM acabou', ad:-10, re:10, sp:-10, q:'Crítico', text:'O CM abandonou a mudança na fase mais vulnerável. As queixas não resolvidas consolidaram a narrativa de que "era melhor antes".', std:'Standard ACMP 5.5 — O Standard é explícito: o esforço de GM não termina na implementação. Completar o esforço exige monitoramento, ajuste e reforço ativo.' },
+          { label:'Ativo os Embaixadores para coletar feedback e propor melhorias em cada andar', ad:10, re:-5, sp:5, q:'Ótimo', text:'Embaixadores canalizaram feedback construtivo. Algumas soluções vieram dos próprios colaboradores — ownership genuíno.', std:'Standard ACMP 5.5 — "Sustentar Resultados" usando a rede de agentes de mudança é prática recomendada. O Standard orienta que a sustentação seja distribuída, não centralizada.' }
+        ]
+      },
+      { phase:2, icon:'🎉', title:'Encerramento: <em>legado</em> da mudança', body:'3 meses depois, a mudança se consolidou. Você precisa fechar o projeto formalmente. O que prioriza?',
+        options:[
+          { label:'Entrego relatório final ao CEO e encerro o projeto', ad:5, re:0, sp:5, q:'Bom', text:'Relatório entregue. Mas sem transferência de conhecimento, a próxima mudança começará do zero.', std:'Standard ACMP 5.5 — "Documentar Lições Aprendidas" e "Transferir Propriedade dos Resultados" são os últimos passos do Standard. Um relatório sozinho não completa o ciclo.' },
+          { label:'Documento lições aprendidas, transfiro ownership dos Embaixadores para RH e celebro publicamente', ad:15, re:-10, sp:10, q:'Excelente', text:'Ciclo completo: lições documentadas, rede de Embaixadores institucionalizada, celebração com toda a empresa. O Standard ACMP foi aplicado do 5.1 ao 5.5.', std:'Standard ACMP 5.5 — Você completou todos os subprocessos: documentar, transferir, sustentar e celebrar. O esforço de GM foi encerrado conforme o Standard — deixando capacidade instalada.' },
+          { label:'Proponho ao CEO criar um Escritório de Gestão de Mudanças permanente', ad:10, re:-5, sp:15, q:'Ótimo', text:'O CEO aprovou. A experiência da mudança de sede virou o caso fundador do escritório de GM do Grupo Floresta.', std:'Standard ACMP 5.5 — O Standard orienta que o esforço de GM construa capacidade organizacional. Um escritório de GM é a forma mais robusta de institucionalizar essa capacidade.' }
+        ]
+      }
+    ]
+  },
+
+  technova: {
+    id:'technova', icon:'🔗', title:'TechNova Group', type:'Integração Pós-Fusão (M&A)',
+    diff:'Expert', diffClass:'diff-expert',
+    desc:'Duas empresas de tecnologia se fundiram. O departamento de TI (280 pessoas) precisa operar como uma só organização — com culturas, sistemas e lideranças diferentes.',
+    tags:['M&A','280 pessoas TI','2 culturas','Modelo operacional'],
+    briefing:[
+      ['Empresa','TechNova Group — resultado da fusão entre NovaSys e TechPrime'],
+      ['Projeto','Unificação do departamento de TI — novo modelo operacional para 280 profissionais'],
+      ['Desafio','2 culturas corporativas distintas, sistemas duplicados, lideranças em conflito'],
+      ['Contexto','Pesquisa inicial de engajamento: melhoria em apenas 4 de 11 categorias. Moral baixo.']
+    ],
+    initAd:40, initRe:55, initSp:50,
+    scenarios:[
+      { phase:0, icon:'🔍', title:'Duas <em>culturas</em>, um diagnóstico', body:'Pesquisa de engajamento mostra 4 de 11 categorias positivas. Times das duas empresas originais não se misturam. Cada lado acha que "o jeito deles era melhor". Por onde começar?',
+        options:[
+          { label:'Realizo assessment de impacto separado para cada cultura — NovaSys e TechPrime — antes de unificar', ad:10, re:-10, sp:5, q:'Excelente', text:'Diagnóstico revelou que os medos eram diferentes: NovaSys temia perder autonomia, TechPrime temia perder identidade. Estratégias distintas para cada grupo.', std:'Standard ACMP 5.1 — "Identificar Stakeholders" e "Avaliar Impacto" devem considerar subgrupos com experiências distintas. Em M&A, cada cultura original é um grupo de stakeholders separado.' },
+          { label:'Crio visão unificada "TechNova" e comunico para todos simultaneamente', ad:-5, re:10, sp:5, q:'Arriscado', text:'Visão unificada prematura. As pessoas não se identificaram com uma identidade que não ajudaram a construir. Sentimento de imposição.', std:'Standard ACMP 5.1 — "Avaliar Prontidão Organizacional" precede "Formular Estratégia". Comunicar visão antes de entender o estado atual inverte a sequência do Standard.' },
+          { label:'Foco nas lideranças primeiro — alinho os 12 Service Line Managers das duas empresas', ad:5, re:-5, sp:10, q:'Ótimo', text:'Alinhamento de liderança é essencial, mas sem diagnóstico da base, as lideranças não sabem o que comunicar.', std:'Standard ACMP 5.1 — O Standard orienta avaliação top-down e bottom-up simultâneas. Alinhar liderança sem dados da base cria desconexão entre estratégia e realidade.' }
+        ]
+      },
+      { phase:0, icon:'🧭', title:'Qual <em>modelo</em> de mudança?', body:'O CTO quer um "big bang" — unificar tudo de uma vez em 3 meses. O CHRO prefere abordagem gradual de 12 meses. Você precisa formular a estratégia.',
+        options:[
+          { label:'Apoio o big bang do CTO — velocidade resolve incerteza', ad:-10, re:20, sp:5, q:'Risco', text:'Mudanças simultâneas em 8 áreas geraram saturação. As pessoas não conseguiram absorver tudo ao mesmo tempo. Burnout generalizado.', std:'Standard ACMP 5.2 — "Avaliar Saturação de Mudanças" é subprocesso explícito do Standard. A capacidade de absorção da organização deve ser avaliada antes de definir o ritmo.' },
+          { label:'Proponho abordagem em ondas: 3 ondas de 4 meses, priorizadas por impacto', ad:10, re:-10, sp:10, q:'Excelente', text:'Ondas permitem aprender com cada fase e ajustar. Patrocinador e CHRO alinhados. As 3 ondas foram: processos → ferramentas → cultura.', std:'Standard ACMP 5.2 — "Formular Estratégia" inclui definir escopo, sequenciamento e ritmo. O Standard orienta avaliar saturação e escalonar quando múltiplas mudanças coexistem.' },
+          { label:'Deixo a decisão para o comitê executivo e me concentro na execução', ad:-5, re:5, sp:-10, q:'Arriscado', text:'Sem recomendação técnica do CM, o comitê decidiu sem dados de impacto. Você abriu mão do seu papel estratégico.', std:'Standard ACMP 5.2 — O CM é o profissional qualificado para formular a estratégia de mudança. O Standard posiciona o CM como conselheiro estratégico — não apenas executor.' }
+        ]
+      },
+      { phase:1, icon:'⚔️', title:'Conflito de <em>lideranças</em>', body:'Dois diretores — um de cada empresa original — disputam o controle da área de infraestrutura unificada. Suas equipes estão divididas. Produtividade caindo.',
+        options:[
+          { label:'Facilito sessão de alinhamento usando o modelo de visão compartilhada (Propósito, Particularidades, Pessoas)', ad:10, re:-10, sp:5, q:'Excelente', text:'Sessão revelou que ambos queriam o mesmo resultado, mas com abordagens diferentes. A visão compartilhada criou terreno comum.', std:'Standard ACMP 5.3 — "Desenvolver Plano de Engajamento de Stakeholders" inclui gestão de conflitos entre líderes. O Standard orienta criar espaços de co-criação para superar polarização.' },
+          { label:'Escalo o conflito para o CTO resolver hierarquicamente', ad:0, re:5, sp:-10, q:'Arriscado', text:'CTO impôs decisão. O diretor "perdedor" saiu da empresa levando 15 pessoas-chave. Perda de capital intelectual crítico.', std:'Standard ACMP 5.4 — "Gerenciar Reações à Mudança" em contexto de M&A exige mediação antes de decisão hierárquica. Perdas de talentos são frequentemente irreversíveis.' },
+          { label:'Proponho que ambos co-liderem por 6 meses em modelo de transição compartilhada', ad:5, re:-5, sp:0, q:'Bom', text:'Co-liderança estabilizou a situação, mas sem prazo definido de convergência, a ambiguidade persistiu.', std:'Standard ACMP 5.3 — O Standard orienta que papéis e responsabilidades sejam claramente definidos no plano de GM. Ambiguidade prolongada gera incerteza nos times.' }
+        ]
+      },
+      { phase:1, icon:'🎓', title:'Capacitação para o <em>novo modelo</em>', body:'O novo modelo operacional exige que todos os 280 profissionais de TI mudem suas formas de trabalho. Treinamento técnico está planejado. E o lado humano?',
+        options:[
+          { label:'Desenvolvo programa de coaching para os 12 Service Line Managers como líderes de mudança', ad:15, re:-10, sp:10, q:'Excelente', text:'SLMs se tornaram multiplicadores. Cada um liderou a transformação na sua área com autonomia e suporte. Engajamento subiu de 4/11 para 10/11 categorias positivas.', std:'Standard ACMP 5.3 — "Desenvolver Plano de Treinamento" no Standard inclui não apenas treinamento técnico, mas desenvolvimento de competências de liderança de mudança.' },
+          { label:'Contrato treinamento externo de change management para toda a equipe', ad:5, re:-5, sp:0, q:'Bom', text:'Treinamento genérico para 280 pessoas é caro e pouco contextualizado. Alguns absorveram, outros acharam irrelevante.', std:'Standard ACMP 5.3 — O Standard orienta que treinamento seja segmentado por papel e nível de impacto. Treinamento genérico tem menor retenção que programas customizados.' },
+          { label:'Foco apenas no treinamento técnico — mudança de comportamento vem com o tempo', ad:-10, re:15, sp:-5, q:'Crítico', text:'Sistema novo instalado, processos velhos mantidos. A mudança técnica sem mudança comportamental gera o pior cenário: custo duplo sem benefício.', std:'Standard ACMP 5.4 — "Implementar Capacitação" no Standard é explícito: treinamento técnico sem gestão do lado humano resulta em adoção superficial e regressão ao estado anterior.' }
+        ]
+      },
+      { phase:2, icon:'📈', title:'6 meses depois: <em>medir</em> o progresso', body:'A onda 1 (processos) e onda 2 (ferramentas) foram concluídas. A onda 3 (cultura) está em andamento. Como medir se a transformação está funcionando?',
+        options:[
+          { label:'Repito a pesquisa de engajamento que deu 4/11 no início e comparo', ad:15, re:-10, sp:10, q:'Excelente', text:'Resultado: 10 de 11 categorias melhoradas. Engajamento sustentável de 79%. Dados irrefutáveis para o board. Melhoria de 153% no desempenho operacional.', std:'Standard ACMP 5.5 — "Avaliar Resultados da Mudança" exige métricas comparáveis ao baseline. Sua pesquisa repetida é a implementação perfeita deste subprocesso do Standard.' },
+          { label:'Crio dashboard de KPIs técnicos: uptime, tickets, produtividade por área', ad:5, re:0, sp:5, q:'Bom', text:'KPIs técnicos mostram melhoria, mas não capturam mudança cultural. O board quer saber de engajamento, não de tickets.', std:'Standard ACMP 5.5 — O Standard orienta métricas de resultado (mudança alcançada) e métricas de processo (atividades realizadas). KPIs técnicos sozinhos cobrem apenas uma dimensão.' },
+          { label:'Confio no feedback informal — "as pessoas parecem mais felizes"', ad:-5, re:5, sp:-10, q:'Risco', text:'Percepção subjetiva não sustenta decisões de budget. Sem dados, o CTO cortou o orçamento de GM na onda 3.', std:'Standard ACMP 5.5 — "Completar o Esforço" exige evidências mensuráveis. O Standard é claro: sem dados de resultado, a disciplina de GM perde credibilidade organizacional.' }
+        ]
+      },
+      { phase:2, icon:'🏛️', title:'Construir <em>capacidade</em> permanente', body:'A fusão está consolidada. O CTO pergunta: "Precisamos manter a equipe de GM ou podemos encerrar?" Você tem 1 reunião para defender sua posição.',
+        options:[
+          { label:'Apresento caso de negócio: custo de não ter GM nos próximos projetos vs. investimento no escritório', ad:10, re:-5, sp:15, q:'Excelente', text:'Business case aprovado. Escritório de GM criado com 3 profissionais. A TechNova agora tem capacidade de mudança institucionalizada para futuras transformações.', std:'Standard ACMP 5.5 — O Standard orienta que o esforço de GM construa "capacidade organizacional para mudanças futuras". Um escritório de GM é a expressão máxima dessa orientação.' },
+          { label:'Sugiro modelo híbrido: 1 CM permanente + consultores para projetos grandes', ad:5, re:0, sp:10, q:'Ótimo', text:'Modelo sustentável aprovado. Menos robusto que um escritório, mas garante continuidade mínima e é financeiramente viável.', std:'Standard ACMP 5.5 — "Transferir Propriedade" inclui definir quem mantém a capacidade de GM após o encerramento do projeto. Modelo híbrido é uma transferência parcial viável.' },
+          { label:'Aceito o encerramento — o projeto está concluído', ad:-5, re:10, sp:-5, q:'Risco', text:'6 meses depois, novo projeto de migração para cloud começou sem GM. Os mesmos erros de resistência e baixa adoção ressurgiram.', std:'Standard ACMP 5.5 — Encerrar sem transferir capacidade é a falha mais comum citada na literatura de GM. O Standard existe justamente para evitar esse ciclo de repetição.' }
+        ]
+      }
+    ]
+  }
+};
+
+// ═══════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════
+let st = { caseId:'', ad:50, re:40, sp:60, idx:0, answered:false };
+
+function clamp(v){return Math.max(0,Math.min(100,Math.round(v)))}
+function updateMetrics(a,r,s){st.ad=clamp(a);st.re=clamp(r);st.sp=clamp(s);document.getElementById('mv-ad').textContent=st.ad;document.getElementById('mv-re').textContent=st.re;document.getElementById('mv-sp').textContent=st.sp;document.getElementById('mb-ad').style.width=st.ad+'%';document.getElementById('mb-re').style.width=st.re+'%';document.getElementById('mb-sp').style.width=st.sp+'%'}
+
+function curCase(){return CASES[st.caseId]}
+function curScenarios(){return curCase().scenarios}
+
+// ═══════════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════════
+function hideAll(){['intro','caseSelect','briefingScreen','gameArea','phaseTransition','ending'].forEach(id=>{const el=document.getElementById(id);el.style.display='none';el.classList.remove('show','active')});document.getElementById('ghead').style.display='none'}
+
+function showCaseSelect(){
+  hideAll();
+  const cs=document.getElementById('caseSelect');cs.style.display='block';cs.classList.add('show');
+  const grid=document.getElementById('casesGrid');grid.innerHTML='';
+  Object.values(CASES).forEach(c=>{
+    const card=document.createElement('div');card.className='case-card';card.onclick=()=>showBriefing(c.id);
+    card.innerHTML=`<span class="cc-diff ${c.diffClass}">${c.diff}</span><div class="cc-icon">${c.icon}</div><div class="cc-title">${c.title}</div><div class="cc-type">${c.type}</div><div class="cc-desc">${c.desc}</div><div class="cc-tags">${c.tags.map(t=>`<span class="cc-tag">${t}</span>`).join('')}</div>`;
+    grid.appendChild(card);
+  });
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function showBriefing(caseId){
+  st.caseId=caseId;const c=curCase();hideAll();
+  document.getElementById('briefingScreen').style.display='block';
+  document.getElementById('briefCaseType').textContent=c.type;
+  document.getElementById('briefCaseTitle').textContent=c.icon+' '+c.title;
+  document.getElementById('briefCaseDesc').textContent=c.desc;
+  const box=document.getElementById('briefingBox');
+  box.innerHTML=`<div class="briefing-head">Seu briefing</div>${c.briefing.map(([k,v])=>`<div class="briefing-row"><span class="briefing-key">${k}</span><span class="briefing-val">${v}</span></div>`).join('')}`;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function startGame(){
+  const c=curCase();
+  st.ad=c.initAd;st.re=c.initRe;st.sp=c.initSp;st.idx=0;st.answered=false;
+  hideAll();
+  document.getElementById('gameArea').style.display='block';document.getElementById('gameArea').classList.add('active');
+  document.getElementById('ghead').style.display='flex';
+  document.getElementById('caseLabel').textContent=c.title+' · '+c.type;
+  updateMetrics(st.ad,st.re,st.sp);
+  renderScenario();
+}
+
+function renderPhase(pi){
+  const p=PHASES_TEMPLATE[pi];
+  document.getElementById('phaseNum').textContent=p.num;
+  document.getElementById('phaseTitle').textContent=p.title;
+  document.getElementById('phaseSub').textContent=p.sub;
+  const steps=document.getElementById('phaseSteps');steps.innerHTML='';
+  const sPerPhase=curScenarios().filter(s=>s.phase===pi).length;
+  const absStart=curScenarios().findIndex(s=>s.phase===pi);
+  for(let i=0;i<sPerPhase;i++){const d=document.createElement('div');d.className='pstep'+(i<st.idx-absStart?' done':i===st.idx-absStart?' cur':'');steps.appendChild(d)}
+}
+
+function renderScenario(){
+  const sc=curScenarios()[st.idx];renderPhase(sc.phase);
+  document.getElementById('sceneIcon').textContent=sc.icon;
+  document.getElementById('sceneCo').textContent=curCase().title;
+  document.getElementById('sceneNum').textContent=`${st.idx+1} / ${curScenarios().length}`;
+  document.getElementById('sceneTitle').innerHTML=sc.title;
+  document.getElementById('sceneBody').textContent=sc.body;
+  const dec=document.getElementById('decisions');dec.innerHTML='';
+  sc.options.forEach((opt,i)=>{const d=document.createElement('div');d.className='dec';d.style.animationDelay=(i*0.06)+'s';d.innerHTML=`<span class="dec-letter">${['A','B','C'][i]}</span><span class="dec-text">${opt.label}</span>`;d.onclick=()=>choose(i);dec.appendChild(d)});
+  document.getElementById('impactBox').classList.remove('show');
+  document.getElementById('nextWrap').style.display='none';
+  st.answered=false;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function choose(oi){
+  if(st.answered)return;st.answered=true;
+  const sc=curScenarios()[st.idx],opt=sc.options[oi];
+  document.querySelectorAll('.dec').forEach((d,i)=>d.classList.add(i===oi?'chosen':'unchosen'));
+  updateMetrics(st.ad+opt.ad,st.re+opt.re,st.sp+opt.sp);
+  const ib=document.getElementById('impactBox');ib.classList.add('show');
+  const qc={'Excelente':'#009E8E','Ótimo':'#009E8E','Bom':'#7A98B0','Neutro':'#2D4A5E','Arriscado':'#F5A420','Risco':'#F5A420','Crítico':'#E24B4A'}[opt.q]||'#7A98B0';
+  document.getElementById('impactTag').textContent=opt.q;document.getElementById('impactTag').style.color=qc;
+  const deltas=document.getElementById('impactDeltas');deltas.innerHTML='';
+  [{v:opt.ad,l:'Adoção'},{v:opt.re,l:'Resistência'},{v:opt.sp,l:'Patrocínio'}].forEach(d=>{if(d.v===0)return;const el=document.createElement('div');el.className='delta '+(d.v>0?'delta-pos':'delta-neg');el.textContent=(d.v>0?'+':'')+d.v+' '+d.l;deltas.appendChild(el)});
+  if(!deltas.children.length)deltas.innerHTML='<div class="delta delta-neu">Sem impacto imediato</div>';
+  document.getElementById('impactText').textContent=opt.text;
+  document.getElementById('impactStd').innerHTML='📘 '+opt.std;
+  document.getElementById('nextWrap').style.display='flex';
+  const nb=document.getElementById('nextBtn');
+  const total=curScenarios().length;
+  if(st.idx===total-1)nb.textContent='Ver resultado →';
+  else if(st.idx<total-1&&curScenarios()[st.idx+1].phase!==sc.phase)nb.textContent='Próxima fase →';
+  else nb.textContent='Próxima decisão →';
+}
+
+function advance(){
+  st.idx++;
+  if(st.idx>=curScenarios().length){showEnding();return}
+  const cur=curScenarios()[st.idx].phase,prev=curScenarios()[st.idx-1].phase;
+  if(cur!==prev){showPhaseTransition(cur);return}
+  renderScenario();
+}
+
+function showPhaseTransition(pi){
+  hideAll();document.getElementById('ghead').style.display='flex';
+  const pt=document.getElementById('phaseTransition');pt.style.display='block';
+  const td=TRANSITIONS[pi-1];
+  document.getElementById('ptNum').textContent=td.num;
+  document.getElementById('ptTitle').textContent=td.title;
+  document.getElementById('ptSub').textContent=td.sub;
+  document.getElementById('ptStd').textContent=td.std;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function enterPhase(){
+  document.getElementById('phaseTransition').style.display='none';
+  document.getElementById('gameArea').style.display='block';document.getElementById('gameArea').classList.add('active');
+  renderScenario();
+}
+
+function showEnding(){
+  hideAll();document.getElementById('ghead').style.display='flex';
+  const end=ENDINGS.find(e=>st.ad>=e.min)||ENDINGS[ENDINGS.length-1];
+  const el=document.getElementById('ending');el.style.display='block';el.classList.add('show');
+  document.getElementById('endBadge').textContent=end.badge;document.getElementById('endBadge').className=`ending-badge ${end.bc}`;
+  document.getElementById('endTitle').textContent=end.title;document.getElementById('endSub').textContent=end.sub;
+  document.getElementById('ef-ad').textContent=st.ad;document.getElementById('ef-re').textContent=st.re;document.getElementById('ef-sp').textContent=st.sp;
+  document.getElementById('endLessons').innerHTML=end.lessons.map(l=>`<div class="lesson-item">${l}</div>`).join('');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function backToIntro(){hideAll();document.getElementById('intro').style.display='block';window.scrollTo({top:0,behavior:'smooth'})}
+function restartGame(){hideAll();showCaseSelect()}
+function replayCase(){startGame()}
+</script>
+</body>
+</html>
