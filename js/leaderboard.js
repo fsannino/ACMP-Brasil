@@ -163,9 +163,97 @@
             .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
     }
 
+    /* ============================================
+       GLOBAL LEADERBOARD (Fase B)
+       ============================================ */
+
+    function fetchGlobalTop(limit) {
+        var url = SUPA_URL + '/rest/v1/global_leaderboard'
+                + '?select=*&order=weighted_score.desc'
+                + '&limit=' + (limit || 10);
+        return fetch(url, {
+            headers: { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY }
+        })
+        .then(function (r) { return r.ok ? r.json() : []; })
+        .catch(function () { return []; });
+    }
+
+    function renderGlobal(opts) {
+        opts = opts || {};
+        injectStyles();
+
+        var container = typeof opts.container === 'string'
+            ? document.querySelector(opts.container)
+            : opts.container;
+        if (!container) return;
+
+        var theme = opts.theme === 'dark' ? 'lb-dark' : 'lb-light';
+        var title = opts.title || 'Ranking Geral';
+        var subtitle = opts.subtitle || 'Pontuação ponderada nos jogos da ACMP Brasil';
+        var myEmail = getCurrentEmail();
+
+        container.innerHTML = '<div class="lb-card ' + theme + '">'
+            + '<div class="lb-head"><h3>' + escapeHtml(title) + '</h3>'
+            + '<span class="lb-game">' + escapeHtml(subtitle) + '</span></div>'
+            + '<div class="lb-loading">Carregando ranking...</div></div>';
+
+        return fetchGlobalTop(opts.limit || 10).then(function (rows) {
+            var card = container.querySelector('.lb-card');
+            var loadingEl = card.querySelector('.lb-loading');
+            if (loadingEl) loadingEl.remove();
+
+            if (!rows || rows.length === 0) {
+                var empty = document.createElement('div');
+                empty.className = 'lb-empty';
+                empty.textContent = 'Ainda sem pontuações registradas. Seja o primeiro a entrar no ranking!';
+                card.appendChild(empty);
+                return rows;
+            }
+
+            var ul = document.createElement('ul');
+            ul.className = 'lb-list lb-global';
+            rows.forEach(function (r, i) {
+                var li = document.createElement('li');
+                li.className = 'lb-row';
+                if (myEmail && r.player_email && r.player_email.toLowerCase() === myEmail) {
+                    li.classList.add('lb-me');
+                }
+                var medal = i === 0 ? '🥇' : (i === 1 ? '🥈' : (i === 2 ? '🥉' : (i + 1) + 'º'));
+                var memberBadge = r.is_member ? '<span class="lb-badge">ACMP</span>' : '';
+                var gamesLabel = r.games_played === 1 ? '1 jogo' : (r.games_played + ' jogos');
+                li.innerHTML = '<span class="lb-rank ' + rankClass(i) + '">' + medal + '</span>'
+                    + '<span class="lb-name">' + escapeHtml(maskName(r.player_name)) + memberBadge
+                    + '<span class="lb-meta"> · ' + gamesLabel + '</span></span>'
+                    + '<span class="lb-score">' + escapeHtml(String(r.weighted_score)) + '</span>';
+                ul.appendChild(li);
+            });
+            card.appendChild(ul);
+            return rows;
+        });
+    }
+
+    /* ============================================
+       Estilo extra para o global leaderboard
+       ============================================ */
+    (function injectGlobalStyles() {
+        if (document.getElementById('leaderboard-global-styles')) return;
+        var s = document.createElement('style');
+        s.id = 'leaderboard-global-styles';
+        s.textContent = [
+            '.lb-list.lb-global .lb-name .lb-meta{font-size:11px;font-weight:500;opacity:.65;}',
+            '.lb-card.lb-light .lb-list.lb-global .lb-name .lb-meta{color:#4a4a5a;}',
+            '.lb-card.lb-dark .lb-list.lb-global .lb-name .lb-meta{color:#a0b8cc;}'
+        ].join('\n');
+        // Aplica só quando o documento estiver pronto (defer + injectStyles cobrem o caso normal)
+        if (document.head) document.head.appendChild(s);
+        else document.addEventListener('DOMContentLoaded', function(){ document.head.appendChild(s); });
+    })();
+
     window.Leaderboard = {
         GAME_LABELS: GAME_LABELS,
         render: render,
-        fetchTop: fetchTop
+        renderGlobal: renderGlobal,
+        fetchTop: fetchTop,
+        fetchGlobalTop: fetchGlobalTop
     };
 })();
