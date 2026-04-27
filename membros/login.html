@@ -200,12 +200,25 @@
         document.getElementById('loading-msg').style.display = 'none';
         document.getElementById('login-content').style.display = 'block';
 
-        // Check existing session
+        // Check existing session (only redirect if token is still valid)
         (function() {
+            function isTokenValid(t){
+                if(!t)return false;
+                try{
+                    var p=t.split('.');
+                    if(p.length!==3)return false;
+                    var payload=JSON.parse(decodeURIComponent(atob(p[1].replace(/-/g,'+').replace(/_/g,'/')).split('').map(function(c){return '%'+('00'+c.charCodeAt(0).toString(16)).slice(-2);}).join('')));
+                    return payload.exp && payload.exp*1000 > Date.now();
+                }catch(e){return false;}
+            }
             var token = localStorage.getItem('sb-token');
             var user = localStorage.getItem('sb-user');
-            if (token && user) {
-                window.location.href = '/membros/';
+            if (token && user && isTokenValid(token)) {
+                window.location.replace('/membros/');
+            } else if (token || user) {
+                // Expired or partial session — clean up so user can log in fresh
+                localStorage.removeItem('sb-token');
+                localStorage.removeItem('sb-user');
             }
         })();
 

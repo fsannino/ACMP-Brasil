@@ -4,6 +4,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Área do Associado - ACMP Brasil</title>
+
+    <!-- Auth guard: redirect to login if no valid session (runs BEFORE any rendering) -->
+    <style>html,body{visibility:hidden}html.auth-ready,html.auth-ready body{visibility:visible}</style>
+    <script>
+    (function(){
+        function isTokenValid(t){
+            if(!t)return false;
+            try{
+                var p=t.split('.');
+                if(p.length!==3)return false;
+                var payload=JSON.parse(decodeURIComponent(atob(p[1].replace(/-/g,'+').replace(/_/g,'/')).split('').map(function(c){return '%'+('00'+c.charCodeAt(0).toString(16)).slice(-2);}).join('')));
+                return payload.exp && payload.exp*1000 > Date.now();
+            }catch(e){return false;}
+        }
+        var token=localStorage.getItem('sb-token');
+        var user=null; try{user=JSON.parse(localStorage.getItem('sb-user'));}catch(e){}
+        if(!token || !user || !isTokenValid(token)){
+            localStorage.removeItem('sb-token');
+            localStorage.removeItem('sb-user');
+            window.location.replace('/membros/login.html');
+        } else {
+            document.documentElement.classList.add('auth-ready');
+        }
+    })();
+    </script>
+
     <link rel="stylesheet" href="../css/styles.css">
     <link rel="icon" type="image/png" href="../img/logo-acmp-brasil.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -215,11 +241,14 @@
             });
         }
 
-        // Check auth
+        // Auth was already validated in <head>; this is just a defensive guard
         var token = getToken();
         var user = getUser();
-        if (!token || !user) { window.location.href = '/membros/login'; }
-        else { initDashboard(); }
+        if (!token || !user) {
+            window.location.replace('/membros/login.html');
+        } else {
+            initDashboard();
+        }
 
         async function initDashboard() {
             var profiles = await supaQuery('member_profiles', 'email=eq.' + encodeURIComponent(user.email));
