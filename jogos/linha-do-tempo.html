@@ -12,6 +12,7 @@
 <meta property="og:locale" content="pt_BR">
 <link rel="icon" type="image/png" href="/img/logo-acmp-brasil.png">
 <script src="/js/game-gate.js" defer></script>
+<script src="/js/game-access.js" defer></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700;9..40,900&display=swap');
 
@@ -550,11 +551,18 @@ function boot(){
   init();
 }
 document.addEventListener('DOMContentLoaded', function(){
-  if(window.GameGate){
-    GameGate.start({ gameId:'linha-do-tempo', gameTitle:'Linha do Tempo da GM', onReady: boot });
-  } else {
-    boot();
-  }
+  var openGate = function(){
+    if(window.GameGate){
+      GameGate.start({ gameId:'linha-do-tempo', gameTitle:'Linha do Tempo da GM', onReady: function(){
+        if(window.GameAccess){
+          GameAccess.guardPage({ gameId:'linha-do-tempo' }).then(function(ok){ if(ok) boot(); });
+        } else { boot(); }
+      }});
+    } else { boot(); }
+  };
+  if(window.GameAccess){
+    GameAccess.guardPage({ gameId:'linha-do-tempo' }).then(function(ok){ if(ok) openGate(); });
+  } else { openGate(); }
 });
 </script>
 </body>

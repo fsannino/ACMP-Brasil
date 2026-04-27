@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jogos Educativos - ACMP Brasil</title>
-    <meta name="description" content="Jogos educativos da ACMP Brasil para profissionais de Gestão de Mudanças. Quiz e ACMP Quest para preparo CCMP® baseados no Standard ACMP.">
+    <meta name="description" content="Jogos educativos da ACMP Brasil para profissionais de Gestão de Mudanças. Quiz, ACMP Quest, Linha do Tempo e Change Manager Simulator baseados no Standard ACMP.">
     <meta name="theme-color" content="#1a3a5c">
     <meta property="og:title" content="Jogos Educativos - ACMP Brasil">
-    <meta property="og:description" content="Quiz e ACMP Quest — treine os conceitos do Standard ACMP de forma divertida.">
+    <meta property="og:description" content="Treine os conceitos do Standard ACMP de forma divertida — Quiz, Quest, Linha do Tempo e Change Manager Simulator.">
     <meta property="og:type" content="website">
     <meta property="og:locale" content="pt_BR">
     <link rel="stylesheet" href="../css/styles.css">
@@ -29,6 +29,7 @@
         .game-card.quiz .game-icon { background: linear-gradient(135deg, var(--secondary), var(--secondary-dark)); }
         .game-card.quest .game-icon { background: linear-gradient(135deg, var(--primary), var(--primary-light)); }
         .game-card.timeline .game-icon { background: linear-gradient(135deg, #28a745, #1f7d36); }
+        .game-card.simulator .game-icon { background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
         .game-card h2 { font-size: 1.35rem; font-weight: 800; color: var(--text-dark); margin-bottom: 8px; }
         .game-card .subtitle { font-size: 0.85rem; color: var(--primary); font-weight: 600; letter-spacing: .04em; text-transform: uppercase; margin-bottom: 14px; }
         .game-card p { font-size: 0.95rem; color: var(--text-body); line-height: 1.65; margin-bottom: 18px; flex: 1; }
@@ -80,8 +81,10 @@
     <main class="games-content">
         <a href="../index.html" class="back-link"><i class="fas fa-arrow-left"></i> Voltar para a página inicial</a>
 
+        <div class="gax-info-banner" id="access-banner" style="display:none;"></div>
+
         <div class="games-grid">
-            <a href="quiz-cm.html" class="game-card quiz" aria-label="Jogar Quiz: Gestão de Mudanças">
+            <a href="quiz-cm.html" class="game-card quiz" data-game-id="quiz-cm" aria-label="Jogar Quiz: Gestão de Mudanças">
                 <div class="game-icon"><i class="fas fa-question-circle"></i></div>
                 <div class="subtitle">Iniciante</div>
                 <h2>Quiz: Gestão de Mudanças</h2>
@@ -94,7 +97,7 @@
                 <span class="play-btn"><i class="fas fa-play"></i> Começar Quiz</span>
             </a>
 
-            <a href="acmp-quest.html" class="game-card quest" aria-label="Jogar ACMP Quest">
+            <a href="acmp-quest.html" class="game-card quest" data-game-id="acmp-quest" aria-label="Jogar ACMP Quest">
                 <span class="featured-badge"><i class="fas fa-star"></i> Novo</span>
                 <div class="game-icon"><i class="fas fa-trophy"></i></div>
                 <div class="subtitle">Avançado · Gamificado</div>
@@ -108,7 +111,7 @@
                 <span class="play-btn"><i class="fas fa-play"></i> Iniciar Missão</span>
             </a>
 
-            <a href="linha-do-tempo.html" class="game-card timeline" aria-label="Jogar Linha do Tempo da GM">
+            <a href="linha-do-tempo.html" class="game-card timeline" data-game-id="linha-do-tempo" aria-label="Jogar Linha do Tempo da GM">
                 <span class="featured-badge"><i class="fas fa-star"></i> Novo</span>
                 <div class="game-icon"><i class="fas fa-history"></i></div>
                 <div class="subtitle">Intermediário · História</div>
@@ -121,11 +124,46 @@
                 </div>
                 <span class="play-btn"><i class="fas fa-play"></i> Começar a Ordenar</span>
             </a>
+
+            <a href="change-manager-simulator.html" class="game-card simulator" data-game-id="change-manager-simulator" aria-label="Jogar Change Manager Simulator">
+                <span class="featured-badge"><i class="fas fa-star"></i> Novo</span>
+                <div class="game-icon"><i class="fas fa-user-tie"></i></div>
+                <div class="subtitle">Avançado · Cenários</div>
+                <h2>Change Manager Simulator</h2>
+                <p>Coloque-se no papel de um(a) Change Manager e tome decisões em 8 cenários reais — patrocínio fraco, resistência, comunicação, mensuração e mais. Cada escolha gera feedback baseado no Standard ACMP.</p>
+                <div class="game-meta">
+                    <span class="meta-item"><i class="fas fa-briefcase"></i> 8 cenários</span>
+                    <span class="meta-item"><i class="fas fa-comments"></i> Feedback CM</span>
+                    <span class="meta-item"><i class="fas fa-chart-line"></i> Maturidade</span>
+                </div>
+                <span class="play-btn"><i class="fas fa-play"></i> Entrar na Simulação</span>
+            </a>
         </div>
     </main>
 
     <footer style="background: var(--primary-dark); color: rgba(255,255,255,0.7); padding: 30px 20px; text-align: center; font-size: 0.85rem;">
         <p>&copy; 2026 ACMP Brasil — Capítulo brasileiro da Association of Change Management Professionals.</p>
     </footer>
+
+    <script src="../js/game-access.js" defer></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        if (!window.GameAccess) return;
+        GameAccess.applyToCatalog({
+            onApplied: function (info) {
+                if (info.lockedCount > 0) {
+                    var banner = document.getElementById('access-banner');
+                    var label = GameAccess.LABELS[info.audience] || info.audience;
+                    if (info.audience === 'public') {
+                        banner.innerHTML = '<i class="fas fa-info-circle"></i><span>Alguns jogos estão restritos. <a href="/membros/login.html" style="color:#1a3a5c;font-weight:600;">Faça login</a> ou identifique-se ao iniciar um jogo para liberar mais opções.</span>';
+                    } else {
+                        banner.innerHTML = '<i class="fas fa-info-circle"></i><span>Você está como <strong>' + label + '</strong>. Alguns jogos podem estar restritos para outras categorias.</span>';
+                    }
+                    banner.style.display = 'flex';
+                }
+            }
+        });
+    });
+    </script>
 </body>
 </html>

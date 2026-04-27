@@ -1,7 +1,9 @@
 -- ============================================
--- ACMP Brasil — Jogos: identificação e feedback
+-- ACMP Brasil — Jogos: identificação, feedback e
+-- liberação por categoria de público.
 -- Aplica para Quiz CM, ACMP Quest, Linha do Tempo
--- Execute no SQL Editor do Supabase
+-- e Change Manager Simulator.
+-- Execute no SQL Editor do Supabase (idempotente).
 -- ============================================
 
 -- 1. Cadastro de jogadores (1 linha por e-mail; upsert)
@@ -25,24 +27,28 @@ CREATE TABLE IF NOT EXISTS game_feedback (
     player_name   TEXT,
     is_member     BOOLEAN,
     user_id       UUID REFERENCES auth.users(id) ON DELETE SET NULL,
-    game_id       TEXT NOT NULL CHECK (game_id IN ('quiz-cm','acmp-quest','linha-do-tempo')),
+    game_id       TEXT NOT NULL CHECK (game_id IN ('quiz-cm','acmp-quest','linha-do-tempo','change-manager-simulator')),
     rating        INTEGER CHECK (rating BETWEEN 1 AND 5),
     suggestion    TEXT,
     score_data    JSONB,
     created_at    TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Atualiza CHECK pré-existente para incluir change-manager-simulator (idempotente)
+ALTER TABLE game_feedback DROP CONSTRAINT IF EXISTS game_feedback_game_id_check;
+ALTER TABLE game_feedback ADD CONSTRAINT game_feedback_game_id_check
+    CHECK (game_id IN ('quiz-cm','acmp-quest','linha-do-tempo','change-manager-simulator'));
+
 CREATE INDEX IF NOT EXISTS idx_game_feedback_game ON game_feedback (game_id, created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_game_feedback_rating ON game_feedback (rating);
 
 -- ============================================
--- ROW LEVEL SECURITY
+-- ROW LEVEL SECURITY (game_players, game_feedback)
 -- ============================================
 
 ALTER TABLE game_players  ENABLE ROW LEVEL SECURITY;
 ALTER TABLE game_feedback ENABLE ROW LEVEL SECURITY;
 
--- Anyone can register / update their own row (anon insert via apikey)
 DROP POLICY IF EXISTS "Anyone insert player"  ON game_players;
 DROP POLICY IF EXISTS "Anyone update player"  ON game_players;
 DROP POLICY IF EXISTS "Admins read players"   ON game_players;
@@ -58,7 +64,6 @@ CREATE POLICY "Admins read players" ON game_players
         EXISTS (SELECT 1 FROM member_profiles WHERE id = auth.uid() AND role = 'admin')
     );
 
--- Anyone can submit feedback; only admins read aggregated
 DROP POLICY IF EXISTS "Anyone insert feedback" ON game_feedback;
 DROP POLICY IF EXISTS "Admins read feedback"   ON game_feedback;
 
@@ -85,3 +90,49 @@ SELECT
     MAX(created_at) AS last_feedback_at
 FROM game_feedback
 GROUP BY game_id;
+
+-- ============================================
+-- 3. Controle de liberação de jogos por categoria de público
+--    Categorias suportadas (allowed_audiences):
+--      'public'    — qualquer visitante (sem login)
+--      'community' — cadastrado no GameGate, não associado
+--      'member'    — associado(a) ACMP Brasil
+--      'volunteer' — voluntário(a)
+--      'ccmp'      — certificado(a) CCMP®
+-- ============================================
+
+CREATE TABLE IF NOT EXISTS game_access_settings (
+    game_id            TEXT PRIMARY KEY,
+    allowed_audiences  TEXT[] NOT NULL DEFAULT ARRAY['public','community','member','volunteer','ccmp'],
+    enabled            BOOLEAN NOT NULL DEFAULT TRUE,
+    updated_at         TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+INSERT INTO game_access_settings (game_id, allowed_audiences, enabled) VALUES
+    ('quiz-cm',                  ARRAY['public','community','member','volunteer','ccmp'], TRUE),
+    ('acmp-quest',               ARRAY['public','community','member','volunteer','ccmp'], TRUE),
+    ('linha-do-tempo',           ARRAY['public','community','member','volunteer','ccmp'], TRUE),
+    ('change-manager-simulator', ARRAY['public','community','member','volunteer','ccmp'], TRUE)
+ON CONFLICT (game_id) DO NOTHING;
+
+ALTER TABLE game_access_settings ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Anyone read access settings"   ON game_access_settings;
+DROP POLICY IF EXISTS "Admins write access settings"  ON game_access_settings;
+DROP POLICY IF EXISTS "Admins update access settings" ON game_access_settings;
+DROP POLICY IF EXISTS "Admins insert access settings" ON game_access_settings;
+
+-- Leitura pública: qualquer página dos jogos pode consultar para gating client-side
+CREATE POLICY "Anyone read access settings" ON game_access_settings
+    FOR SELECT USING (true);
+
+-- Apenas admins podem inserir/atualizar configurações
+CREATE POLICY "Admins insert access settings" ON game_access_settings
+    FOR INSERT WITH CHECK (
+        EXISTS (SELECT 1 FROM member_profiles WHERE id = auth.uid() AND role = 'admin')
+    );
+
+CREATE POLICY "Admins update access settings" ON game_access_settings
+    FOR UPDATE USING (
+        EXISTS (SELECT 1 FROM member_profiles WHERE id = auth.uid() AND role = 'admin')
+    );
