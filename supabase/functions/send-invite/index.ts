@@ -235,10 +235,30 @@ Deno.serve(async (req: Request) => {
     return json(403, { error: "Jogue pelo menos uma partida antes de convidar amigos." });
   }
 
-  // 5) Envio via Resend
+  // 5) Insere convite primeiro pra ter o id (necessário no link de tracking).
+  //    Se o envio falhar, removemos a linha logo abaixo.
+  const { data: inserted, error: insertErr } = await supa
+    .from("game_invites")
+    .insert({
+      inviter_email: inviterEmail,
+      inviter_name: inviterName,
+      invitee_email: inviteeEmail,
+      game_id: gameId,
+      message: message || null,
+      ip_hash: ipHash,
+    })
+    .select("id")
+    .single();
+  if (insertErr || !inserted) {
+    console.error("Insert error", insertErr);
+    return json(500, { error: "Erro ao registrar convite." });
+  }
+  const inviteId = inserted.id;
+
+  // 6) Envio via Resend (link inclui ?invite=<id> pra tracking de aceite)
   const gameLabel = gameId ? GAME_LABELS[gameId] : undefined;
   const gamePath = gameId ? GAME_PATHS[gameId] : "/jogos/";
-  const gameUrl = SITE_URL + gamePath;
+  const gameUrl = SITE_URL + gamePath + "?invite=" + inviteId;
 
   const emailPayload: any = {
     from: FROM,
@@ -261,18 +281,10 @@ Deno.serve(async (req: Request) => {
   if (!resendRes.ok) {
     const detail = await resendRes.text();
     console.error("Resend error", resendRes.status, detail);
+    // Reverte o insert pra não contar contra o rate limit do convidador.
+    await supa.from("game_invites").delete().eq("id", inviteId);
     return json(502, { error: "Falha ao enviar e-mail (provedor)." });
   }
 
-  // 6) Registra envio (anti-abuso + analytics)
-  await supa.from("game_invites").insert({
-    inviter_email: inviterEmail,
-    inviter_name: inviterName,
-    invitee_email: inviteeEmail,
-    game_id: gameId,
-    message: message || null,
-    ip_hash: ipHash,
-  });
-
-  return json(200, { ok: true });
+  return json(200, { ok: true, invite_id: inviteId });
 });
