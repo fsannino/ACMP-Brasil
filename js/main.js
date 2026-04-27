@@ -87,6 +87,16 @@ document.addEventListener('DOMContentLoaded', function () {
                             '<li><a href="../index.html#eventos">Próximos Eventos</a></li>' +
                         '</ul>' +
                     '</li>' +
+                    '<li class="nav-item has-dropdown">' +
+                        '<a href="../jogos/">Jogos <i class="fas fa-chevron-down"></i></a>' +
+                        '<ul class="dropdown">' +
+                            '<li><a href="../jogos/">Todos os Jogos</a></li>' +
+                            '<li><a href="../jogos/quiz-cm.html">Quiz: Gestão de Mudanças</a></li>' +
+                            '<li><a href="../jogos/acmp-quest.html">ACMP Quest</a></li>' +
+                            '<li><a href="../jogos/linha-do-tempo.html">Linha do Tempo da GM</a></li>' +
+                            '<li><a href="../jogos/change-manager-simulator.html">Change Manager Simulator</a></li>' +
+                        '</ul>' +
+                    '</li>' +
                 '</ul>' +
             '</nav>' +
             '<button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Abrir menu">' +
