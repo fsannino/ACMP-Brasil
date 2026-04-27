@@ -1,7 +1,9 @@
 -- ============================================
--- ACMP Brasil — Jogos: identificação e feedback
+-- ACMP Brasil — Jogos: identificação, feedback e
+-- liberação por categoria de público.
 -- Aplica para Quiz CM, ACMP Quest, Linha do Tempo
--- Execute no SQL Editor do Supabase
+-- e Change Manager Simulator.
+-- Execute no SQL Editor do Supabase (idempotente).
 -- ============================================
 
 -- 1. Cadastro de jogadores (1 linha por e-mail; upsert)
@@ -25,12 +27,39 @@ CREATE TABLE IF NOT EXISTS game_feedback (
     player_name   TEXT,
     is_member     BOOLEAN,
     user_id       UUID REFERENCES auth.users(id) ON DELETE SET NULL,
-    game_id       TEXT NOT NULL CHECK (game_id IN ('quiz-cm','acmp-quest','linha-do-tempo')),
+    game_id       TEXT NOT NULL CHECK (game_id IN ('quiz-cm','acmp-quest','linha-do-tempo','change-manager-simulator')),
     rating        INTEGER CHECK (rating BETWEEN 1 AND 5),
     suggestion    TEXT,
     score_data    JSONB,
     created_at    TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- Atualiza CHECK pré-existente, se necessário (idempotente)
+ALTER TABLE game_feedback DROP CONSTRAINT IF EXISTS game_feedback_game_id_check;
+ALTER TABLE game_feedback ADD CONSTRAINT game_feedback_game_id_check
+    CHECK (game_id IN ('quiz-cm','acmp-quest','linha-do-tempo','change-manager-simulator'));
+
+-- 3. Liberação de jogos por categoria de público (admin controla)
+--    Cada flag indica se a audiência tem permissão de visualizar/jogar.
+CREATE TABLE IF NOT EXISTS game_access_settings (
+    game_id            TEXT PRIMARY KEY
+                       CHECK (game_id IN ('quiz-cm','acmp-quest','linha-do-tempo','change-manager-simulator')),
+    public_enabled     BOOLEAN NOT NULL DEFAULT TRUE,   -- visitante anônimo
+    community_enabled  BOOLEAN NOT NULL DEFAULT TRUE,   -- identificado (nome+e-mail) ou cadastrado não-associado
+    member_enabled     BOOLEAN NOT NULL DEFAULT TRUE,   -- associado ACMP ativo
+    volunteer_enabled  BOOLEAN NOT NULL DEFAULT TRUE,   -- voluntário (role=volunteer)
+    certified_enabled  BOOLEAN NOT NULL DEFAULT TRUE,   -- CCMP certificado
+    updated_at         TIMESTAMPTZ DEFAULT NOW(),
+    updated_by         UUID REFERENCES auth.users(id) ON DELETE SET NULL
+);
+
+-- Pré-popula com tudo liberado (idempotente)
+INSERT INTO game_access_settings (game_id) VALUES
+    ('quiz-cm'),
+    ('acmp-quest'),
+    ('linha-do-tempo'),
+    ('change-manager-simulator')
+ON CONFLICT (game_id) DO NOTHING;
 
 CREATE INDEX IF NOT EXISTS idx_game_feedback_game ON game_feedback (game_id, created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_game_feedback_rating ON game_feedback (rating);
@@ -39,8 +68,9 @@ CREATE INDEX IF NOT EXISTS idx_game_feedback_rating ON game_feedback (rating);
 -- ROW LEVEL SECURITY
 -- ============================================
 
-ALTER TABLE game_players  ENABLE ROW LEVEL SECURITY;
-ALTER TABLE game_feedback ENABLE ROW LEVEL SECURITY;
+ALTER TABLE game_players         ENABLE ROW LEVEL SECURITY;
+ALTER TABLE game_feedback        ENABLE ROW LEVEL SECURITY;
+ALTER TABLE game_access_settings ENABLE ROW LEVEL SECURITY;
 
 -- Anyone can register / update their own row (anon insert via apikey)
 DROP POLICY IF EXISTS "Anyone insert player"  ON game_players;
@@ -67,6 +97,21 @@ CREATE POLICY "Anyone insert feedback" ON game_feedback
 
 CREATE POLICY "Admins read feedback" ON game_feedback
     FOR SELECT USING (
+        EXISTS (SELECT 1 FROM member_profiles WHERE id = auth.uid() AND role = 'admin')
+    );
+
+-- game_access_settings: leitura pública (frontend filtra cards),
+-- escrita apenas por admins.
+DROP POLICY IF EXISTS "Anyone read game access"   ON game_access_settings;
+DROP POLICY IF EXISTS "Admins write game access"  ON game_access_settings;
+
+CREATE POLICY "Anyone read game access" ON game_access_settings
+    FOR SELECT USING (true);
+
+CREATE POLICY "Admins write game access" ON game_access_settings
+    FOR ALL USING (
+        EXISTS (SELECT 1 FROM member_profiles WHERE id = auth.uid() AND role = 'admin')
+    ) WITH CHECK (
         EXISTS (SELECT 1 FROM member_profiles WHERE id = auth.uid() AND role = 'admin')
     );
 
