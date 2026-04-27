@@ -1501,7 +1501,15 @@ const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJ
 
 function supaToken(){return localStorage.getItem('sb-token');}
 function supaUser(){try{return JSON.parse(localStorage.getItem('sb-user'));}catch(e){return null;}}
-function supaIsLogged(){return !!(supaToken()&&supaUser());}
+function supaTokenValid(t){
+  if(!t)return false;
+  try{
+    const p=t.split('.');if(p.length!==3)return false;
+    const payload=JSON.parse(decodeURIComponent(atob(p[1].replace(/-/g,'+').replace(/_/g,'/')).split('').map(c=>'%'+('00'+c.charCodeAt(0).toString(16)).slice(-2)).join('')));
+    return payload.exp && payload.exp*1000 > Date.now();
+  }catch(e){return false;}
+}
+function supaIsLogged(){return !!(supaToken()&&supaUser()&&supaTokenValid(supaToken()));}
 
 function supaHeaders(authed){
   const h={'Content-Type':'application/json','apikey':SUPA_KEY};
