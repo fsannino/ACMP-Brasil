@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jogos Educativos - ACMP Brasil</title>
-    <meta name="description" content="Jogos educativos da ACMP Brasil para profissionais de Gestão de Mudanças. Quiz, ACMP Quest, Linha do Tempo e Change Manager Simulator baseados no Standard ACMP.">
+    <meta name="description" content="Jogos educativos da ACMP Brasil para profissionais de Gestão de Mudanças. Quiz e ACMP Quest para preparo CCMP® baseados no Standard ACMP.">
     <meta name="theme-color" content="#1a3a5c">
     <meta property="og:title" content="Jogos Educativos - ACMP Brasil">
-    <meta property="og:description" content="Treine os conceitos do Standard ACMP de forma divertida — Quiz, Quest, Linha do Tempo e Change Manager Simulator.">
+    <meta property="og:description" content="Quiz e ACMP Quest — treine os conceitos do Standard ACMP de forma divertida.">
     <meta property="og:type" content="website">
     <meta property="og:locale" content="pt_BR">
     <link rel="stylesheet" href="../css/styles.css">
@@ -21,7 +21,7 @@
         .page-hero h1 { font-size: 2.4rem; font-weight: 800; margin-bottom: 14px; }
         .page-hero p { font-size: 1.05rem; opacity: 0.92; max-width: 620px; margin: 0 auto; line-height: 1.6; }
         .page-hero .hero-icon { font-size: 2.8rem; color: var(--secondary); margin-bottom: 14px; opacity: .95; }
-        .games-content { padding: 50px 0 80px; max-width: 1100px; margin: 0 auto; }
+        .games-content { padding: 50px 0 80px; max-width: 1000px; margin: 0 auto; }
         .games-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; padding: 0 20px; }
         .game-card { background: var(--bg-white); border-radius: var(--radius-lg); padding: 32px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-light); transition: all 0.3s; text-decoration: none; color: inherit; display: flex; flex-direction: column; position: relative; overflow: hidden; }
         .game-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); border-color: var(--primary-light); }
@@ -29,7 +29,6 @@
         .game-card.quiz .game-icon { background: linear-gradient(135deg, var(--secondary), var(--secondary-dark)); }
         .game-card.quest .game-icon { background: linear-gradient(135deg, var(--primary), var(--primary-light)); }
         .game-card.timeline .game-icon { background: linear-gradient(135deg, #28a745, #1f7d36); }
-        .game-card.simulator .game-icon { background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
         .game-card h2 { font-size: 1.35rem; font-weight: 800; color: var(--text-dark); margin-bottom: 8px; }
         .game-card .subtitle { font-size: 0.85rem; color: var(--primary); font-weight: 600; letter-spacing: .04em; text-transform: uppercase; margin-bottom: 14px; }
         .game-card p { font-size: 0.95rem; color: var(--text-body); line-height: 1.65; margin-bottom: 18px; flex: 1; }
@@ -41,16 +40,11 @@
         .game-card .featured-badge { position: absolute; top: 14px; right: 14px; background: var(--secondary); color: var(--primary-dark); padding: 4px 12px; border-radius: 50px; font-size: 0.7rem; font-weight: 700; letter-spacing: .03em; }
         .back-link { display: inline-flex; align-items: center; gap: 8px; color: var(--primary); font-weight: 600; font-size: 0.9rem; padding: 0 20px; margin-bottom: 24px; text-decoration: none; }
         .back-link:hover { gap: 12px; }
-        .access-info { max-width: 720px; margin: 0 auto 24px; padding: 14px 20px; background: rgba(26,58,92,.04); border: 1px solid rgba(26,58,92,.12); border-radius: var(--radius-md); font-size: .85rem; color: var(--text-body); display: flex; align-items: center; gap: 10px; }
-        .access-info i { color: var(--primary); }
-        .games-empty { text-align: center; padding: 60px 20px; color: var(--text-light); }
-        .games-empty i { font-size: 3rem; color: var(--border); margin-bottom: 14px; }
         @media (max-width: 600px) {
             .page-hero { padding: 50px 0 40px; }
             .page-hero h1 { font-size: 1.8rem; }
             .games-content { padding: 30px 0 60px; }
             .game-card { padding: 24px; }
-            .access-info { margin: 0 20px 20px; }
         }
     </style>
 </head>
@@ -86,13 +80,10 @@
     <main class="games-content">
         <a href="../index.html" class="back-link"><i class="fas fa-arrow-left"></i> Voltar para a página inicial</a>
 
-        <div class="access-info" id="access-info">
-            <i class="fas fa-circle-info"></i>
-            <span id="access-info-text">Você pode jogar como visitante. Antes de começar pediremos um nome e e-mail para acompanhar sua evolução.</span>
-        </div>
+        <div class="gax-info-banner" id="access-banner" style="display:none;"></div>
 
-        <div class="games-grid" id="games-grid">
-            <a href="quiz-cm.html" class="game-card quiz" data-game="quiz-cm" aria-label="Jogar Quiz: Gestão de Mudanças">
+        <div class="games-grid">
+            <a href="quiz-cm.html" class="game-card quiz" data-game-id="quiz-cm" aria-label="Jogar Quiz: Gestão de Mudanças">
                 <div class="game-icon"><i class="fas fa-question-circle"></i></div>
                 <div class="subtitle">Iniciante</div>
                 <h2>Quiz: Gestão de Mudanças</h2>
@@ -105,12 +96,12 @@
                 <span class="play-btn"><i class="fas fa-play"></i> Começar Quiz</span>
             </a>
 
-            <a href="acmp-quest.html" class="game-card quest" data-game="acmp-quest" aria-label="Jogar ACMP Quest">
+            <a href="acmp-quest.html" class="game-card quest" data-game-id="acmp-quest" aria-label="Jogar ACMP Quest">
                 <span class="featured-badge"><i class="fas fa-star"></i> Novo</span>
                 <div class="game-icon"><i class="fas fa-trophy"></i></div>
                 <div class="subtitle">Avançado · Gamificado</div>
                 <h2>ACMP Quest</h2>
-                <p>Quiz gamificado com XP, níveis, ranking e 4 modos de jogo: Sprint, Lightning, Connect e Boss Battle. Para quem está se preparando para a certificação CCMP&reg;.</p>
+                <p>Quiz gamificado com XP, níveis, ranking e 4 modos de jogo: Sprint, Lightning, Connect e Boss Battle. Para quem está se preparando para a certificação CCMP®.</p>
                 <div class="game-meta">
                     <span class="meta-item"><i class="fas fa-bolt"></i> 4 modos</span>
                     <span class="meta-item"><i class="fas fa-medal"></i> Ranking</span>
@@ -119,7 +110,8 @@
                 <span class="play-btn"><i class="fas fa-play"></i> Iniciar Missão</span>
             </a>
 
-            <a href="linha-do-tempo.html" class="game-card timeline" data-game="linha-do-tempo" aria-label="Jogar Linha do Tempo da GM">
+            <a href="linha-do-tempo.html" class="game-card timeline" data-game-id="linha-do-tempo" aria-label="Jogar Linha do Tempo da GM">
+                <span class="featured-badge"><i class="fas fa-star"></i> Novo</span>
                 <div class="game-icon"><i class="fas fa-history"></i></div>
                 <div class="subtitle">Intermediário · História</div>
                 <h2>Linha do Tempo da GM</h2>
@@ -131,175 +123,32 @@
                 </div>
                 <span class="play-btn"><i class="fas fa-play"></i> Começar a Ordenar</span>
             </a>
-
-            <a href="change-manager-simulator.html" class="game-card simulator" data-game="change-manager-simulator" aria-label="Jogar Change Manager Simulator">
-                <span class="featured-badge"><i class="fas fa-star"></i> Novo</span>
-                <div class="game-icon"><i class="fas fa-user-tie"></i></div>
-                <div class="subtitle">Avançado · Cenários</div>
-                <h2>Change Manager Simulator</h2>
-                <p>Coloque-se no papel de um(a) Change Manager e tome decisões em 8 cenários reais — patrocínio fraco, resistência, comunicação, mensuração e mais. Cada escolha gera feedback baseado no Standard ACMP.</p>
-                <div class="game-meta">
-                    <span class="meta-item"><i class="fas fa-briefcase"></i> 8 cenários</span>
-                    <span class="meta-item"><i class="fas fa-comments"></i> Feedback CM</span>
-                    <span class="meta-item"><i class="fas fa-chart-line"></i> Maturidade</span>
-                </div>
-                <span class="play-btn"><i class="fas fa-play"></i> Entrar na Simulação</span>
-            </a>
-        </div>
-
-        <div class="games-empty" id="games-empty" style="display:none;">
-            <i class="fas fa-lock"></i>
-            <p>Nenhum jogo está liberado para o seu perfil no momento.</p>
-            <p style="font-size:.85rem;margin-top:8px;"><a href="/membros/login.html" style="color:var(--primary);font-weight:600;">Faça login na Área do Associado</a> para ver mais opções.</p>
         </div>
     </main>
 
     <footer style="background: var(--primary-dark); color: rgba(255,255,255,0.7); padding: 30px 20px; text-align: center; font-size: 0.85rem;">
-        <p>&copy; 2026 ACMP Brasil &mdash; Capítulo brasileiro da Association of Change Management Professionals.</p>
+        <p>&copy; 2026 ACMP Brasil — Capítulo brasileiro da Association of Change Management Professionals.</p>
     </footer>
 
+    <script src="../js/game-access.js" defer></script>
     <script>
-    /* ============================================
-       Filtro de acesso por categoria de público.
-       Lê game_access_settings do Supabase. Se uma
-       categoria do visitante (public, community,
-       member, volunteer, certified) estiver liberada
-       para um jogo, o card aparece. Falha aberta:
-       em caso de erro, mostra todos os cards.
-       ============================================ */
-    (function () {
-        var SUPA_URL = 'https://yaumzlssybzoipwmllqy.supabase.co';
-        var SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlhdW16bHNzeWJ6b2lwd21sbHF5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU5MTcwMTEsImV4cCI6MjA5MTQ5MzAxMX0.GWK1jnlEmgxWmeWk1VGwR25fLBvquWtrkQ4ipq_A3RU';
-
-        function isTokenValid(t) {
-            if (!t) return false;
-            try {
-                var p = t.split('.');
-                if (p.length !== 3) return false;
-                var b64 = p[1].replace(/-/g, '+').replace(/_/g, '/');
-                var payload = JSON.parse(decodeURIComponent(atob(b64).split('').map(function (c) {
-                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-                }).join('')));
-                return payload.exp && payload.exp * 1000 > Date.now();
-            } catch (e) { return false; }
-        }
-
-        function getMemberSession() {
-            var token = localStorage.getItem('sb-token');
-            if (!token || !isTokenValid(token)) return null;
-            try {
-                var u = JSON.parse(localStorage.getItem('sb-user'));
-                return u && u.email ? { token: token, user: u } : null;
-            } catch (e) { return null; }
-        }
-
-        function getStoredPlayer() {
-            try {
-                var p = JSON.parse(localStorage.getItem('acmp_player_v1'));
-                if (!p || !p.email) return null;
-                if (p.timestamp && Date.now() - p.timestamp > 30 * 86400000) return null;
-                return p;
-            } catch (e) { return null; }
-        }
-
-        // Returns the set of audiences the visitor belongs to.
-        async function getVisitorAudiences() {
-            var audiences = ['public']; // todo mundo é "public"
-            var session = getMemberSession();
-            if (session) {
-                // Logado: por padrão também é community
-                audiences.push('community');
-                // Tenta buscar o perfil para definir member/volunteer/certified
-                try {
-                    var res = await fetch(SUPA_URL + '/rest/v1/member_profiles?select=role,membership_status,ccmp_certified&email=eq.' + encodeURIComponent(session.user.email), {
-                        headers: {
-                            'apikey': SUPA_KEY,
-                            'Authorization': 'Bearer ' + session.token
-                        }
-                    });
-                    var data = await res.json();
-                    var prof = data && data[0];
-                    if (prof) {
-                        if (prof.membership_status === 'active') audiences.push('member');
-                        if (prof.role === 'volunteer') audiences.push('volunteer');
-                        if (prof.ccmp_certified) audiences.push('certified');
+    document.addEventListener('DOMContentLoaded', function () {
+        if (!window.GameAccess) return;
+        GameAccess.applyToCatalog({
+            onApplied: function (info) {
+                if (info.lockedCount > 0) {
+                    var banner = document.getElementById('access-banner');
+                    var label = GameAccess.LABELS[info.audience] || info.audience;
+                    if (info.audience === 'public') {
+                        banner.innerHTML = '<i class="fas fa-info-circle"></i><span>Alguns jogos estão restritos. <a href="/membros/login.html" style="color:#1a3a5c;font-weight:600;">Faça login</a> ou identifique-se ao iniciar um jogo para liberar mais opções.</span>';
+                    } else {
+                        banner.innerHTML = '<i class="fas fa-info-circle"></i><span>Você está como <strong>' + label + '</strong>. Alguns jogos podem estar restritos para outras categorias.</span>';
                     }
-                } catch (e) { /* ignora — fica em community */ }
-            } else {
-                var stored = getStoredPlayer();
-                if (stored && !stored.anonymous) {
-                    audiences.push('community');
-                    if (stored.isMember) audiences.push('member');
+                    banner.style.display = 'flex';
                 }
             }
-            return audiences;
-        }
-
-        async function getAccessSettings() {
-            try {
-                var res = await fetch(SUPA_URL + '/rest/v1/game_access_settings?select=*', {
-                    headers: {
-                        'apikey': SUPA_KEY,
-                        'Authorization': 'Bearer ' + SUPA_KEY
-                    }
-                });
-                if (!res.ok) return null;
-                var rows = await res.json();
-                var map = {};
-                rows.forEach(function (r) { map[r.game_id] = r; });
-                return map;
-            } catch (e) { return null; }
-        }
-
-        function gameAllowed(setting, audiences) {
-            if (!setting) return true; // sem configuração: liberado por padrão
-            for (var i = 0; i < audiences.length; i++) {
-                var key = audiences[i] + '_enabled';
-                if (setting[key] === true) return true;
-            }
-            return false;
-        }
-
-        function updateAccessInfo(audiences) {
-            var el = document.getElementById('access-info-text');
-            if (!el) return;
-            if (audiences.indexOf('certified') !== -1) {
-                el.textContent = 'Você está logado(a) como CCMP — todos os jogos disponíveis aparecem abaixo.';
-            } else if (audiences.indexOf('volunteer') !== -1) {
-                el.textContent = 'Você está logado(a) como voluntário(a) ACMP Brasil — veja os jogos liberados para o seu perfil.';
-            } else if (audiences.indexOf('member') !== -1) {
-                el.textContent = 'Você está logado(a) como associado(a) ACMP — aproveite os jogos liberados para você.';
-            } else if (audiences.indexOf('community') !== -1) {
-                el.textContent = 'Você já se identificou — veja os jogos disponíveis para o seu perfil.';
-            } else {
-                el.textContent = 'Você pode jogar como visitante. Antes de começar pediremos um nome e e-mail para acompanhar sua evolução.';
-            }
-        }
-
-        async function applyFilter() {
-            var cards = document.querySelectorAll('.game-card[data-game]');
-            var audiences = await getVisitorAudiences();
-            updateAccessInfo(audiences);
-            var settings = await getAccessSettings();
-            if (!settings) return; // falha aberta
-            var visible = 0;
-            cards.forEach(function (card) {
-                var gid = card.getAttribute('data-game');
-                if (gameAllowed(settings[gid], audiences)) {
-                    card.style.display = '';
-                    visible++;
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-            if (visible === 0) {
-                document.getElementById('games-grid').style.display = 'none';
-                document.getElementById('games-empty').style.display = 'block';
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', applyFilter);
-    })();
+        });
+    });
     </script>
 </body>
 </html>

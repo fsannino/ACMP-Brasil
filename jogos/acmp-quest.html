@@ -11,6 +11,7 @@
 <meta property="og:locale" content="pt_BR">
 <link rel="icon" type="image/png" href="/img/logo-acmp-brasil.png">
 <script src="/js/game-gate.js" defer></script>
+<script src="/js/game-access.js" defer></script>
 <title>ACMP Quest — ACMP Brasil</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
@@ -1663,16 +1664,23 @@ function selectDiff(el){
 }
 
 function launchGame(){
-  if(window.GameGate){
-    GameGate.start({
-      gameId:'acmp-quest',
-      gameTitle:'ACMP Quest',
-      onReady:function(p){
-        if(p && p.name && !p.anonymous){ player.name = p.name; savePlayer(); updateHomeUI(); }
-        _launchGameCore();
-      }
-    });
-  } else { _launchGameCore(); }
+  var openGate = function(){
+    if(window.GameGate){
+      GameGate.start({
+        gameId:'acmp-quest',
+        gameTitle:'ACMP Quest',
+        onReady:function(p){
+          if(p && p.name && !p.anonymous){ player.name = p.name; savePlayer(); updateHomeUI(); }
+          if(window.GameAccess){
+            GameAccess.guardPage({ gameId:'acmp-quest' }).then(function(ok){ if(ok) _launchGameCore(); });
+          } else { _launchGameCore(); }
+        }
+      });
+    } else { _launchGameCore(); }
+  };
+  if(window.GameAccess){
+    GameAccess.guardPage({ gameId:'acmp-quest' }).then(function(ok){ if(ok) openGate(); });
+  } else { openGate(); }
 }
 function _launchGameCore(){
   const mc=MODE_CONFIG[gMode];

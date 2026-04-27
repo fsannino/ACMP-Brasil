@@ -355,9 +355,12 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         function loadAnalytics() {
-            // Google Analytics - Replace G-XXXXXXXXXX with your GA4 Measurement ID
+            // Google Analytics 4 — desativado até o GA4 ID real ser configurado.
+            // Para ativar: substitua a string abaixo pelo seu Measurement ID
+            // (formato 'G-XXXXXXXXXX', visível em https://analytics.google.com).
+            var gaId = ''; // TODO: preencher com o GA4 real, ex: 'G-ABC123XYZ'
+            if (!gaId || /^G-X+$/i.test(gaId)) return; // skip placeholder
             if (window.gtag) return;
-            var gaId = 'G-XXXXXXXXXX'; // TODO: Replace with real GA4 ID
             var s = document.createElement('script');
             s.async = true;
             s.src = 'https://www.googletagmanager.com/gtag/js?id=' + gaId;

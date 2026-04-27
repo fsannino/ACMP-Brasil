@@ -130,3 +130,48 @@ SELECT
     MAX(created_at) AS last_feedback_at
 FROM game_feedback
 GROUP BY game_id;
+
+-- ============================================
+-- 3. Controle de liberação de jogos por categoria de público
+--    Categorias suportadas (allowed_audiences):
+--      'public'    — qualquer visitante (sem login)
+--      'community' — cadastrado no GameGate, não associado
+--      'member'    — associado(a) ACMP Brasil
+--      'volunteer' — voluntário(a)
+--      'ccmp'      — certificado(a) CCMP®
+-- ============================================
+
+CREATE TABLE IF NOT EXISTS game_access_settings (
+    game_id            TEXT PRIMARY KEY,
+    allowed_audiences  TEXT[] NOT NULL DEFAULT ARRAY['public','community','member','volunteer','ccmp'],
+    enabled            BOOLEAN NOT NULL DEFAULT TRUE,
+    updated_at         TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+INSERT INTO game_access_settings (game_id, allowed_audiences, enabled) VALUES
+    ('quiz-cm',        ARRAY['public','community','member','volunteer','ccmp'], TRUE),
+    ('acmp-quest',     ARRAY['public','community','member','volunteer','ccmp'], TRUE),
+    ('linha-do-tempo', ARRAY['public','community','member','volunteer','ccmp'], TRUE)
+ON CONFLICT (game_id) DO NOTHING;
+
+ALTER TABLE game_access_settings ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Anyone read access settings" ON game_access_settings;
+DROP POLICY IF EXISTS "Admins write access settings" ON game_access_settings;
+DROP POLICY IF EXISTS "Admins update access settings" ON game_access_settings;
+DROP POLICY IF EXISTS "Admins insert access settings" ON game_access_settings;
+
+-- Leitura pública: qualquer página dos jogos pode consultar para gating client-side
+CREATE POLICY "Anyone read access settings" ON game_access_settings
+    FOR SELECT USING (true);
+
+-- Apenas admins podem inserir/atualizar configurações
+CREATE POLICY "Admins insert access settings" ON game_access_settings
+    FOR INSERT WITH CHECK (
+        EXISTS (SELECT 1 FROM member_profiles WHERE id = auth.uid() AND role = 'admin')
+    );
+
+CREATE POLICY "Admins update access settings" ON game_access_settings
+    FOR UPDATE USING (
+        EXISTS (SELECT 1 FROM member_profiles WHERE id = auth.uid() AND role = 'admin')
+    );
