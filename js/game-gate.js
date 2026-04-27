@@ -152,6 +152,17 @@
             '.gg-actions .gg-btn-skip{margin-top:0;text-align:center;}',
             '.gg-thanks-icon{text-align:center;font-size:48px;margin-bottom:12px;}',
             '.gg-saved-banner{background:rgba(40,167,69,.08);border:1px solid rgba(40,167,69,.25);color:#0d6e30;padding:10px 14px;border-radius:8px;font-size:12.5px;margin-bottom:16px;display:flex;align-items:center;gap:8px;}',
+            '.gg-invite-box{margin-top:18px;padding:16px 16px 14px;background:#f8f9fc;border:1px solid #e2e8f0;border-radius:10px;}',
+            '.gg-invite-toggle{display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none;font-size:13.5px;color:#1a3a5c;font-weight:700;}',
+            '.gg-invite-toggle .gg-invite-emoji{font-size:18px;}',
+            '.gg-invite-toggle .gg-invite-chev{margin-left:auto;font-size:12px;color:#6b7280;transition:transform .2s;}',
+            '.gg-invite-box.open .gg-invite-chev{transform:rotate(180deg);}',
+            '.gg-invite-form{display:none;margin-top:14px;}',
+            '.gg-invite-box.open .gg-invite-form{display:block;}',
+            '.gg-invite-status{margin-top:10px;font-size:12.5px;line-height:1.5;}',
+            '.gg-invite-status.ok{color:#0d6e30;}',
+            '.gg-invite-status.err{color:#a72027;}',
+            '.gg-turnstile{margin:8px 0;}',
             '@media (max-width:480px){.gg-card{padding:24px 18px;border-radius:10px;}.gg-title{font-size:18px;}.gg-stars label{font-size:30px;}}'
         ].join('\n');
         document.head.appendChild(s);
@@ -297,13 +308,119 @@
             '<div class="gg-card" role="dialog" aria-modal="true">' +
                 '<div class="gg-thanks-icon">✨</div>' +
                 '<div class="gg-title" style="text-align:center;">Obrigado!</div>' +
-                '<p class="gg-sub" style="text-align:center;">Seu apoio fortalece a comunidade brasileira de Gestão de Mudanças. Bons estudos e até a próxima partida!</p>' +
+                '<p class="gg-sub" style="text-align:center;">Seu apoio fortalece a comunidade brasileira de Gestão de Mudanças.</p>' +
+                buildInviteSection(opts) +
                 '<div class="gg-actions">' +
                     '<a href="/jogos/" class="gg-btn-primary">Outros jogos</a>' +
                     '<a href="/" class="gg-btn-skip">Voltar para o site</a>' +
                 '</div>' +
             '</div>';
         modal.style.display = 'flex';
+        wireInviteSection(opts);
+    }
+
+    /* ============================================
+       INVITE A FRIEND
+       ============================================ */
+    var TURNSTILE_LOADED = false;
+    function loadTurnstile() {
+        if (TURNSTILE_LOADED || !window.ACMP_TURNSTILE_SITE_KEY) return;
+        TURNSTILE_LOADED = true;
+        var s = document.createElement('script');
+        s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
+        s.async = true; s.defer = true;
+        document.head.appendChild(s);
+    }
+
+    function buildInviteSection(opts) {
+        var player = getStoredPlayer();
+        if (!player || !player.email || player.anonymous) return ''; // não convida se não identificado
+        loadTurnstile();
+        var siteKey = window.ACMP_TURNSTILE_SITE_KEY || '';
+        var turnstileBlock = siteKey
+            ? '<div class="gg-turnstile cf-turnstile" data-sitekey="' + escapeHTML(siteKey) + '" data-size="flexible"></div>'
+            : '';
+        return '' +
+            '<div class="gg-invite-box" id="gg-invite-box">' +
+                '<div class="gg-invite-toggle" id="gg-invite-toggle">' +
+                    '<span class="gg-invite-emoji">🎯</span>' +
+                    '<span>Desafie um amigo</span>' +
+                    '<span class="gg-invite-chev">▼</span>' +
+                '</div>' +
+                '<form class="gg-invite-form" id="gg-invite-form">' +
+                    '<label class="gg-field">' +
+                        '<span>E-mail do amigo</span>' +
+                        '<input type="email" name="invitee_email" placeholder="amigo@exemplo.com" required autocomplete="off">' +
+                    '</label>' +
+                    '<label class="gg-field">' +
+                        '<span>Mensagem <small>(opcional, até 280 caracteres)</small></span>' +
+                        '<textarea name="message" rows="2" maxlength="280" placeholder="Topa esse desafio?"></textarea>' +
+                    '</label>' +
+                    turnstileBlock +
+                    '<button type="submit" class="gg-btn-primary" style="margin-top:6px;">Enviar convite</button>' +
+                    '<div class="gg-invite-status" id="gg-invite-status"></div>' +
+                '</form>' +
+            '</div>';
+    }
+
+    function wireInviteSection(opts) {
+        var box = document.getElementById('gg-invite-box');
+        if (!box) return;
+        var toggle = document.getElementById('gg-invite-toggle');
+        var form = document.getElementById('gg-invite-form');
+        var status = document.getElementById('gg-invite-status');
+
+        toggle.addEventListener('click', function () { box.classList.toggle('open'); });
+
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+            status.className = 'gg-invite-status';
+            status.textContent = 'Enviando…';
+
+            var player = getStoredPlayer() || {};
+            var fd = new FormData(form);
+            var token = '';
+            if (window.turnstile && window.ACMP_TURNSTILE_SITE_KEY) {
+                try {
+                    var widgets = form.querySelectorAll('.cf-turnstile');
+                    if (widgets.length) token = window.turnstile.getResponse(widgets[0]) || '';
+                } catch (e) {}
+            }
+
+            var payload = {
+                inviter_email: player.email,
+                inviter_name: player.name || 'Jogador',
+                invitee_email: String(fd.get('invitee_email') || '').trim(),
+                game_id: opts && opts.gameId ? opts.gameId : null,
+                message: (fd.get('message') || '').toString().trim() || null,
+                turnstile_token: token
+            };
+
+            fetch(SUPA_URL + '/functions/v1/send-invite', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'apikey': SUPA_KEY,
+                    'Authorization': 'Bearer ' + SUPA_KEY
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, body: j }; }); })
+            .then(function (res) {
+                if (res.ok && res.body && res.body.ok) {
+                    status.className = 'gg-invite-status ok';
+                    status.textContent = '✅ Convite enviado! Boa sorte na competição.';
+                    form.querySelector('button[type=submit]').disabled = true;
+                } else {
+                    status.className = 'gg-invite-status err';
+                    status.textContent = (res.body && res.body.error) || 'Erro ao enviar convite. Tente novamente.';
+                }
+            })
+            .catch(function () {
+                status.className = 'gg-invite-status err';
+                status.textContent = 'Sem conexão. Tente novamente em instantes.';
+            });
+        });
     }
 
     function escapeHTML(s) {
