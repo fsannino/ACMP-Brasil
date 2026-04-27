@@ -20,81 +20,81 @@ document.addEventListener('DOMContentLoaded', function () {
             '<nav class="main-nav" id="main-nav" role="navigation" aria-label="Menu principal">' +
                 '<ul class="nav-list">' +
                     '<li class="nav-item has-dropdown">' +
-                        '<a href="../index.html#sobre">Sobre <i class="fas fa-chevron-down"></i></a>' +
+                        '<a href="/#sobre">Sobre <i class="fas fa-chevron-down"></i></a>' +
                         '<ul class="dropdown">' +
-                            '<li><a href="../index.html#sobre">Sobre a ACMP Brasil</a></li>' +
-                            '<li><a href="historia.html">Nossa História</a></li>' +
-                            '<li><a href="../index.html#sobre">Missão e Visão</a></li>' +
-                            '<li><a href="diretoria.html">Nossa Diretoria BR</a></li>' +
-                            '<li><a href="nossos-voluntarios.html">Nossos Voluntários</a></li>' +
-                            '<li><a href="parceiros.html">Nossos Parceiros</a></li>' +
-                            '<li><a href="estatuto.html">Nosso Estatuto</a></li>' +
-                            '<li><a href="../index.html#deib">Diversidade e Inclusão</a></li>' +
-                            '<li><a href="branches.html">Branches Regionais</a></li>' +
-                            '<li><a href="../index.html#gestao-mudancas">O que é Gestão de Mudanças</a></li>' +
-                            '<li><a href="../index.html#etica">Código de Ética</a></li>' +
+                            '<li><a href="/#sobre">Sobre a ACMP Brasil</a></li>' +
+                            '<li><a href="/pages/historia.html">Nossa História</a></li>' +
+                            '<li><a href="/#sobre">Missão e Visão</a></li>' +
+                            '<li><a href="/pages/diretoria.html">Nossa Diretoria BR</a></li>' +
+                            '<li><a href="/pages/nossos-voluntarios.html">Nossos Voluntários</a></li>' +
+                            '<li><a href="/pages/parceiros.html">Nossos Parceiros</a></li>' +
+                            '<li><a href="/pages/estatuto.html">Nosso Estatuto</a></li>' +
+                            '<li><a href="/#deib">Diversidade e Inclusão</a></li>' +
+                            '<li><a href="/pages/branches.html">Branches Regionais</a></li>' +
+                            '<li><a href="/#gestao-mudancas">O que é Gestão de Mudanças</a></li>' +
+                            '<li><a href="/#etica">Código de Ética</a></li>' +
                         '</ul>' +
                     '</li>' +
                     '<li class="nav-item has-dropdown">' +
-                        '<a href="../index.html#associe-se">Associe-se <i class="fas fa-chevron-down"></i></a>' +
+                        '<a href="/#associe-se">Associe-se <i class="fas fa-chevron-down"></i></a>' +
                         '<ul class="dropdown">' +
-                            '<li><a href="../index.html#associe-se">Por que se Associar</a></li>' +
+                            '<li><a href="/#associe-se">Por que se Associar</a></li>' +
                             '<li><a href="https://www.acmpglobal.org/page/join_acmp" target="_blank" rel="noopener">Associe-se / Renove</a></li>' +
                             '<li><a href="https://www.acmpglobal.org/page/corporate-member-organizations" target="_blank" rel="noopener">Membros Corporativos</a></li>' +
-                            '<li><a href="pacotes-corporativos.html">Pacotes Corporativos</a></li>' +
-                            '<li><a href="voluntarios.html">Seja Voluntário</a></li>' +
+                            '<li><a href="/pages/pacotes-corporativos.html">Pacotes Corporativos</a></li>' +
+                            '<li><a href="/pages/voluntarios.html">Seja Voluntário</a></li>' +
                         '</ul>' +
                     '</li>' +
                     '<li class="nav-item has-dropdown">' +
-                        '<a href="../index.html#credenciais">Credenciais <i class="fas fa-chevron-down"></i></a>' +
+                        '<a href="/#credenciais">Credenciais <i class="fas fa-chevron-down"></i></a>' +
                         '<ul class="dropdown">' +
-                            '<li><a href="../index.html#credenciais">Visão Geral</a></li>' +
+                            '<li><a href="/#credenciais">Visão Geral</a></li>' +
                             '<li><a href="https://www.acmpglobal.org/page/ccmp" target="_blank" rel="noopener">Sobre o CCMP&reg;</a></li>' +
                             '<li><a href="https://www.acmpglobal.org/page/mcmp" target="_blank" rel="noopener">MCMP&trade;</a></li>' +
                             '<li><a href="https://www.acmpglobal.org/page/credentials-and-training-resources" target="_blank" rel="noopener">Encontre Treinamento</a></li>' +
                             '<li><a href="https://www.acmpglobal.org/page/renew-your-ccmp" target="_blank" rel="noopener">Renove seu CCMP&reg;</a></li>' +
-                            '<li><a href="qep.html">QEP - Provedores de Treinamento</a></li>' +
+                            '<li><a href="/pages/qep.html">QEP - Provedores de Treinamento</a></li>' +
                             '<li><a href="https://www.acmpglobal.org/page/faqs_ccmp" target="_blank" rel="noopener">Perguntas Frequentes</a></li>' +
                         '</ul>' +
                     '</li>' +
                     '<li class="nav-item has-dropdown">' +
-                        '<a href="../index.html#standard">Standard <i class="fas fa-chevron-down"></i></a>' +
+                        '<a href="/#standard">Standard <i class="fas fa-chevron-down"></i></a>' +
                         '<ul class="dropdown">' +
-                            '<li><a href="../index.html#standard">Sobre o Standard&copy;</a></li>' +
+                            '<li><a href="/#standard">Sobre o Standard&copy;</a></li>' +
                             '<li><a href="https://www.acmpglobal.org/page/ACMPStandard" target="_blank" rel="noopener">Standard 1&ordf; Edição</a></li>' +
                             '<li><a href="https://www.acmpglobal.org/page/ACMPStandard-2nd-edition" target="_blank" rel="noopener">Standard 2&ordf; Edição</a></li>' +
-                            '<li><a href="standard-portugues.html">Standard em Português</a></li>' +
+                            '<li><a href="/pages/standard-portugues.html">Standard em Português</a></li>' +
                         '</ul>' +
                     '</li>' +
                     '<li class="nav-item has-dropdown">' +
-                        '<a href="../index.html#recursos">Recursos <i class="fas fa-chevron-down"></i></a>' +
+                        '<a href="/#recursos">Recursos <i class="fas fa-chevron-down"></i></a>' +
                         '<ul class="dropdown">' +
                             '<li><a href="https://www.acmpglobal.org/page/resource_library" target="_blank" rel="noopener">Biblioteca de Recursos</a></li>' +
                             '<li><a href="https://www.acmpglobal.org/page/discover-whats-next-in-change-management" target="_blank" rel="noopener">White Paper 2025</a></li>' +
                             '<li><a href="https://www.acmpglobal.org/networking/" target="_blank" rel="noopener">Centro de Carreiras</a></li>' +
-                            '<li><a href="business-solutions.html">Soluções para Empresas</a></li>' +
-                            '<li><a href="carreiras.html">Carreiras em CM</a></li>' +
-                            '<li><a href="podcast.html">Podcast - The Way Change Works</a></li>' +
-                            '<li><a href="../blog/">Blog ACMP Brasil</a></li>' +
+                            '<li><a href="/pages/business-solutions.html">Soluções para Empresas</a></li>' +
+                            '<li><a href="/pages/carreiras.html">Carreiras em CM</a></li>' +
+                            '<li><a href="/pages/podcast.html">Podcast - The Way Change Works</a></li>' +
+                            '<li><a href="/blog/">Blog ACMP Brasil</a></li>' +
                         '</ul>' +
                     '</li>' +
                     '<li class="nav-item has-dropdown">' +
-                        '<a href="../index.html#eventos">Eventos <i class="fas fa-chevron-down"></i></a>' +
+                        '<a href="/#eventos">Eventos <i class="fas fa-chevron-down"></i></a>' +
                         '<ul class="dropdown">' +
                             '<li><a href="https://www.acmpglobal.org/events/event_list.asp" target="_blank" rel="noopener">Calendário de Eventos</a></li>' +
-                            '<li><a href="change-orlando-2026.html">Change Orlando 2026</a></li>' +
-                            '<li><a href="global-cm-day.html">Dia Global da Gestão de Mudanças</a></li>' +
-                            '<li><a href="../index.html#eventos">Próximos Eventos</a></li>' +
+                            '<li><a href="/pages/change-orlando-2026.html">Change Orlando 2026</a></li>' +
+                            '<li><a href="/pages/global-cm-day.html">Dia Global da Gestão de Mudanças</a></li>' +
+                            '<li><a href="/#eventos">Próximos Eventos</a></li>' +
                         '</ul>' +
                     '</li>' +
                     '<li class="nav-item has-dropdown">' +
-                        '<a href="../jogos/">Jogos <i class="fas fa-chevron-down"></i></a>' +
+                        '<a href="/jogos/">Jogos <i class="fas fa-chevron-down"></i></a>' +
                         '<ul class="dropdown">' +
-                            '<li><a href="../jogos/">Todos os Jogos</a></li>' +
-                            '<li><a href="../jogos/quiz-cm.html">Quiz: Gestão de Mudanças</a></li>' +
-                            '<li><a href="../jogos/acmp-quest.html">ACMP Quest</a></li>' +
-                            '<li><a href="../jogos/linha-do-tempo.html">Linha do Tempo da GM</a></li>' +
-                            '<li><a href="../jogos/change-manager-simulator.html">Change Manager Simulator</a></li>' +
+                            '<li><a href="/jogos/">Todos os Jogos</a></li>' +
+                            '<li><a href="/jogos/quiz-cm.html">Quiz: Gestão de Mudanças</a></li>' +
+                            '<li><a href="/jogos/acmp-quest.html">ACMP Quest</a></li>' +
+                            '<li><a href="/jogos/linha-do-tempo.html">Linha do Tempo da GM</a></li>' +
+                            '<li><a href="/jogos/change-manager-simulator.html">Change Manager Simulator</a></li>' +
                         '</ul>' +
                     '</li>' +
                 '</ul>' +
