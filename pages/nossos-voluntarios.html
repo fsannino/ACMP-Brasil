@@ -60,6 +60,13 @@
         .committee-card h3 { font-size: 1.05rem; font-weight: 700; color: var(--text-dark); margin-bottom: 6px; }
         .committee-card p { font-size: 0.85rem; color: var(--text-body); line-height: 1.6; margin: 0; }
 
+        /* Empty state (placeholder enquanto a lista não é publicada) */
+        .vol-empty-state { background: var(--bg-light); border: 1px dashed var(--border-light); border-radius: var(--radius-md); padding: 36px 24px; text-align: center; margin: 8px 0 12px; }
+        .vol-empty-state i { font-size: 2rem; color: var(--primary); margin-bottom: 10px; display: block; }
+        .vol-empty-state h3 { font-size: 1.05rem; font-weight: 700; color: var(--text-dark); margin-bottom: 6px; }
+        .vol-empty-state p { font-size: 0.9rem; color: var(--text-body); line-height: 1.6; margin: 0 auto; max-width: 560px; }
+        .vol-empty-state a { color: var(--primary); font-weight: 600; }
+
         /* CTA */
         .page-cta { background: linear-gradient(135deg, var(--primary-dark), var(--primary)); color: white; border-radius: var(--radius-lg); padding: 40px; text-align: center; margin: 50px 0 0; }
         .page-cta h3 { font-size: 1.3rem; font-weight: 700; margin-bottom: 12px; }
@@ -154,69 +161,27 @@
                 <button class="filter-btn" data-filter="branches">Branches</button>
             </div>
 
-            <div class="vol-grid">
-                <article class="vol-card" data-tags="eventos">
-                    <div class="vol-avatar">NV</div>
-                    <h3 class="vol-name">Nome do Voluntário</h3>
-                    <p class="vol-city"><i class="fas fa-map-marker-alt"></i> Cidade, UF</p>
-                    <div class="vol-tags"><span class="vol-tag tag-eventos">Eventos</span></div>
-                    <a href="#" class="vol-link"><i class="fab fa-linkedin"></i> LinkedIn</a>
-                </article>
-                <article class="vol-card" data-tags="comunicacao">
-                    <div class="vol-avatar">NV</div>
-                    <h3 class="vol-name">Nome do Voluntário</h3>
-                    <p class="vol-city"><i class="fas fa-map-marker-alt"></i> Cidade, UF</p>
-                    <div class="vol-tags"><span class="vol-tag tag-comunicacao">Comunicação</span></div>
-                    <a href="#" class="vol-link"><i class="fab fa-linkedin"></i> LinkedIn</a>
-                </article>
-                <article class="vol-card" data-tags="educacao">
-                    <div class="vol-avatar">NV</div>
-                    <h3 class="vol-name">Nome do Voluntário</h3>
-                    <p class="vol-city"><i class="fas fa-map-marker-alt"></i> Cidade, UF</p>
-                    <div class="vol-tags"><span class="vol-tag tag-educacao">Educação</span></div>
-                    <a href="#" class="vol-link"><i class="fab fa-linkedin"></i> LinkedIn</a>
-                </article>
-                <article class="vol-card" data-tags="traducao">
-                    <div class="vol-avatar">NV</div>
-                    <h3 class="vol-name">Nome do Voluntário</h3>
-                    <p class="vol-city"><i class="fas fa-map-marker-alt"></i> Cidade, UF</p>
-                    <div class="vol-tags"><span class="vol-tag tag-traducao">Tradução</span></div>
-                    <a href="#" class="vol-link"><i class="fab fa-linkedin"></i> LinkedIn</a>
-                </article>
-                <article class="vol-card" data-tags="branches">
-                    <div class="vol-avatar">NV</div>
-                    <h3 class="vol-name">Nome do Voluntário</h3>
-                    <p class="vol-city"><i class="fas fa-map-marker-alt"></i> Cidade, UF</p>
-                    <div class="vol-tags"><span class="vol-tag tag-branches">Branch Regional</span></div>
-                    <a href="#" class="vol-link"><i class="fab fa-linkedin"></i> LinkedIn</a>
-                </article>
-                <article class="vol-card" data-tags="eventos comunicacao">
-                    <div class="vol-avatar">NV</div>
-                    <h3 class="vol-name">Nome do Voluntário</h3>
-                    <p class="vol-city"><i class="fas fa-map-marker-alt"></i> Cidade, UF</p>
-                    <div class="vol-tags">
-                        <span class="vol-tag tag-eventos">Eventos</span>
-                        <span class="vol-tag tag-comunicacao">Comunicação</span>
-                    </div>
-                    <a href="#" class="vol-link"><i class="fab fa-linkedin"></i> LinkedIn</a>
-                </article>
-                <article class="vol-card" data-tags="educacao traducao">
-                    <div class="vol-avatar">NV</div>
-                    <h3 class="vol-name">Nome do Voluntário</h3>
-                    <p class="vol-city"><i class="fas fa-map-marker-alt"></i> Cidade, UF</p>
-                    <div class="vol-tags">
-                        <span class="vol-tag tag-educacao">Educação</span>
-                        <span class="vol-tag tag-traducao">Tradução</span>
-                    </div>
-                    <a href="#" class="vol-link"><i class="fab fa-linkedin"></i> LinkedIn</a>
-                </article>
-                <article class="vol-card" data-tags="branches">
-                    <div class="vol-avatar">NV</div>
-                    <h3 class="vol-name">Nome do Voluntário</h3>
-                    <p class="vol-city"><i class="fas fa-map-marker-alt"></i> Cidade, UF</p>
-                    <div class="vol-tags"><span class="vol-tag tag-branches">Branch Regional</span></div>
-                    <a href="#" class="vol-link"><i class="fab fa-linkedin"></i> LinkedIn</a>
-                </article>
+            <div class="vol-grid" id="vol-grid-active">
+                <!-- Cards dos voluntários atuantes serão adicionados aqui conforme a lista for confirmada. -->
+            </div>
+
+            <div class="vol-empty-state">
+                <i class="fas fa-user-friends"></i>
+                <h3>Lista em construção</h3>
+                <p>Estamos finalizando a confirmação dos voluntários atuantes neste ciclo. Em breve esta seção será atualizada com os perfis completos.</p>
+            </div>
+
+            <h2>Alumni de Voluntários ACMP</h2>
+            <p class="section-sub">Reconhecemos e agradecemos os voluntários que contribuíram em ciclos anteriores e ajudaram a construir a ACMP Brasil que conhecemos hoje.</p>
+
+            <div class="vol-grid" id="vol-grid-alumni">
+                <!-- Cards dos alumni serão adicionados aqui conforme a lista for confirmada. -->
+            </div>
+
+            <div class="vol-empty-state">
+                <i class="fas fa-award"></i>
+                <h3>Em breve: nosso Hall de Alumni</h3>
+                <p>Estamos organizando o histórico de voluntários que passaram pelos comitês e branches da ACMP Brasil. Foi voluntário em algum ciclo? <a href="mailto:contato@acmpbrasil.org.br">Conte-nos sua história</a>.</p>
             </div>
 
             <p style="font-size: 0.85rem; color: var(--text-light); text-align: center; margin-top: 24px;"><i class="fas fa-info-circle"></i> A lista de voluntários é mantida e atualizada periodicamente. Está faltando alguém? <a href="mailto:contato@acmpbrasil.org.br" style="color: var(--primary); font-weight: 600;">Avise-nos</a>.</p>
