@@ -55,22 +55,24 @@ html,body{
   position:fixed;top:0;left:0;right:0;z-index:30;
   display:flex;align-items:center;justify-content:space-between;
   height:44px;padding:0 18px;
-  background:var(--mid);
-  border-bottom:1px solid rgba(255,255,255,.08);
+  background:#fff;
+  border-bottom:1px solid #e2e8f0;
+  box-shadow:0 1px 3px rgba(0,0,0,.04);
 }
 .quest-topbar a{
   display:inline-flex;align-items:center;gap:8px;
-  color:rgba(255,255,255,.85);text-decoration:none;
-  font-size:13px;font-weight:500;letter-spacing:.02em;
+  color:#1a3a5c;text-decoration:none;
+  font-size:13px;font-weight:600;letter-spacing:.02em;
   transition:color .15s;
 }
-.quest-topbar a:hover{color:var(--white)}
+.quest-topbar a:hover{color:#0f2440}
 .quest-topbar .quest-logo img{height:24px;display:block}
 .quest-topbar .quest-back-arrow{font-size:16px;line-height:1}
 @media (max-width:600px){
   .quest-topbar{height:40px;padding:0 12px}
   .quest-topbar a{font-size:12px}
   .quest-topbar .quest-logo img{height:20px}
+  .quest-topbar .quest-back span:not(.quest-back-arrow){display:none}
 }
 
 /* ─── SUBTLE GRADIENT OVERLAY (institucional) ─── */
@@ -88,7 +90,13 @@ body::before{
   padding:64px 20px 20px;
   transition:opacity .3s,transform .3s;
 }
-@media (max-width:600px){.screen{padding:56px 16px 16px}}
+@media (max-width:600px){
+  .screen{
+    padding:56px 16px 140px;
+    justify-content:flex-start;
+    overflow-y:auto;-webkit-overflow-scrolling:touch;
+  }
+}
 .screen.hidden{opacity:0;pointer-events:none;transform:scale(.97)}
 .screen.active{opacity:1;pointer-events:all;transform:scale(1)}
 
@@ -120,11 +128,12 @@ body::before{
 }
 .game-logo .acmp-badge{
   display:inline-flex;align-items:center;gap:8px;
-  background:rgba(91,155,213,.06);border:1px solid rgba(91,155,213,.2);
-  padding:5px 16px;border-radius:2px;
+  background:#fff;border:1px solid #e2e8f0;
+  padding:6px 16px;border-radius:4px;
   font-family:var(--font-mono);font-size:10px;
-  letter-spacing:.3em;color:var(--teal);text-transform:uppercase;
+  letter-spacing:.3em;color:#1a3a5c;text-transform:uppercase;
   margin-bottom:14px;
+  box-shadow:0 1px 3px rgba(0,0,0,.08);
 }
 .game-logo h1{
   font-family:var(--font-main);font-size:clamp(32px,6vw,64px);
@@ -320,7 +329,13 @@ body::before{
   padding:124px 20px 20px;
   z-index:10;
 }
-@media (max-width:600px){.question-area{padding-top:140px}}
+@media (max-width:600px){
+  .question-area{
+    padding:140px 16px 140px;
+    justify-content:flex-start;
+    overflow-y:auto;-webkit-overflow-scrolling:touch;
+  }
+}
 
 /* CATEGORY TAG */
 .q-category{
@@ -471,6 +486,64 @@ body::before{
 .result-actions{display:flex;gap:10px;margin-top:20px}
 
 /* ════════════════════════════════
+   REVIEW SCREEN (questões erradas)
+════════════════════════════════ */
+#reviewScreen{z-index:10}
+.review-box{
+  background:rgba(15,36,64,.95);border:1px solid var(--dimmer);
+  border-radius:8px;padding:24px;max-width:720px;width:100%;
+  animation:fadeUp .35s ease both;max-height:85vh;overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+}
+.review-title{
+  font-family:var(--font-main);font-size:18px;font-weight:800;color:var(--teal);
+  letter-spacing:.04em;text-align:center;margin-bottom:6px;
+}
+.review-subtitle{
+  font-size:12px;color:var(--dim);text-align:center;margin-bottom:20px;letter-spacing:.06em;
+}
+.review-card{
+  background:var(--dark);border:1px solid var(--dimmer);
+  border-left:3px solid var(--red);
+  border-radius:5px;padding:16px 18px;margin-bottom:14px;
+}
+.review-card .review-tag{
+  display:inline-block;font-family:var(--font-mono);font-size:9px;
+  letter-spacing:.18em;color:var(--teal);text-transform:uppercase;
+  margin-bottom:8px;
+}
+.review-card .review-q{
+  font-size:14px;font-weight:600;color:var(--cream);line-height:1.5;margin-bottom:12px;
+}
+.review-card .review-q strong{color:var(--teal)}
+.review-card .review-opt{
+  display:flex;align-items:flex-start;gap:10px;
+  padding:8px 12px;margin-bottom:6px;
+  border-radius:4px;font-size:12px;line-height:1.4;
+}
+.review-card .review-opt.correct{
+  background:rgba(40,167,69,.12);border:1px solid rgba(40,167,69,.4);color:var(--cream);
+}
+.review-card .review-opt.chosen{
+  background:rgba(220,53,69,.12);border:1px solid rgba(220,53,69,.4);color:var(--cream);
+}
+.review-card .review-opt.timed-out{
+  background:rgba(232,168,56,.1);border:1px solid rgba(232,168,56,.3);color:var(--cream);
+  font-style:italic;
+}
+.review-card .review-opt-key{
+  flex-shrink:0;font-weight:700;font-family:var(--font-mono);font-size:11px;
+}
+.review-card .review-explanation{
+  margin-top:10px;padding:10px 12px;
+  background:rgba(91,155,213,.08);border:1px solid rgba(91,155,213,.2);
+  border-radius:4px;font-size:12px;color:var(--cream);line-height:1.6;
+}
+.review-card .review-explanation strong{color:var(--teal)}
+.review-actions{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+.review-actions button{flex:1;min-width:140px}
+
+/* ════════════════════════════════
    LEADERBOARD SCREEN
 ════════════════════════════════ */
 #lbScreen{z-index:10}
@@ -605,7 +678,63 @@ body::before{
   pointer-events: none;
   transition: opacity .3s;
 }
-.prof-wrap.prof-hidden { opacity: 0; }
+.prof-wrap > * { pointer-events: auto; }
+.prof-wrap.prof-hidden { opacity: 0; pointer-events: none; }
+.prof-wrap.prof-hidden > * { pointer-events: none; }
+
+/* Minimize button on the prof wrap */
+.prof-min-btn {
+  position: absolute;
+  top: -6px; right: -6px;
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  background: var(--mid);
+  color: #fff;
+  border: 2px solid #fff;
+  font-size: 14px; line-height: 1;
+  font-family: var(--font-main); font-weight: 700;
+  cursor: pointer;
+  z-index: 10;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0;
+  box-shadow: 0 2px 6px rgba(0,0,0,.4);
+  transition: transform .15s;
+}
+.prof-min-btn:hover { transform: scale(1.1); }
+
+/* Floating reopen button (shown only when minimized) */
+.prof-reopen-btn {
+  position: fixed;
+  bottom: 16px; right: 16px;
+  z-index: 200;
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  background: var(--mid);
+  color: #fff;
+  border: 2px solid var(--teal);
+  font-size: 24px; line-height: 1;
+  cursor: pointer;
+  display: none;
+  align-items: center; justify-content: center;
+  padding: 0;
+  box-shadow: 0 4px 16px rgba(0,0,0,.5);
+  transition: transform .15s, background .15s;
+}
+.prof-reopen-btn:hover { transform: scale(1.05); background: var(--teal2); }
+.prof-reopen-btn.show { display: flex; }
+
+/* When minimized, hide all prof contents */
+.prof-wrap.prof-minimized .speech-bubble,
+.prof-wrap.prof-minimized .prof-figure,
+.prof-wrap.prof-minimized .prof-nametag,
+.prof-wrap.prof-minimized .prof-min-btn { display: none; }
+
+@media (max-width:600px) {
+  .prof-figure { transform: scale(.78); transform-origin: bottom right; }
+  .speech-bubble { max-width: 160px; font-size: 11px; padding: 7px 10px; }
+  .prof-wrap { bottom: 8px; right: 8px; }
+  .prof-reopen-btn { width: 44px; height: 44px; font-size: 22px; bottom: 12px; right: 12px; }
+}
 
 /* ── Speech Bubble ── */
 .speech-bubble {
@@ -1164,7 +1293,21 @@ body::before{
     <div class="ach-row" id="achRow"></div>
     <div class="result-actions">
       <button class="btn-back" onclick="goHome()">← Menu</button>
+      <button class="btn-primary" id="reviewBtn" style="display:none" onclick="showReview()">📚 Revisar Erradas</button>
       <button class="btn-primary" onclick="replayGame()">↺ Jogar Novamente</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ REVIEW ═══════════════════════════ -->
+<div class="screen hidden" id="reviewScreen">
+  <div class="review-box">
+    <div class="review-title">📚 Revisar Questões Erradas</div>
+    <div class="review-subtitle" id="reviewCount">0 questões para revisar</div>
+    <div id="reviewContent"></div>
+    <div class="review-actions">
+      <button class="btn-back" onclick="goHome()">← Menu</button>
+      <button class="btn-primary" onclick="showScreen('resultScreen')">Voltar ao Resultado</button>
     </div>
   </div>
 </div>
@@ -1345,7 +1488,72 @@ const LEVELS = [
 
 function getLevel(xp){let lv=0;for(let i=LEVELS.length-1;i>=0;i--){if(xp>=LEVELS[i].min){lv=i;break;}}return lv;}
 function savePlayer(){localStorage.setItem('acmp_player',JSON.stringify(player));}
-function loadPlayer(){const s=localStorage.getItem('acmp_player');if(s)player=Object.assign(player,JSON.parse(s));}
+function loadPlayer(){
+  const s=localStorage.getItem('acmp_player');if(s)player=Object.assign(player,JSON.parse(s));
+  if(supaIsLogged()) supaLoadProgress().then(ok=>{ if(ok){savePlayer();updateHomeUI();} });
+}
+
+// ══════════════════════════════════════════════════
+//  SUPABASE INTEGRATION (modo híbrido: localStorage + sync se logado)
+// ══════════════════════════════════════════════════
+const SUPA_URL='https://yaumzlssybzoipwmllqy.supabase.co';
+const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlhdW16bHNzeWJ6b2lwd21sbHF5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU5MTcwMTEsImV4cCI6MjA5MTQ5MzAxMX0.GWK1jnlEmgxWmeWk1VGwR25fLBvquWtrkQ4ipq_A3RU';
+
+function supaToken(){return localStorage.getItem('sb-token');}
+function supaUser(){try{return JSON.parse(localStorage.getItem('sb-user'));}catch(e){return null;}}
+function supaIsLogged(){return !!(supaToken()&&supaUser());}
+
+function supaHeaders(authed){
+  const h={'Content-Type':'application/json','apikey':SUPA_KEY};
+  h['Authorization']='Bearer '+(authed?supaToken():SUPA_KEY);
+  return h;
+}
+
+async function supaFetch(path, opts){
+  try{
+    const res=await fetch(SUPA_URL+'/rest/v1/'+path, opts);
+    if(!res.ok) return null;
+    const text=await res.text();
+    return text?JSON.parse(text):true;
+  }catch(e){return null;}
+}
+
+async function supaLoadProgress(){
+  const u=supaUser();if(!u)return false;
+  const data=await supaFetch('quiz_progress?select=*&user_id=eq.'+u.id,{headers:supaHeaders(true)});
+  if(!data||!data.length)return false;
+  const p=data[0];
+  player.name=p.display_name||player.name;
+  player.xp=Math.max(player.xp||0, p.xp||0);
+  player.totalScore=Math.max(player.totalScore||0, p.total_score||0);
+  player.achievements=Array.from(new Set([...(player.achievements||[]),...(p.achievements||[])]));
+  return true;
+}
+
+async function supaSaveResult(record, xpEarned, achievements){
+  if(!supaIsLogged())return;
+  const u=supaUser();if(!u)return;
+  // 1) push score row
+  supaFetch('quiz_scores',{
+    method:'POST',headers:Object.assign(supaHeaders(true),{Prefer:'return=minimal'}),
+    body:JSON.stringify(Object.assign({user_id:u.id},record))
+  });
+  // 2) update aggregated progress via RPC
+  supaFetch('rpc/add_quiz_result',{
+    method:'POST',headers:supaHeaders(true),
+    body:JSON.stringify({
+      p_xp:Math.max(0,xpEarned|0),
+      p_score:Math.max(0,record.score|0),
+      p_display_name:record.display_name,
+      p_new_achievements:achievements||[]
+    })
+  });
+}
+
+async function supaFetchLeaderboard(limit){
+  const data=await supaFetch('quiz_leaderboard?select=*&order=score.desc&limit='+(limit||10),{headers:supaHeaders(false)});
+  return Array.isArray(data)?data:null;
+}
 
 // ══════════════════════════════════════════════════
 //  GAME STATE
@@ -1354,6 +1562,7 @@ let gMode='sprint',gDiff='easy',gQuestions=[],gIdx=0,gScore=0,gLives=3;
 let gStreak=0,gMaxStreak=0,gCorrect=0,gTimer=null,gTimeLeft=0;
 let gAnswered=false,gGameOver=false,gEndCalled=false;
 let connectCorrectIdx=-1;
+let gWrongQuestions=[];
 
 const MODE_CONFIG = {
   sprint:{label:'SPRINT',hasTimer:false,maxQ:10,xpMult:1},
@@ -1396,7 +1605,8 @@ function goHome(){clearTimer();showScreen('homeScreen');updateHomeUI();showProfe
 function updateHomeUI(){
   const lv=getLevel(player.xp);const lvData=LEVELS[lv];
   document.getElementById('playerNameDisp').textContent=player.name;
-  document.getElementById('playerLevelDisp').textContent=`Nível ${lv+1} · ${lvData.name}`;
+  const sync=supaIsLogged()?' · 🌐 Sincronizado':'';
+  document.getElementById('playerLevelDisp').textContent=`Nível ${lv+1} · ${lvData.name}${sync}`;
   document.getElementById('playerAvatar').textContent=lvData.icon;
   document.getElementById('totalScoreDisp').textContent=player.totalScore.toLocaleString();
   const xpBase=LEVELS[lv].min;
@@ -1456,6 +1666,7 @@ function launchGame(){
   }
   gIdx=0;gScore=0;gLives=gMode==='boss'?1:dc.lives;
   gStreak=0;gMaxStreak=0;gCorrect=0;gAnswered=false;gGameOver=false;gEndCalled=false;
+  gWrongQuestions=[];
   showScreen('gameScreen');
   if(gMode==='boss'){showBossIntro();}else{renderQuestion();}
 }
@@ -1531,7 +1742,9 @@ function timeOut(){
   gAnswered=true;
   setProfState('wrong', getRndMsg('timeout'));
   loseLife();
-  highlightAnswer(-1,gQuestions[gIdx].c);
+  const q=gQuestions[gIdx];
+  highlightAnswer(-1,q.c);
+  gWrongQuestions.push({type:'multi',q:q.q,options:q.a.slice(),correctIdx:q.c,chosenIdx:-1,exp:q.exp,tag:q.tag,timedOut:true});
   const expl=document.getElementById('expl');if(expl)expl.classList.add('show');
   const nb=document.getElementById('nextBtn');if(nb&&!gGameOver)nb.classList.add('show');
 }
@@ -1598,6 +1811,7 @@ function answer(idx){
   } else {
     gStreak=0;loseLife();
     const qc=document.getElementById('qCard');if(qc)qc.classList.add('shake');
+    gWrongQuestions.push({type:'multi',q:q.q,options:q.a.slice(),correctIdx:q.c,chosenIdx:idx,exp:q.exp,tag:q.tag});
     // Professor reaction
     setProfState('wrong', getRndMsg('wrong'));
   }
@@ -1685,6 +1899,8 @@ function connectAnswer(el){
   } else {
     gStreak=0;loseLife();
     const qc=document.getElementById('qCard');if(qc)qc.classList.add('shake');
+    const q=gQuestions[gIdx];
+    gWrongQuestions.push({type:'connect',input:q.input,output:q.output,process:q.process,tag:'Connect'});
   }
   updateHUD();
   const expl=document.getElementById('expl');if(expl)expl.classList.add('show');
@@ -1725,6 +1941,16 @@ function endGame(bossFail=false){
   player.highScores.push({name:player.name,score:gScore,mode:gMode,date:new Date().toLocaleDateString('pt-BR')});
   player.highScores.sort((a,b)=>b.score-a.score);player.highScores=player.highScores.slice(0,20);
   savePlayer();
+  // Sync to Supabase if user is logged in (silent failure → localStorage continues)
+  if(supaIsLogged() && !bossFail){
+    supaSaveResult({
+      display_name:player.name,
+      mode:gMode,
+      difficulty:(gMode==='boss'||gMode==='connect')?null:gDiff,
+      score:gScore,correct:gCorrect,total_questions:totalQ,
+      max_streak:gMaxStreak,grade:String(grade)
+    }, xpEarned, newAch);
+  }
   if(pct>=.75&&!bossFail)spawnConfetti();
   showScreen('resultScreen');
   // Professor result comment
@@ -1742,8 +1968,45 @@ function endGame(bossFail=false){
   document.getElementById('rsStreak').textContent=gMaxStreak;
   document.getElementById('xpGain').innerHTML='⚡ + '+xpEarned+' XP ganhos';
   document.getElementById('achRow').innerHTML=newAch.map(a=>`<div class="ach-badge">${a}</div>`).join('');
+  const reviewBtn=document.getElementById('reviewBtn');
+  if(reviewBtn) reviewBtn.style.display=gWrongQuestions.length>0?'inline-block':'none';
   updateHomeUI();
   if(newLevel>prevLevel)setTimeout(()=>showLevelUp(newLevel),600);
+}
+
+// ══════════════════════════════════════════════════
+//  REVIEW WRONG ANSWERS
+// ══════════════════════════════════════════════════
+function showReview(){
+  const list=document.getElementById('reviewContent');
+  const count=document.getElementById('reviewCount');
+  count.textContent=`${gWrongQuestions.length} ${gWrongQuestions.length===1?'questão':'questões'} para revisar`;
+  list.innerHTML=gWrongQuestions.map(w=>{
+    if(w.type==='connect'){
+      return `<div class="review-card">
+        <div class="review-tag">${escapeHTML(w.tag||'Connect')}</div>
+        <div class="review-q">📥 <strong>Inputs:</strong> ${escapeHTML(w.input)}</div>
+        <div class="review-opt correct"><span class="review-opt-key">✓</span><span>${escapeHTML(w.process)}</span></div>
+        <div class="review-explanation">📤 <strong>Output:</strong> ${escapeHTML(w.output)}</div>
+      </div>`;
+    }
+    const optsHTML=w.options.map((o,i)=>{
+      let cls='';
+      if(i===w.correctIdx) cls='correct';
+      else if(i===w.chosenIdx) cls='chosen';
+      const key=i===w.correctIdx?'✓':(i===w.chosenIdx?'✗':'ABCD'[i]);
+      return cls?`<div class="review-opt ${cls}"><span class="review-opt-key">${key}</span><span>${o}</span></div>`:'';
+    }).filter(Boolean).join('');
+    const timedOut=w.timedOut?`<div class="review-opt timed-out"><span class="review-opt-key">⏱</span><span>Tempo esgotado</span></div>`:'';
+    return `<div class="review-card">
+      <div class="review-tag">${escapeHTML(w.tag||'Standard')}</div>
+      <div class="review-q">${w.q}</div>
+      ${timedOut}
+      ${optsHTML}
+      ${w.exp?`<div class="review-explanation">${w.exp}</div>`:''}
+    </div>`;
+  }).join('');
+  showScreen('reviewScreen');
 }
 
 // ══════════════════════════════════════════════════
@@ -1781,16 +2044,36 @@ function spawnConfetti(){
 // ══════════════════════════════════════════════════
 function escapeHTML(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 
-function showLB(){
+async function showLB(){
   const lb=document.getElementById('lbContent');
-  if(!player.highScores.length){lb.innerHTML='<div style="text-align:center;color:var(--dim);font-size:12px;padding:20px">Nenhuma partida registrada ainda.</div>';}
-  else{lb.innerHTML=player.highScores.slice(0,10).map((s,i)=>`
-    <div class="lb-row">
-      <div class="lb-rank ${i===0?'r1':i===1?'r2':i===2?'r3':''}">${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</div>
-      <div><div class="lb-name">${escapeHTML(s.name)}</div><div class="lb-mode">${escapeHTML((s.mode||'').toUpperCase())} · ${escapeHTML(s.date)}</div></div>
-      <div class="lb-score">${Number(s.score||0).toLocaleString()}</div>
-    </div>`).join('');}
   showScreen('lbScreen');
+  lb.innerHTML='<div style="text-align:center;color:var(--dim);font-size:12px;padding:20px">Carregando ranking...</div>';
+
+  // Try Supabase first (global ranking — view is public)
+  const remote=await supaFetchLeaderboard(10);
+  if(remote && remote.length){
+    lb.innerHTML='<div style="font-size:10px;color:var(--teal);text-align:center;letter-spacing:.18em;text-transform:uppercase;margin-bottom:10px">🌐 Ranking global ACMP Brasil</div>'+
+      remote.map((s,i)=>`
+        <div class="lb-row">
+          <div class="lb-rank ${i===0?'r1':i===1?'r2':i===2?'r3':''}">${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</div>
+          <div><div class="lb-name">${escapeHTML(s.display_name)}</div><div class="lb-mode">${escapeHTML((s.mode||'').toUpperCase())}${s.grade?' · '+escapeHTML(s.grade):''}</div></div>
+          <div class="lb-score">${Number(s.score||0).toLocaleString()}</div>
+        </div>`).join('');
+    return;
+  }
+
+  // Fallback: local highScores
+  if(!player.highScores.length){
+    lb.innerHTML='<div style="text-align:center;color:var(--dim);font-size:12px;padding:20px">Nenhuma partida registrada ainda.</div>';
+  } else {
+    lb.innerHTML='<div style="font-size:10px;color:var(--dim);text-align:center;letter-spacing:.18em;text-transform:uppercase;margin-bottom:10px">📱 Ranking deste dispositivo</div>'+
+      player.highScores.slice(0,10).map((s,i)=>`
+        <div class="lb-row">
+          <div class="lb-rank ${i===0?'r1':i===1?'r2':i===2?'r3':''}">${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</div>
+          <div><div class="lb-name">${escapeHTML(s.name)}</div><div class="lb-mode">${escapeHTML((s.mode||'').toUpperCase())} · ${escapeHTML(s.date)}</div></div>
+          <div class="lb-score">${Number(s.score||0).toLocaleString()}</div>
+        </div>`).join('');
+  }
 }
 
 function resetProgress(){
@@ -1930,8 +2213,33 @@ function getRndMsg(type) {
 
 function showProfessor(visible) {
   const w = document.getElementById('profWrap');
+  const reopenBtn = document.getElementById('profReopenBtn');
   if(w) w.classList.toggle('prof-hidden', !visible);
+  if(reopenBtn) {
+    const isMin = w && w.classList.contains('prof-minimized');
+    reopenBtn.classList.toggle('show', visible && isMin);
+  }
 }
+
+// Minimize/restore Prof. CM
+function setProfMinimized(min) {
+  const w = document.getElementById('profWrap');
+  const btn = document.getElementById('profReopenBtn');
+  if(!w || !btn) return;
+  w.classList.toggle('prof-minimized', min);
+  btn.classList.toggle('show', min);
+  try { localStorage.setItem('acmp_prof_min', min ? '1' : '0'); } catch(e){}
+}
+document.getElementById('profMinBtn').addEventListener('click', () => setProfMinimized(true));
+document.getElementById('profReopenBtn').addEventListener('click', () => setProfMinimized(false));
+
+// Default: minimized on mobile, or restore previous preference
+(function initProfState(){
+  let stored = null;
+  try { stored = localStorage.getItem('acmp_prof_min'); } catch(e){}
+  if(stored === '1') setProfMinimized(true);
+  else if(stored === null && window.innerWidth <= 600) setProfMinimized(true);
+})();
 
 // ══════════════════════════════════════════════════
 //  INIT
@@ -1948,7 +2256,9 @@ if(!player.name||player.name==='Agente')setTimeout(showNameModal,600);
 </script>
 
 <!-- ═══════════════ PROF. CM CHARACTER ═══════════════ -->
+<button class="prof-reopen-btn" id="profReopenBtn" aria-label="Mostrar Prof. CM" title="Mostrar Prof. CM">🎓</button>
 <div class="prof-wrap state-thinking prof-hidden" id="profWrap">
+  <button class="prof-min-btn" id="profMinBtn" aria-label="Ocultar Prof. CM" title="Ocultar Prof. CM">×</button>
   <div class="speech-bubble" id="speechBubble">
     <div class="thought-dots"><span></span><span></span><span></span></div>
     <span id="speechText">Bem-vindo! Prontos para estudar?</span>
