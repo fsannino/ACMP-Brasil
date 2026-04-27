@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogos Educativos - ACMP Brasil</title>
+    <meta name="description" content="Jogos educativos da ACMP Brasil para profissionais de Gestão de Mudanças. Quiz e ACMP Quest para preparo CCMP® baseados no Standard ACMP.">
+    <meta name="theme-color" content="#1a3a5c">
+    <meta property="og:title" content="Jogos Educativos - ACMP Brasil">
+    <meta property="og:description" content="Quiz e ACMP Quest — treine os conceitos do Standard ACMP de forma divertida.">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="pt_BR">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="icon" type="image/png" href="../img/logo-acmp-brasil.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .page-hero { background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 50%, var(--primary-light) 100%); padding: 70px 0 50px; color: white; text-align: center; }
+        .page-hero h1 { font-size: 2.4rem; font-weight: 800; margin-bottom: 14px; }
+        .page-hero p { font-size: 1.05rem; opacity: 0.92; max-width: 620px; margin: 0 auto; line-height: 1.6; }
+        .page-hero .hero-icon { font-size: 2.8rem; color: var(--secondary); margin-bottom: 14px; opacity: .95; }
+        .games-content { padding: 50px 0 80px; max-width: 1000px; margin: 0 auto; }
+        .games-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; padding: 0 20px; }
+        .game-card { background: var(--bg-white); border-radius: var(--radius-lg); padding: 32px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-light); transition: all 0.3s; text-decoration: none; color: inherit; display: flex; flex-direction: column; position: relative; overflow: hidden; }
+        .game-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); border-color: var(--primary-light); }
+        .game-card .game-icon { width: 64px; height: 64px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-size: 1.8rem; color: white; margin-bottom: 18px; }
+        .game-card.quiz .game-icon { background: linear-gradient(135deg, var(--secondary), var(--secondary-dark)); }
+        .game-card.quest .game-icon { background: linear-gradient(135deg, var(--primary), var(--primary-light)); }
+        .game-card h2 { font-size: 1.35rem; font-weight: 800; color: var(--text-dark); margin-bottom: 8px; }
+        .game-card .subtitle { font-size: 0.85rem; color: var(--primary); font-weight: 600; letter-spacing: .04em; text-transform: uppercase; margin-bottom: 14px; }
+        .game-card p { font-size: 0.95rem; color: var(--text-body); line-height: 1.65; margin-bottom: 18px; flex: 1; }
+        .game-card .game-meta { display: flex; gap: 16px; flex-wrap: wrap; padding: 14px 0; border-top: 1px solid var(--border-light); border-bottom: 1px solid var(--border-light); margin-bottom: 18px; }
+        .game-card .meta-item { display: flex; align-items: center; gap: 6px; font-size: 0.8rem; color: var(--text-light); }
+        .game-card .meta-item i { color: var(--primary); }
+        .game-card .play-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 24px; background: var(--primary); color: white; border-radius: var(--radius-sm); font-weight: 600; font-size: 0.92rem; transition: background 0.2s; }
+        .game-card:hover .play-btn { background: var(--primary-light); }
+        .game-card .featured-badge { position: absolute; top: 14px; right: 14px; background: var(--secondary); color: var(--primary-dark); padding: 4px 12px; border-radius: 50px; font-size: 0.7rem; font-weight: 700; letter-spacing: .03em; }
+        .back-link { display: inline-flex; align-items: center; gap: 8px; color: var(--primary); font-weight: 600; font-size: 0.9rem; padding: 0 20px; margin-bottom: 24px; text-decoration: none; }
+        .back-link:hover { gap: 12px; }
+        @media (max-width: 600px) {
+            .page-hero { padding: 50px 0 40px; }
+            .page-hero h1 { font-size: 1.8rem; }
+            .games-content { padding: 30px 0 60px; }
+            .game-card { padding: 24px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <div class="container top-bar-content">
+            <div class="top-bar-left">
+                <a href="https://www.acmpglobal.org/" target="_blank" rel="noopener"><i class="fas fa-globe"></i> ACMP Global</a>
+                <a href="https://www.acmpglobal.org/page/acmp-connect" target="_blank" rel="noopener"><i class="fas fa-users"></i> ACMP Connect</a>
+            </div>
+            <div class="top-bar-right">
+                <a href="/membros/login.html" class="btn-login"><i class="fas fa-lock"></i> Área do Associado</a>
+                <a href="https://www.acmpglobal.org/page/join_acmp" target="_blank" rel="noopener" class="btn-join">Associe-se</a>
+            </div>
+        </div>
+    </div>
+    <header class="main-header">
+        <div class="container header-content">
+            <a href="../index.html" class="logo">
+                <img src="../img/logo-acmp-brasil.png" alt="ACMP Brasil" style="height: 44px; width: auto; display: block;">
+            </a>
+        </div>
+    </header>
+
+    <section class="page-hero">
+        <div class="container">
+            <div class="hero-icon"><i class="fas fa-gamepad"></i></div>
+            <h1>Jogos Educativos</h1>
+            <p>Aprenda Gestão de Mudanças com base no Standard ACMP de forma interativa. Escolha o desafio que combina com seu nível.</p>
+        </div>
+    </section>
+
+    <main class="games-content">
+        <a href="../index.html" class="back-link"><i class="fas fa-arrow-left"></i> Voltar para a página inicial</a>
+
+        <div class="games-grid">
+            <a href="quiz-cm.html" class="game-card quiz" aria-label="Jogar Quiz: Gestão de Mudanças">
+                <div class="game-icon"><i class="fas fa-question-circle"></i></div>
+                <div class="subtitle">Iniciante</div>
+                <h2>Quiz: Gestão de Mudanças</h2>
+                <p>15 perguntas de múltipla escolha baseadas nos fundamentos do Standard ACMP. Ideal para quem está começando.</p>
+                <div class="game-meta">
+                    <span class="meta-item"><i class="fas fa-clock"></i> ~5 minutos</span>
+                    <span class="meta-item"><i class="fas fa-list-ol"></i> 15 questões</span>
+                    <span class="meta-item"><i class="fas fa-graduation-cap"></i> Fundamentos</span>
+                </div>
+                <span class="play-btn"><i class="fas fa-play"></i> Começar Quiz</span>
+            </a>
+
+            <a href="acmp-quest.html" class="game-card quest" aria-label="Jogar ACMP Quest">
+                <span class="featured-badge"><i class="fas fa-star"></i> Novo</span>
+                <div class="game-icon"><i class="fas fa-trophy"></i></div>
+                <div class="subtitle">Avançado · Gamificado</div>
+                <h2>ACMP Quest</h2>
+                <p>Quiz gamificado com XP, níveis, ranking e 4 modos de jogo: Sprint, Lightning, Connect e Boss Battle. Para quem está se preparando para a certificação CCMP®.</p>
+                <div class="game-meta">
+                    <span class="meta-item"><i class="fas fa-bolt"></i> 4 modos</span>
+                    <span class="meta-item"><i class="fas fa-medal"></i> Ranking</span>
+                    <span class="meta-item"><i class="fas fa-fire"></i> XP &amp; níveis</span>
+                </div>
+                <span class="play-btn"><i class="fas fa-play"></i> Iniciar Missão</span>
+            </a>
+        </div>
+    </main>
+
+    <footer style="background: var(--primary-dark); color: rgba(255,255,255,0.7); padding: 30px 20px; text-align: center; font-size: 0.85rem;">
+        <p>&copy; 2026 ACMP Brasil — Capítulo brasileiro da Association of Change Management Professionals.</p>
+    </footer>
+</body>
+</html>
