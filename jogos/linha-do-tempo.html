@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Linha do Tempo da GM — ACMP Brasil</title>
+<meta name="description" content="Jogo educativo: ordene os marcos históricos da Gestão de Mudanças do mais antigo ao mais recente. Marcos globais e brasileiros.">
+<meta name="theme-color" content="#0D1E35">
+<meta property="og:title" content="Linha do Tempo da GM — ACMP Brasil">
+<meta property="og:description" content="Ordene os marcos históricos da Gestão de Mudanças. Modos Fácil, Normal e Difícil.">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="pt_BR">
+<link rel="icon" type="image/png" href="/img/logo-acmp-brasil.png">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700;9..40,900&display=swap');
+
+:root {
+  --navy: #0D1E35;
+  --navy-mid: #112338;
+  --navy-deep: #080F1C;
+  --teal: #009E8E;
+  --gold: #F5A420;
+  --muted: #2D4A5E;
+  --dim: #1A2E45;
+  --danger: #E24B4A;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--navy);
+  font-family: 'DM Sans', 'Helvetica Neue', sans-serif;
+  color: #fff;
+  min-height: 100vh;
+  overflow-x: hidden;
+  padding-top: 44px;
+}
+
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image:
+    radial-gradient(ellipse 60% 40% at 20% 20%, rgba(0,158,142,0.04) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 50% at 80% 80%, rgba(27,56,104,0.1) 0%, transparent 60%);
+  pointer-events: none; z-index: 0;
+}
+
+/* ── INSTITUTIONAL TOPBAR ── */
+.quest-topbar{
+  position:fixed;top:0;left:0;right:0;z-index:30;
+  display:flex;align-items:center;justify-content:space-between;
+  height:44px;padding:0 18px;
+  background:#fff;
+  border-bottom:1px solid #e2e8f0;
+  box-shadow:0 1px 3px rgba(0,0,0,.04);
+}
+.quest-topbar a{
+  display:inline-flex;align-items:center;gap:8px;
+  color:#1a3a5c;text-decoration:none;
+  font-size:13px;font-weight:600;letter-spacing:.02em;
+  font-family:'DM Sans',sans-serif;
+  transition:color .15s;
+}
+.quest-topbar a:hover{color:#0f2440}
+.quest-topbar .quest-logo img{height:24px;display:block}
+.quest-topbar .quest-back-arrow{font-size:16px;line-height:1}
+@media (max-width:600px){
+  .quest-topbar{height:40px;padding:0 12px}
+  .quest-topbar a{font-size:12px}
+  .quest-topbar .quest-logo img{height:20px}
+  body{padding-top:40px}
+  .quest-topbar .quest-back span:not(.quest-back-arrow){display:none}
+}
+
+.wrap { position: relative; z-index: 1; max-width: 1020px; margin: 0 auto; padding: 36px 24px 80px; }
+
+/* ── HEADER ── */
+.header { text-align: center; margin-bottom: 36px; }
+
+.logo-mark {
+  display: inline-flex; align-items: center; gap: 7px;
+  margin-bottom: 16px; padding: 7px 13px;
+  border: 1px solid var(--dim); border-radius: 4px;
+}
+.logo-mark .lt { font-size: 12px; font-weight: 900; letter-spacing: 0.05em; }
+.logo-mark .lb { font-size: 7px; font-weight: 700; color: var(--teal); letter-spacing: 0.2em; }
+
+h1 {
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-size: clamp(28px, 4.5vw, 46px);
+  font-weight: 400; line-height: 1.05; color: #fff; margin-bottom: 10px;
+}
+h1 em { font-style: italic; color: var(--teal); }
+
+.header p { font-size: 13px; color: var(--muted); line-height: 1.7; max-width: 500px; margin: 0 auto 18px; }
+
+/* mode tabs */
+.mode-tabs {
+  display: inline-flex; gap: 0; border: 1px solid var(--dim);
+  border-radius: 6px; overflow: hidden; margin-bottom: 14px;
+}
+.mode-tab {
+  padding: 7px 18px; font-size: 12px; font-weight: 500;
+  background: transparent; border: none; color: var(--muted);
+  cursor: pointer; font-family: inherit; transition: all .15s;
+  border-right: 1px solid var(--dim);
+}
+.mode-tab:last-child { border-right: none; }
+.mode-tab.active { background: var(--teal); color: var(--navy); }
+.mode-tab:not(.active):hover { color: var(--teal); }
+
+.stat-row {
+  display: inline-flex; gap: 24px;
+  border: 1px solid var(--dim); border-radius: 4px;
+  padding: 9px 18px; font-size: 11px; color: var(--muted);
+  letter-spacing: 0.12em; text-transform: uppercase;
+}
+.stat-row strong { color: var(--teal); font-size: 15px; font-weight: 900; display: block; letter-spacing: -0.02em; }
+
+/* ── HINT ── */
+.hint {
+  text-align: center; font-size: 12px; color: var(--dim);
+  letter-spacing: 0.06em; margin-bottom: 22px; min-height: 18px; transition: color 0.3s;
+}
+.hint.on { color: var(--teal); }
+
+/* ── POOL ── */
+.slabel {
+  font-size: 10px; letter-spacing: 0.26em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 12px; display: flex; align-items: center; gap: 10px;
+}
+.slabel::after { content: ''; flex: 1; height: 1px; background: var(--dim); }
+
+.cards-pool {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 8px; margin-bottom: 36px; min-height: 80px;
+  border: 1px dashed var(--dim); border-radius: 10px; padding: 14px;
+  transition: border-color .2s;
+}
+.cards-pool.sel { border-color: rgba(0,158,142,0.3); }
+
+.ecard {
+  display: flex; gap: 11px; align-items: flex-start;
+  background: var(--navy-mid); border: 1px solid var(--dim); border-radius: 8px;
+  padding: 13px 15px; cursor: pointer; transition: all .15s; user-select: none;
+  position: relative; overflow: hidden;
+}
+.ecard::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+  background: var(--teal); transform: scaleY(0); transform-origin: center; transition: transform .2s;
+}
+.ecard:hover { border-color: rgba(0,158,142,0.4); }
+.ecard:hover::before { transform: scaleY(1); }
+.ecard.selected { border-color: var(--teal); background: rgba(0,158,142,0.07); box-shadow: 0 0 0 1px var(--teal); }
+.ecard.selected::before { transform: scaleY(1); }
+.ecard.placed { opacity: 0.22; pointer-events: none; }
+.ecard .ci { font-size: 20px; line-height: 1; flex-shrink: 0; margin-top: 2px; }
+.ecard .ct { font-size: 12px; color: #7A98B0; line-height: 1.5; font-weight: 500; }
+.ecard .cbadge {
+  position: absolute; top: 6px; right: 8px;
+  font-size: 9px; padding: 1px 6px; border-radius: 3px;
+  font-weight: 700; letter-spacing: 0.06em;
+}
+.cbadge.brasil { background: rgba(245,164,32,0.15); color: var(--gold); }
+.cbadge.global { background: rgba(0,158,142,0.12); color: var(--teal); }
+
+/* ── TIMELINE ── */
+.taxlabel {
+  display: flex; justify-content: space-between;
+  font-size: 10px; color: var(--dim); letter-spacing: 0.14em;
+  text-transform: uppercase; margin-bottom: 8px;
+}
+.track { position: relative; margin-bottom: 30px; }
+.trackline {
+  position: absolute; top: 50%; left: 16px; right: 16px;
+  height: 1px; background: var(--dim); transform: translateY(-50%);
+  z-index: 0;
+}
+.trackline::before, .trackline::after {
+  content: ''; position: absolute; top: 50%;
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--dim); transform: translateY(-50%);
+}
+.trackline::before { left: -2px; }
+.trackline::after { right: -2px; }
+
+.slots-row {
+  display: grid; gap: 5px; position: relative; z-index: 1;
+}
+
+.slot {
+  min-height: 104px; border: 1px dashed var(--dim); border-radius: 8px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  cursor: pointer; transition: all .15s; position: relative;
+  background: rgba(255,255,255,0.01); padding: 7px 5px;
+}
+.slot-n {
+  font-size: 10px; font-weight: 700; color: var(--dim); letter-spacing: 0.06em;
+  position: absolute; bottom: 5px; left: 0; right: 0; text-align: center;
+}
+.slot.ready { border-color: rgba(0,158,142,0.3); background: rgba(0,158,142,0.04); }
+.slot.filled { border-style: solid; border-color: var(--dim); cursor: default; }
+.slot.correct-slot { border-color: var(--teal) !important; background: rgba(0,158,142,0.1) !important; }
+.slot.wrong-slot { border-color: var(--danger) !important; background: rgba(226,75,74,0.06) !important; }
+
+.mini {
+  display: flex; flex-direction: column; align-items: center;
+  text-align: center; gap: 4px; cursor: pointer; width: 100%;
+}
+.mini .micon { font-size: 17px; }
+.mini .mtxt { font-size: 10px; color: #5A7A8E; line-height: 1.4; font-weight: 500; }
+.mini .mbadge { font-size: 9px; padding: 1px 6px; border-radius: 3px; font-weight: 700; letter-spacing: 0.04em; margin-bottom: 2px; display: none; }
+.mbadge.show { display: inline-block; }
+.mbadge.ok { background: var(--teal); color: var(--navy); }
+.mbadge.bad { background: var(--danger); color: #fff; }
+
+/* ── CONTROLS ── */
+.controls { display: flex; gap: 10px; justify-content: center; margin-bottom: 36px; }
+.btn { padding: 11px 24px; font-size: 13px; font-weight: 700; letter-spacing: 0.06em;
+  border: none; border-radius: 4px; cursor: pointer; transition: all .15s; font-family: inherit; }
+.btn-primary { background: var(--teal); color: var(--navy); }
+.btn-primary:hover:not(:disabled) { background: #00b8a6; }
+.btn-primary:disabled { opacity: 0.3; cursor: not-allowed; }
+.btn-ghost { background: transparent; border: 1px solid var(--dim); color: var(--muted); }
+.btn-ghost:hover { border-color: var(--teal); color: var(--teal); }
+
+/* ── RESULTS ── */
+.results-panel {
+  display: none; background: var(--navy-deep); border: 1px solid var(--dim);
+  border-radius: 12px; padding: 26px; animation: up .3s ease;
+}
+.results-panel.show { display: block; }
+@keyframes up { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
+
+.rhead { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 10px; margin-bottom: 6px; }
+.rhead h2 { font-family: 'DM Serif Display', serif; font-size: 24px; font-weight: 400; }
+.rhead h2 em { font-style: italic; color: var(--teal); }
+.rsub { font-size: 13px; color: var(--muted); margin-bottom: 20px; }
+
+.dots { display: flex; justify-content: center; gap: 6px; margin-bottom: 18px; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--dim); transition: background .3s; }
+.dot.lit { background: var(--teal); }
+
+.ritems { display: flex; flex-direction: column; gap: 8px; margin-bottom: 22px; }
+.ritem {
+  display: grid; grid-template-columns: 60px 1fr; gap: 11px;
+  align-items: start; padding: 13px; border-radius: 8px; border: 1px solid transparent;
+}
+.ritem.ok { background: rgba(0,158,142,0.06); border-color: rgba(0,158,142,0.18); }
+.ritem.bad { background: rgba(226,75,74,0.05); border-color: rgba(226,75,74,0.14); }
+.ryear { font-size: 17px; font-weight: 900; letter-spacing: -0.02em; line-height: 1.1; }
+.ok .ryear { color: var(--teal); }
+.bad .ryear { color: var(--danger); }
+.rbody {}
+.rtitle { font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 3px; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.rbadge { font-size: 9px; padding: 1px 6px; border-radius: 3px; font-weight: 700; }
+.rbadge-br { background: rgba(245,164,32,0.2); color: var(--gold); }
+.rbadge-gl { background: rgba(0,158,142,0.15); color: var(--teal); }
+.rdetail { font-size: 12px; color: #4A6888; line-height: 1.6; }
+
+.ract { display: flex; gap: 10px; justify-content: center; }
+</style>
+</head>
+<body>
+
+<header class="quest-topbar" role="banner">
+  <a href="/" class="quest-logo" aria-label="ACMP Brasil — página inicial">
+    <img src="/img/logo-acmp-brasil.png" alt="ACMP Brasil">
+  </a>
+  <a href="/membros/" class="quest-back" aria-label="Voltar à Área do Associado">
+    <span class="quest-back-arrow" aria-hidden="true">←</span>
+    <span>Área do Associado</span>
+  </a>
+</header>
+
+<div class="wrap">
+
+<div class="header">
+  <div class="logo-mark">
+    <svg width="13" height="11" viewBox="0 0 20 17"><polygon points="10,0 20,17 0,17" fill="#F5A420"/></svg>
+    <span class="lt">CMP</span>
+    <span class="lb">BRASIL 🇧🇷</span>
+  </div>
+  <h1>Linha do Tempo da<br><em>Gestão de Mudanças</em></h1>
+  <p>Ordene os marcos históricos da disciplina — do mais antigo ao mais recente.</p>
+  <div class="mode-tabs">
+    <button class="mode-tab active" onclick="setMode('easy')">Fácil · 6 eventos</button>
+    <button class="mode-tab" onclick="setMode('normal')">Normal · 8 eventos</button>
+    <button class="mode-tab" onclick="setMode('hard')">Difícil · 10 eventos</button>
+  </div><br><br>
+  <div class="stat-row">
+    <div><strong id="rnd">1</strong>Rodada</div>
+    <div><strong id="scr">—</strong>Pontuação</div>
+    <div><strong id="best">0</strong>Recorde</div>
+  </div>
+</div>
+
+<div class="hint" id="hint">Selecione um evento para começar</div>
+
+<div class="slabel">Eventos (em ordem aleatória)</div>
+<div class="cards-pool" id="pool"></div>
+
+<div class="taxlabel"><span>← mais antigo</span><span>mais recente →</span></div>
+<div class="track">
+  <div class="trackline"></div>
+  <div class="slots-row" id="srow"></div>
+</div>
+
+<div class="controls">
+  <button class="btn btn-ghost" onclick="reset()">↺ Reiniciar</button>
+  <button class="btn btn-primary" id="chk" onclick="check()" disabled>Verificar →</button>
+</div>
+
+<div class="results-panel" id="results">
+  <div class="rhead">
+    <h2 id="rtitle"></h2>
+    <div class="dots" id="rdots"></div>
+  </div>
+  <div class="rsub" id="rsub"></div>
+  <div class="ritems" id="ritems"></div>
+  <div class="ract">
+    <button class="btn btn-ghost" onclick="reset()">↺ Jogar novamente</button>
+    <button class="btn btn-primary" onclick="nextRound()">Nova rodada →</button>
+  </div>
+</div>
+
+</div>
+<script>
+const ALL_EVENTS = [
+  // FÁCIL (6 eventos) — marco global + brasil
+  { id:'e1', year:1947, icon:'🧠', label:'fácil',
+    badge:'global',
+    short:'Lewin publica o modelo Unfreeze–Change–Refreeze',
+    detail:'Kurt Lewin, pai da psicologia social, publica sua teoria de mudança em 3 etapas — a base de quase todos os modelos modernos de Gestão de Mudanças.' },
+  { id:'e2', year:1996, icon:'📖', label:'fácil',
+    badge:'global',
+    short:'Kotter publica "Leading Change" — os 8 passos',
+    detail:'O livro mais influente da história da GM, com mais de 1 milhão de cópias vendidas. Define o vocabulário que toda organização usa até hoje.' },
+  { id:'e3', year:2011, icon:'🌐', label:'fácil',
+    badge:'global',
+    short:'Fundação da ACMP Global + 1ª Conferência em Orlando',
+    detail:'Lançamento oficial da ACMP em fevereiro de 2011, com a 1ª Global Conference em maio em Orlando — keynote de John Kotter. Marco da era profissional da disciplina.' },
+  { id:'e4', year:2014, icon:'📋', label:'fácil',
+    badge:'global',
+    short:'Standard for Change Management v1 publicado pela ACMP',
+    detail:'Resultado de 1.100+ profissionais de 57 países. Primeiro documento de referência neutro em metodologia para a disciplina de GM no mundo.' },
+  { id:'e5', year:2017, icon:'🇧🇷', label:'fácil',
+    badge:'brasil',
+    short:'Fundação oficial do Chapter ACMP Brasil',
+    detail:'A ACMP Global reconhece oficialmente o chapter brasileiro. 1ª diretoria formada por Fabiano Sannino, Emerson Zuccherato, Isis Moda Pires, Daniel Druwe Araujo, Armando Kokitsu e Geni Elisabeth Esteves.' },
+  { id:'e6', year:2026, icon:'💻', label:'fácil',
+    badge:'brasil',
+    short:'ACMP Brasil lança o novo site acmpbrasil.org.br',
+    detail:'Novo hub digital da maior comunidade de Change Management do Brasil — com área do associado, certificações, agenda e recursos exclusivos para membros.' },
+
+  // NORMAL (8 eventos) — adicionam 2 marcos
+  { id:'e7', year:2003, icon:'🧩', label:'normal',
+    badge:'global',
+    short:'ADKAR formalizado como modelo de GM individual',
+    detail:'A Prosci publica o ADKAR (Awareness, Desire, Knowledge, Ability, Reinforcement) como framework estruturado. Hoje é o modelo individual de mudança mais usado no mundo — presente em +80 países.' },
+  { id:'e8', year:2016, icon:'🏅', label:'normal',
+    badge:'brasil',
+    short:'Fabiano Sannino e Daniel Araujo — primeiros CCMPs do Brasil',
+    detail:'Os dois profissionais pioneiros obtêm a Certified Change Management Professional® no Brasil, abrindo caminho para a certificação da comunidade brasileira de GM.' },
+
+  // DIFÍCIL (10 eventos) — adicionam 2 marcos históricos
+  { id:'e9', year:1994, icon:'🔬', label:'hard',
+    badge:'global',
+    short:'Prosci é fundada por Jeff Hiatt',
+    detail:'Ex-engenheiro da Bell Labs, Jeff Hiatt cria a Prosci como empresa de pesquisa em GM — que se tornaria a maior empresa mundial dedicada à disciplina, com +3 milhões de praticantes certificados.' },
+  { id:'e10', year:2019, icon:'🎤', label:'hard',
+    badge:'brasil',
+    short:'1ª Conferência ACMP Brasil em São Paulo (~200 pessoas)',
+    detail:'Primeiro grande evento presencial do chapter brasileiro, reunindo cerca de 200 profissionais de GM em São Paulo. Marco da consolidação da comunidade nacional.' },
+];
+
+const MODES = { easy:6, normal:8, hard:10 };
+const ORDINALS = ['1º','2º','3º','4º','5º','6º','7º','8º','9º','10º'];
+const MSGS = ['Continue estudando!','Quase lá!','Boa tentativa!','Bem vindo!','Muito bem!','Quase perfeito!','Perfeito! 🎉'];
+
+let mode='easy', n=6, shuffled=[], slots=[], sel=null, round=1, best=0, answered=false;
+
+function setMode(m){
+  if(answered) return;
+  mode=m; n=MODES[m];
+  document.querySelectorAll('.mode-tab').forEach((b,i)=>b.classList.toggle('active', ['easy','normal','hard'][i]===m));
+  document.getElementById('srow').style.gridTemplateColumns=`repeat(${n}, 1fr)`;
+  init();
+}
+
+function pool(){
+  const labels = { easy:['fácil'], normal:['fácil','normal'], hard:['fácil','normal','hard'] }[mode];
+  return ALL_EVENTS.filter(e=>labels.includes(e.label));
+}
+
+function shuffle(a){ const b=[...a]; for(let i=b.length-1;i>0;i--){const j=0|Math.random()*(i+1);[b[i],b[j]]=[b[j],b[i]];} return b; }
+
+function init(){
+  shuffled=shuffle(pool()); slots=new Array(n).fill(null);
+  sel=null; answered=false;
+  document.getElementById('results').classList.remove('show');
+  document.getElementById('chk').disabled=true;
+  document.getElementById('rnd').textContent=round;
+  document.getElementById('scr').textContent='—';
+  document.getElementById('srow').style.gridTemplateColumns=`repeat(${n}, 1fr)`;
+  hint('Selecione um evento para começar');
+  render();
+}
+
+function hint(t,on=false){ const h=document.getElementById('hint'); h.textContent=t; h.className='hint'+(on?' on':''); }
+
+function render(){ rPool(); rSlots(); }
+
+function rPool(){
+  const p=document.getElementById('pool');
+  p.className='cards-pool'+(sel?' sel':'');
+  p.innerHTML='';
+  shuffled.forEach(ev=>{
+    const inSlot=slots.some(s=>s&&s.id===ev.id);
+    const isSel=sel&&sel.id===ev.id;
+    const c=document.createElement('div');
+    c.className='ecard'+(inSlot?' placed':'')+(isSel?' selected':'');
+    c.innerHTML=`
+      <div class="cbadge ${ev.badge==='brasil'?'brasil':'global'}">${ev.badge==='brasil'?'BR':'GL'}</div>
+      <div class="ci">${ev.icon}</div>
+      <div class="ct">${ev.short}</div>`;
+    if(!inSlot) c.onclick=()=>pick(ev);
+    p.appendChild(c);
+  });
+}
+
+function rSlots(){
+  const g=document.getElementById('srow');
+  g.innerHTML='';
+  for(let i=0;i<n;i++){
+    const ev=slots[i];
+    const s=document.createElement('div');
+    s.className='slot'+(ev?' filled':'')+((!ev&&sel)?' ready':'');
+    s.dataset.i=i;
+    if(ev){
+      s.innerHTML=`<div class="mini" onclick="unplace(${i},event)">
+        <div class="mbadge" id="mb-${i}"></div>
+        <div class="micon">${ev.icon}</div>
+        <div class="mtxt">${ev.short}</div>
+      </div><div class="slot-n">${ORDINALS[i]}</div>`;
+    } else {
+      s.innerHTML=`<div class="slot-n">${ORDINALS[i]}</div>`;
+      s.onclick=()=>place(i);
+    }
+    g.appendChild(s);
+  }
+}
+
+function pick(ev){
+  sel=(sel&&sel.id===ev.id)?null:ev;
+  hint(sel?`"${ev.short.substring(0,44)}…" — clique em um slot`:'Selecione um evento para começar',!!sel);
+  render();
+}
+
+function place(i){
+  if(!sel||slots[i]) return;
+  slots[i]=sel; sel=null;
+  const f=slots.filter(Boolean).length;
+  hint(f===n?'Tudo preenchido! Clique em Verificar':`${f}/${n} posicionados`);
+  render();
+  document.getElementById('chk').disabled=slots.some(s=>!s);
+}
+
+function unplace(i,e){
+  if(answered) return;
+  e.stopPropagation();
+  sel=slots[i]; slots[i]=null;
+  hint(`"${sel.short.substring(0,44)}…" — escolha um slot`,true);
+  document.getElementById('chk').disabled=true;
+  render();
+}
+
+function check(){
+  answered=true;
+  const correct=[...pool()].sort((a,b)=>a.year-b.year);
+  let score=0;
+  document.querySelectorAll('.slot').forEach((el,i)=>{
+    const ev=slots[i];
+    const ok=ev&&ev.id===correct[i].id;
+    if(ok) score++;
+    el.classList.add(ok?'correct-slot':'wrong-slot');
+    const mb=el.querySelector(`#mb-${i}`);
+    if(mb){ mb.textContent=ev.year; mb.className=`mbadge show ${ok?'ok':'bad'}`; }
+  });
+  if(score>best) best=score;
+  document.getElementById('best').textContent=`${best}/${n}`;
+  document.getElementById('scr').textContent=`${score}/${n}`;
+  document.getElementById('chk').disabled=true;
+  buildResults(score, correct);
+}
+
+function buildResults(score, correct){
+  const panel=document.getElementById('results');
+  const msgs=['Continue estudando!','Quase lá!','Boa tentativa!','Bom!','Muito bem!','Quase perfeito!','Perfeito! 🎉'];
+  document.getElementById('rtitle').innerHTML=`${msgs[score]||'Resultado'} — <em>${score}/${n}</em>`;
+  document.getElementById('rsub').textContent=`Você acertou ${score} de ${n} marcos históricos da Gestão de Mudanças.`;
+
+  const dots=document.getElementById('rdots');
+  dots.innerHTML='';
+  for(let i=0;i<n;i++){
+    const d=document.createElement('div');
+    d.className='dot'+(i<score?' lit':'');
+    dots.appendChild(d);
+  }
+
+  const list=document.getElementById('ritems');
+  list.innerHTML='';
+  correct.forEach((ev,i)=>{
+    const placed=slots[i];
+    const ok=placed&&placed.id===ev.id;
+    const item=document.createElement('div');
+    item.className=`ritem ${ok?'ok':'bad'}`;
+    item.innerHTML=`
+      <div class="ryear">${ev.year}</div>
+      <div class="rbody">
+        <div class="rtitle">
+          <span>${ev.icon}</span>
+          <span>${ev.short}</span>
+          <span class="rbadge ${ev.badge==='brasil'?'rbadge-br':'rbadge-gl'}">${ev.badge==='brasil'?'BRASIL 🇧🇷':'GLOBAL'}</span>
+        </div>
+        <div class="rdetail">${ev.detail}</div>
+      </div>`;
+    list.appendChild(item);
+  });
+
+  panel.classList.add('show');
+  setTimeout(()=>panel.scrollIntoView({behavior:'smooth',block:'start'}),100);
+}
+
+function reset(){ init(); window.scrollTo({top:0,behavior:'smooth'}); }
+function nextRound(){ round++; document.getElementById('rnd').textContent=round; init(); window.scrollTo({top:0,behavior:'smooth'}); }
+
+// boot
+document.getElementById('srow').style.gridTemplateColumns=`repeat(${n}, 1fr)`;
+init();
+</script>
+</body>
+</html>
