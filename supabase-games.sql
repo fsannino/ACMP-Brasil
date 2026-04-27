@@ -34,45 +34,21 @@ CREATE TABLE IF NOT EXISTS game_feedback (
     created_at    TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Atualiza CHECK pré-existente, se necessário (idempotente)
+-- Atualiza CHECK pré-existente para incluir change-manager-simulator (idempotente)
 ALTER TABLE game_feedback DROP CONSTRAINT IF EXISTS game_feedback_game_id_check;
 ALTER TABLE game_feedback ADD CONSTRAINT game_feedback_game_id_check
     CHECK (game_id IN ('quiz-cm','acmp-quest','linha-do-tempo','change-manager-simulator'));
-
--- 3. Liberação de jogos por categoria de público (admin controla)
---    Cada flag indica se a audiência tem permissão de visualizar/jogar.
-CREATE TABLE IF NOT EXISTS game_access_settings (
-    game_id            TEXT PRIMARY KEY
-                       CHECK (game_id IN ('quiz-cm','acmp-quest','linha-do-tempo','change-manager-simulator')),
-    public_enabled     BOOLEAN NOT NULL DEFAULT TRUE,   -- visitante anônimo
-    community_enabled  BOOLEAN NOT NULL DEFAULT TRUE,   -- identificado (nome+e-mail) ou cadastrado não-associado
-    member_enabled     BOOLEAN NOT NULL DEFAULT TRUE,   -- associado ACMP ativo
-    volunteer_enabled  BOOLEAN NOT NULL DEFAULT TRUE,   -- voluntário (role=volunteer)
-    certified_enabled  BOOLEAN NOT NULL DEFAULT TRUE,   -- CCMP certificado
-    updated_at         TIMESTAMPTZ DEFAULT NOW(),
-    updated_by         UUID REFERENCES auth.users(id) ON DELETE SET NULL
-);
-
--- Pré-popula com tudo liberado (idempotente)
-INSERT INTO game_access_settings (game_id) VALUES
-    ('quiz-cm'),
-    ('acmp-quest'),
-    ('linha-do-tempo'),
-    ('change-manager-simulator')
-ON CONFLICT (game_id) DO NOTHING;
 
 CREATE INDEX IF NOT EXISTS idx_game_feedback_game ON game_feedback (game_id, created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_game_feedback_rating ON game_feedback (rating);
 
 -- ============================================
--- ROW LEVEL SECURITY
+-- ROW LEVEL SECURITY (game_players, game_feedback)
 -- ============================================
 
-ALTER TABLE game_players         ENABLE ROW LEVEL SECURITY;
-ALTER TABLE game_feedback        ENABLE ROW LEVEL SECURITY;
-ALTER TABLE game_access_settings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE game_players  ENABLE ROW LEVEL SECURITY;
+ALTER TABLE game_feedback ENABLE ROW LEVEL SECURITY;
 
--- Anyone can register / update their own row (anon insert via apikey)
 DROP POLICY IF EXISTS "Anyone insert player"  ON game_players;
 DROP POLICY IF EXISTS "Anyone update player"  ON game_players;
 DROP POLICY IF EXISTS "Admins read players"   ON game_players;
@@ -88,7 +64,6 @@ CREATE POLICY "Admins read players" ON game_players
         EXISTS (SELECT 1 FROM member_profiles WHERE id = auth.uid() AND role = 'admin')
     );
 
--- Anyone can submit feedback; only admins read aggregated
 DROP POLICY IF EXISTS "Anyone insert feedback" ON game_feedback;
 DROP POLICY IF EXISTS "Admins read feedback"   ON game_feedback;
 
@@ -97,21 +72,6 @@ CREATE POLICY "Anyone insert feedback" ON game_feedback
 
 CREATE POLICY "Admins read feedback" ON game_feedback
     FOR SELECT USING (
-        EXISTS (SELECT 1 FROM member_profiles WHERE id = auth.uid() AND role = 'admin')
-    );
-
--- game_access_settings: leitura pública (frontend filtra cards),
--- escrita apenas por admins.
-DROP POLICY IF EXISTS "Anyone read game access"   ON game_access_settings;
-DROP POLICY IF EXISTS "Admins write game access"  ON game_access_settings;
-
-CREATE POLICY "Anyone read game access" ON game_access_settings
-    FOR SELECT USING (true);
-
-CREATE POLICY "Admins write game access" ON game_access_settings
-    FOR ALL USING (
-        EXISTS (SELECT 1 FROM member_profiles WHERE id = auth.uid() AND role = 'admin')
-    ) WITH CHECK (
         EXISTS (SELECT 1 FROM member_profiles WHERE id = auth.uid() AND role = 'admin')
     );
 
@@ -149,15 +109,16 @@ CREATE TABLE IF NOT EXISTS game_access_settings (
 );
 
 INSERT INTO game_access_settings (game_id, allowed_audiences, enabled) VALUES
-    ('quiz-cm',        ARRAY['public','community','member','volunteer','ccmp'], TRUE),
-    ('acmp-quest',     ARRAY['public','community','member','volunteer','ccmp'], TRUE),
-    ('linha-do-tempo', ARRAY['public','community','member','volunteer','ccmp'], TRUE)
+    ('quiz-cm',                  ARRAY['public','community','member','volunteer','ccmp'], TRUE),
+    ('acmp-quest',               ARRAY['public','community','member','volunteer','ccmp'], TRUE),
+    ('linha-do-tempo',           ARRAY['public','community','member','volunteer','ccmp'], TRUE),
+    ('change-manager-simulator', ARRAY['public','community','member','volunteer','ccmp'], TRUE)
 ON CONFLICT (game_id) DO NOTHING;
 
 ALTER TABLE game_access_settings ENABLE ROW LEVEL SECURITY;
 
-DROP POLICY IF EXISTS "Anyone read access settings" ON game_access_settings;
-DROP POLICY IF EXISTS "Admins write access settings" ON game_access_settings;
+DROP POLICY IF EXISTS "Anyone read access settings"   ON game_access_settings;
+DROP POLICY IF EXISTS "Admins write access settings"  ON game_access_settings;
 DROP POLICY IF EXISTS "Admins update access settings" ON game_access_settings;
 DROP POLICY IF EXISTS "Admins insert access settings" ON game_access_settings;
 
