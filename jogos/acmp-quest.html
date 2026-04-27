@@ -48,7 +48,30 @@ html,body{
 /* prevent text selection on interactive UI, but keep questions/explanations copiable */
 .opt,.match-item,.diff-opt,.mode-card,.btn-primary,.btn-back,.ghost-btn,.next-btn,
 .player-bar,.game-hud,.lb-row,.ach-badge,.boss-intro,.levelup-card,
-.q-category,.q-type-label,.opt-key{user-select:none;-webkit-user-select:none}
+.q-category,.q-type-label,.opt-key,.quest-topbar{user-select:none;-webkit-user-select:none}
+
+/* ─── INSTITUTIONAL TOPBAR ─── */
+.quest-topbar{
+  position:fixed;top:0;left:0;right:0;z-index:30;
+  display:flex;align-items:center;justify-content:space-between;
+  height:44px;padding:0 18px;
+  background:var(--mid);
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+.quest-topbar a{
+  display:inline-flex;align-items:center;gap:8px;
+  color:rgba(255,255,255,.85);text-decoration:none;
+  font-size:13px;font-weight:500;letter-spacing:.02em;
+  transition:color .15s;
+}
+.quest-topbar a:hover{color:var(--white)}
+.quest-topbar .quest-logo img{height:24px;display:block}
+.quest-topbar .quest-back-arrow{font-size:16px;line-height:1}
+@media (max-width:600px){
+  .quest-topbar{height:40px;padding:0 12px}
+  .quest-topbar a{font-size:12px}
+  .quest-topbar .quest-logo img{height:20px}
+}
 
 /* ─── SUBTLE GRADIENT OVERLAY (institucional) ─── */
 body::before{
@@ -62,9 +85,10 @@ body::before{
   position:fixed;inset:0;
   display:flex;flex-direction:column;
   align-items:center;justify-content:center;
-  padding:20px;
+  padding:64px 20px 20px;
   transition:opacity .3s,transform .3s;
 }
+@media (max-width:600px){.screen{padding:56px 16px 16px}}
 .screen.hidden{opacity:0;pointer-events:none;transform:scale(.97)}
 .screen.active{opacity:1;pointer-events:all;transform:scale(1)}
 
@@ -231,20 +255,21 @@ body::before{
 /* ════════════════════════════════
    GAME SCREEN
 ════════════════════════════════ */
-#gameScreen{z-index:10;padding:0}
+#gameScreen{z-index:10;padding:44px 0 0}
+@media (max-width:600px){#gameScreen{padding-top:40px}}
 
 .game-hud{
-  position:fixed;top:0;left:0;right:0;z-index:20;
+  position:fixed;top:44px;left:0;right:0;z-index:20;
   display:flex;align-items:center;gap:16px;flex-wrap:wrap;
-  background:rgba(6,14,26,.9);backdrop-filter:blur(10px);
+  background:rgba(15,36,64,.92);backdrop-filter:blur(10px);
   border-bottom:1px solid var(--dimmer);
   padding:10px 24px;
 }
+@media (max-width:600px){.game-hud{top:40px}}
 @media (max-width:600px){
   .game-hud{gap:10px;padding:8px 12px}
   .hud-mode,.hud-q{font-size:10px}
   .modes-grid{grid-template-columns:1fr;max-width:280px}
-  .question-area{padding-top:96px}
   .question-card{padding:20px 18px}
   .home-footer{flex-wrap:wrap;justify-content:center}
 }
@@ -292,9 +317,10 @@ body::before{
 .question-area{
   position:fixed;inset:0;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding:80px 20px 20px;
+  padding:124px 20px 20px;
   z-index:10;
 }
+@media (max-width:600px){.question-area{padding-top:140px}}
 
 /* CATEGORY TAG */
 .q-category{
@@ -997,6 +1023,16 @@ body::before{
 </style>
 </head>
 <body>
+
+<header class="quest-topbar" role="banner">
+  <a href="/" class="quest-logo" aria-label="ACMP Brasil — página inicial">
+    <img src="/img/logo-acmp-brasil.png" alt="ACMP Brasil">
+  </a>
+  <a href="/membros/" class="quest-back" aria-label="Voltar à Área do Associado">
+    <span class="quest-back-arrow" aria-hidden="true">←</span>
+    <span>Área do Associado</span>
+  </a>
+</header>
 
 <div class="grid-bg"></div>
 <div id="particles"></div>
