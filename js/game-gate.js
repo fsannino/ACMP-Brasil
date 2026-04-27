@@ -298,7 +298,7 @@
 
         document.getElementById('gg-fb-skip').addEventListener('click', function () {
             markFeedbackDone(opts.gameId);
-            closeModal();
+            showThankYou(opts);
         });
     }
 
@@ -477,8 +477,13 @@
                 }
             }
 
-            // 2) Feedback: 1x por sessão (rating + sugestão).
-            if (feedbackAlreadyDone(opts.gameId)) return;
+            // 2) Feedback: form aparece 1x por sessão (rating + sugestão).
+            //    Se já preencheu/pulou, vai direto para a tela de Obrigado
+            //    (mantém o form de convite acessível em rodadas seguintes).
+            if (feedbackAlreadyDone(opts.gameId)) {
+                showThankYou(opts);
+                return;
+            }
             showFeedbackForm(opts);
         },
 
