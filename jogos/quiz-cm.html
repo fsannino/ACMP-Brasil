@@ -9,6 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="../js/game-gate.js" defer></script>
     <style>
         :root { --primary: #1a3a5c; --primary-light: #2a5a8c; --secondary: #e8a838; --accent: #28a745; --text-dark: #1a1a2e; --text-body: #4a4a5a; --text-light: #6b7280; --bg-white: #fff; --bg-light: #f8f9fc; --border: #e2e8f0; --radius-sm: 6px; --radius-md: 10px; --radius-lg: 16px; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -116,6 +117,17 @@
     var currentQ = 0, score = 0, answered = false;
 
     function startQuiz() {
+        if (window.GameGate) {
+            GameGate.start({
+                gameId: 'quiz-cm',
+                gameTitle: 'Quiz: Gestão de Mudanças',
+                onReady: _startQuizCore
+            });
+        } else {
+            _startQuizCore();
+        }
+    }
+    function _startQuizCore() {
         currentQ = 0; score = 0;
         shuffle(questions);
         document.getElementById('quiz-start').style.display = 'none';
@@ -192,6 +204,15 @@
             '<button class="btn-replay" onclick="startQuiz()"><i class="fas fa-redo"></i> Jogar Novamente</button>' +
             '<a href="/membros/" class="btn-back"><i class="fas fa-arrow-left"></i> Voltar</a>' +
             '</div></div>';
+        if (window.GameGate) {
+            setTimeout(function () {
+                GameGate.finish({
+                    gameId: 'quiz-cm',
+                    gameTitle: 'Quiz: Gestão de Mudanças',
+                    scoreData: { score: score, total: questions.length, percentage: pct }
+                });
+            }, 2200);
+        }
     }
     </script>
 </body>
