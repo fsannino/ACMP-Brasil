@@ -1488,7 +1488,72 @@ const LEVELS = [
 
 function getLevel(xp){let lv=0;for(let i=LEVELS.length-1;i>=0;i--){if(xp>=LEVELS[i].min){lv=i;break;}}return lv;}
 function savePlayer(){localStorage.setItem('acmp_player',JSON.stringify(player));}
-function loadPlayer(){const s=localStorage.getItem('acmp_player');if(s)player=Object.assign(player,JSON.parse(s));}
+function loadPlayer(){
+  const s=localStorage.getItem('acmp_player');if(s)player=Object.assign(player,JSON.parse(s));
+  if(supaIsLogged()) supaLoadProgress().then(ok=>{ if(ok){savePlayer();updateHomeUI();} });
+}
+
+// ══════════════════════════════════════════════════
+//  SUPABASE INTEGRATION (modo híbrido: localStorage + sync se logado)
+// ══════════════════════════════════════════════════
+const SUPA_URL='https://yaumzlssybzoipwmllqy.supabase.co';
+const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlhdW16bHNzeWJ6b2lwd21sbHF5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU5MTcwMTEsImV4cCI6MjA5MTQ5MzAxMX0.GWK1jnlEmgxWmeWk1VGwR25fLBvquWtrkQ4ipq_A3RU';
+
+function supaToken(){return localStorage.getItem('sb-token');}
+function supaUser(){try{return JSON.parse(localStorage.getItem('sb-user'));}catch(e){return null;}}
+function supaIsLogged(){return !!(supaToken()&&supaUser());}
+
+function supaHeaders(authed){
+  const h={'Content-Type':'application/json','apikey':SUPA_KEY};
+  h['Authorization']='Bearer '+(authed?supaToken():SUPA_KEY);
+  return h;
+}
+
+async function supaFetch(path, opts){
+  try{
+    const res=await fetch(SUPA_URL+'/rest/v1/'+path, opts);
+    if(!res.ok) return null;
+    const text=await res.text();
+    return text?JSON.parse(text):true;
+  }catch(e){return null;}
+}
+
+async function supaLoadProgress(){
+  const u=supaUser();if(!u)return false;
+  const data=await supaFetch('quiz_progress?select=*&user_id=eq.'+u.id,{headers:supaHeaders(true)});
+  if(!data||!data.length)return false;
+  const p=data[0];
+  player.name=p.display_name||player.name;
+  player.xp=Math.max(player.xp||0, p.xp||0);
+  player.totalScore=Math.max(player.totalScore||0, p.total_score||0);
+  player.achievements=Array.from(new Set([...(player.achievements||[]),...(p.achievements||[])]));
+  return true;
+}
+
+async function supaSaveResult(record, xpEarned, achievements){
+  if(!supaIsLogged())return;
+  const u=supaUser();if(!u)return;
+  // 1) push score row
+  supaFetch('quiz_scores',{
+    method:'POST',headers:Object.assign(supaHeaders(true),{Prefer:'return=minimal'}),
+    body:JSON.stringify(Object.assign({user_id:u.id},record))
+  });
+  // 2) update aggregated progress via RPC
+  supaFetch('rpc/add_quiz_result',{
+    method:'POST',headers:supaHeaders(true),
+    body:JSON.stringify({
+      p_xp:Math.max(0,xpEarned|0),
+      p_score:Math.max(0,record.score|0),
+      p_display_name:record.display_name,
+      p_new_achievements:achievements||[]
+    })
+  });
+}
+
+async function supaFetchLeaderboard(limit){
+  const data=await supaFetch('quiz_leaderboard?select=*&order=score.desc&limit='+(limit||10),{headers:supaHeaders(false)});
+  return Array.isArray(data)?data:null;
+}
 
 // ══════════════════════════════════════════════════
 //  GAME STATE
@@ -1540,7 +1605,8 @@ function goHome(){clearTimer();showScreen('homeScreen');updateHomeUI();showProfe
 function updateHomeUI(){
   const lv=getLevel(player.xp);const lvData=LEVELS[lv];
   document.getElementById('playerNameDisp').textContent=player.name;
-  document.getElementById('playerLevelDisp').textContent=`Nível ${lv+1} · ${lvData.name}`;
+  const sync=supaIsLogged()?' · 🌐 Sincronizado':'';
+  document.getElementById('playerLevelDisp').textContent=`Nível ${lv+1} · ${lvData.name}${sync}`;
   document.getElementById('playerAvatar').textContent=lvData.icon;
   document.getElementById('totalScoreDisp').textContent=player.totalScore.toLocaleString();
   const xpBase=LEVELS[lv].min;
@@ -1875,6 +1941,16 @@ function endGame(bossFail=false){
   player.highScores.push({name:player.name,score:gScore,mode:gMode,date:new Date().toLocaleDateString('pt-BR')});
   player.highScores.sort((a,b)=>b.score-a.score);player.highScores=player.highScores.slice(0,20);
   savePlayer();
+  // Sync to Supabase if user is logged in (silent failure → localStorage continues)
+  if(supaIsLogged() && !bossFail){
+    supaSaveResult({
+      display_name:player.name,
+      mode:gMode,
+      difficulty:(gMode==='boss'||gMode==='connect')?null:gDiff,
+      score:gScore,correct:gCorrect,total_questions:totalQ,
+      max_streak:gMaxStreak,grade:String(grade)
+    }, xpEarned, newAch);
+  }
   if(pct>=.75&&!bossFail)spawnConfetti();
   showScreen('resultScreen');
   // Professor result comment
@@ -1968,16 +2044,36 @@ function spawnConfetti(){
 // ══════════════════════════════════════════════════
 function escapeHTML(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 
-function showLB(){
+async function showLB(){
   const lb=document.getElementById('lbContent');
-  if(!player.highScores.length){lb.innerHTML='<div style="text-align:center;color:var(--dim);font-size:12px;padding:20px">Nenhuma partida registrada ainda.</div>';}
-  else{lb.innerHTML=player.highScores.slice(0,10).map((s,i)=>`
-    <div class="lb-row">
-      <div class="lb-rank ${i===0?'r1':i===1?'r2':i===2?'r3':''}">${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</div>
-      <div><div class="lb-name">${escapeHTML(s.name)}</div><div class="lb-mode">${escapeHTML((s.mode||'').toUpperCase())} · ${escapeHTML(s.date)}</div></div>
-      <div class="lb-score">${Number(s.score||0).toLocaleString()}</div>
-    </div>`).join('');}
   showScreen('lbScreen');
+  lb.innerHTML='<div style="text-align:center;color:var(--dim);font-size:12px;padding:20px">Carregando ranking...</div>';
+
+  // Try Supabase first (global ranking — view is public)
+  const remote=await supaFetchLeaderboard(10);
+  if(remote && remote.length){
+    lb.innerHTML='<div style="font-size:10px;color:var(--teal);text-align:center;letter-spacing:.18em;text-transform:uppercase;margin-bottom:10px">🌐 Ranking global ACMP Brasil</div>'+
+      remote.map((s,i)=>`
+        <div class="lb-row">
+          <div class="lb-rank ${i===0?'r1':i===1?'r2':i===2?'r3':''}">${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</div>
+          <div><div class="lb-name">${escapeHTML(s.display_name)}</div><div class="lb-mode">${escapeHTML((s.mode||'').toUpperCase())}${s.grade?' · '+escapeHTML(s.grade):''}</div></div>
+          <div class="lb-score">${Number(s.score||0).toLocaleString()}</div>
+        </div>`).join('');
+    return;
+  }
+
+  // Fallback: local highScores
+  if(!player.highScores.length){
+    lb.innerHTML='<div style="text-align:center;color:var(--dim);font-size:12px;padding:20px">Nenhuma partida registrada ainda.</div>';
+  } else {
+    lb.innerHTML='<div style="font-size:10px;color:var(--dim);text-align:center;letter-spacing:.18em;text-transform:uppercase;margin-bottom:10px">📱 Ranking deste dispositivo</div>'+
+      player.highScores.slice(0,10).map((s,i)=>`
+        <div class="lb-row">
+          <div class="lb-rank ${i===0?'r1':i===1?'r2':i===2?'r3':''}">${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</div>
+          <div><div class="lb-name">${escapeHTML(s.name)}</div><div class="lb-mode">${escapeHTML((s.mode||'').toUpperCase())} · ${escapeHTML(s.date)}</div></div>
+          <div class="lb-score">${Number(s.score||0).toLocaleString()}</div>
+        </div>`).join('');
+  }
 }
 
 function resetProgress(){
