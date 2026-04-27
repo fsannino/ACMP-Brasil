@@ -90,6 +90,7 @@
         <div class="admin-tabs">
             <button class="admin-tab active" onclick="showAdminTab('members')"><i class="fas fa-users"></i> Membros</button>
             <button class="admin-tab" onclick="showAdminTab('content')"><i class="fas fa-folder"></i> Conteúdo</button>
+            <button class="admin-tab" onclick="showAdminTab('games')"><i class="fas fa-gamepad"></i> Jogos</button>
             <button class="admin-tab" onclick="showAdminTab('import')"><i class="fas fa-file-csv"></i> Importar CSV</button>
         </div>
 
@@ -171,6 +172,37 @@
             </div>
         </div>
 
+        <!-- Games Panel -->
+        <div class="admin-panel" id="panel-games" style="display: none;">
+            <h3>Liberar jogos por categoria de público</h3>
+            <p style="color: var(--text-light); font-size: 0.85rem; margin-bottom: 16px;">
+                Defina quais categorias de público têm acesso a cada jogo. Categorias não marcadas verão o jogo bloqueado na grade de jogos e serão impedidas de iniciar.
+            </p>
+            <div id="games-alert" class="alert-admin" style="display: none;"></div>
+            <div style="overflow-x: auto;">
+                <table class="admin-table" id="games-access-table">
+                    <thead>
+                        <tr>
+                            <th>Jogo</th>
+                            <th style="text-align:center;">Visitantes<br><small style="font-weight:400;color:var(--text-light);">sem login</small></th>
+                            <th style="text-align:center;">Comunidade</th>
+                            <th style="text-align:center;">Associados</th>
+                            <th style="text-align:center;">Voluntários</th>
+                            <th style="text-align:center;">CCMP®</th>
+                            <th style="text-align:center;">Ativo</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="games-access-tbody">
+                        <tr><td colspan="8" style="text-align:center;padding:30px;color:var(--text-light);">Carregando...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <p style="font-size: 0.78rem; color: var(--text-light); margin-top: 14px;">
+                <i class="fas fa-info-circle"></i> Jogos novos sem registro nesta tabela ficam abertos a todas as categorias por padrão. Clique em <strong>Salvar</strong> para aplicar as mudanças.
+            </p>
+        </div>
+
         <!-- Import Panel -->
         <div class="admin-panel" id="panel-import" style="display: none;">
             <h3>Importar Membros do ACMP Global (CSV)</h3>
@@ -239,13 +271,13 @@
             }
             currentRole = prof.role;
 
-            // Moderators: hide delete buttons, content management, import
+            // Moderators: hide delete buttons, content management, games access, import
             if (currentRole === 'moderator') {
                 document.querySelector('.admin-badge').textContent = 'GESTOR';
-                // Hide content and import tabs
                 var tabs = document.querySelectorAll('.admin-tab');
                 if (tabs[1]) tabs[1].style.display = 'none'; // Content tab
-                if (tabs[2]) tabs[2].style.display = 'none'; // Import tab
+                if (tabs[2]) tabs[2].style.display = 'none'; // Games tab
+                if (tabs[3]) tabs[3].style.display = 'none'; // Import tab
             }
 
             await loadAdminData();
@@ -353,12 +385,74 @@
             else { var data = await res.json(); showAlert('import-alert', (data||0) + ' membros sincronizados!', 'success'); await loadMembersTable(); await loadAdminData(); }
         }
 
+        // ---- Gestão de acesso aos jogos por categoria ----
+        var GAMES_CATALOG = [
+            { id: 'quiz-cm',        name: 'Quiz: Gestão de Mudanças', icon: 'fas fa-question-circle' },
+            { id: 'acmp-quest',     name: 'ACMP Quest',                icon: 'fas fa-trophy' },
+            { id: 'linha-do-tempo', name: 'Linha do Tempo da GM',     icon: 'fas fa-history' }
+        ];
+        var AUDIENCES = [
+            { key: 'public',    color: '#6b7280' },
+            { key: 'community', color: '#2563eb' },
+            { key: 'member',    color: '#16a34a' },
+            { key: 'volunteer', color: '#d97706' },
+            { key: 'ccmp',      color: '#9333ea' }
+        ];
+
+        async function loadGamesAccessTable() {
+            var tbody = document.getElementById('games-access-tbody');
+            tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:20px;color:var(--text-light);">Carregando...</td></tr>';
+            var rows = await supaQ('game_access_settings', '');
+            var byId = {};
+            (rows || []).forEach(function(r){ byId[r.game_id] = r; });
+
+            tbody.innerHTML = GAMES_CATALOG.map(function(g) {
+                var setting = byId[g.id];
+                var allowed = setting && setting.allowed_audiences ? setting.allowed_audiences : ['public','community','member','volunteer','ccmp'];
+                var enabled = !setting || setting.enabled !== false;
+                var checks = AUDIENCES.map(function(a) {
+                    var checked = allowed.indexOf(a.key) !== -1 ? 'checked' : '';
+                    return '<td style="text-align:center;"><input type="checkbox" data-game="' + g.id + '" data-aud="' + a.key + '" ' + checked + ' style="width:18px;height:18px;cursor:pointer;accent-color:' + a.color + ';"></td>';
+                }).join('');
+                var enabledCheck = '<td style="text-align:center;"><input type="checkbox" data-game="' + g.id + '" data-enabled="1" ' + (enabled ? 'checked' : '') + ' style="width:18px;height:18px;cursor:pointer;accent-color:#16a34a;"></td>';
+                return '<tr>' +
+                    '<td><i class="' + g.icon + '" style="color:#1a3a5c;margin-right:6px;"></i><strong>' + g.name + '</strong><br><code style="font-size:0.72rem;color:var(--text-light);">' + g.id + '</code></td>' +
+                    checks +
+                    enabledCheck +
+                    '<td><button class="action-btn approve" onclick="saveGameAccess(\'' + g.id + '\')"><i class="fas fa-save"></i> Salvar</button></td>' +
+                    '</tr>';
+            }).join('');
+        }
+
+        async function saveGameAccess(gameId) {
+            var allowed = [];
+            document.querySelectorAll('input[type=checkbox][data-game="' + gameId + '"][data-aud]').forEach(function(cb) {
+                if (cb.checked) allowed.push(cb.getAttribute('data-aud'));
+            });
+            var enabledCb = document.querySelector('input[type=checkbox][data-game="' + gameId + '"][data-enabled]');
+            var enabled = !enabledCb || enabledCb.checked;
+
+            var existing = await supaQ('game_access_settings', 'game_id=eq.' + encodeURIComponent(gameId));
+            var payload = { allowed_audiences: allowed, enabled: enabled, updated_at: new Date().toISOString() };
+            var ok;
+            if (existing && existing.length) {
+                ok = await supaPatch('game_access_settings', 'game_id=eq.' + encodeURIComponent(gameId), payload);
+            } else {
+                payload.game_id = gameId;
+                var res = await supaPost('game_access_settings', payload);
+                ok = res && res.ok;
+            }
+            showAlert('games-alert', ok ? ('Configuração salva para ' + gameId) : 'Erro ao salvar configuração', ok ? 'success' : 'error');
+        }
+
         function showAdminTab(tab) {
             document.querySelectorAll('.admin-tab').forEach(function(t){t.classList.remove('active');});
             event.target.classList.add('active');
             document.getElementById('panel-members').style.display = tab === 'members' ? 'block' : 'none';
             document.getElementById('panel-content').style.display = tab === 'content' ? 'block' : 'none';
+            document.getElementById('panel-games').style.display = tab === 'games' ? 'block' : 'none';
             document.getElementById('panel-import').style.display = tab === 'import' ? 'block' : 'none';
+            if (tab === 'games') loadGamesAccessTable();
         }
 
         function showAlert(id, msg, type) {

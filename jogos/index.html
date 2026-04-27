@@ -80,8 +80,10 @@
     <main class="games-content">
         <a href="../index.html" class="back-link"><i class="fas fa-arrow-left"></i> Voltar para a página inicial</a>
 
+        <div class="gax-info-banner" id="access-banner" style="display:none;"></div>
+
         <div class="games-grid">
-            <a href="quiz-cm.html" class="game-card quiz" aria-label="Jogar Quiz: Gestão de Mudanças">
+            <a href="quiz-cm.html" class="game-card quiz" data-game-id="quiz-cm" aria-label="Jogar Quiz: Gestão de Mudanças">
                 <div class="game-icon"><i class="fas fa-question-circle"></i></div>
                 <div class="subtitle">Iniciante</div>
                 <h2>Quiz: Gestão de Mudanças</h2>
@@ -94,7 +96,7 @@
                 <span class="play-btn"><i class="fas fa-play"></i> Começar Quiz</span>
             </a>
 
-            <a href="acmp-quest.html" class="game-card quest" aria-label="Jogar ACMP Quest">
+            <a href="acmp-quest.html" class="game-card quest" data-game-id="acmp-quest" aria-label="Jogar ACMP Quest">
                 <span class="featured-badge"><i class="fas fa-star"></i> Novo</span>
                 <div class="game-icon"><i class="fas fa-trophy"></i></div>
                 <div class="subtitle">Avançado · Gamificado</div>
@@ -108,7 +110,7 @@
                 <span class="play-btn"><i class="fas fa-play"></i> Iniciar Missão</span>
             </a>
 
-            <a href="linha-do-tempo.html" class="game-card timeline" aria-label="Jogar Linha do Tempo da GM">
+            <a href="linha-do-tempo.html" class="game-card timeline" data-game-id="linha-do-tempo" aria-label="Jogar Linha do Tempo da GM">
                 <span class="featured-badge"><i class="fas fa-star"></i> Novo</span>
                 <div class="game-icon"><i class="fas fa-history"></i></div>
                 <div class="subtitle">Intermediário · História</div>
@@ -127,5 +129,26 @@
     <footer style="background: var(--primary-dark); color: rgba(255,255,255,0.7); padding: 30px 20px; text-align: center; font-size: 0.85rem;">
         <p>&copy; 2026 ACMP Brasil — Capítulo brasileiro da Association of Change Management Professionals.</p>
     </footer>
+
+    <script src="../js/game-access.js" defer></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        if (!window.GameAccess) return;
+        GameAccess.applyToCatalog({
+            onApplied: function (info) {
+                if (info.lockedCount > 0) {
+                    var banner = document.getElementById('access-banner');
+                    var label = GameAccess.LABELS[info.audience] || info.audience;
+                    if (info.audience === 'public') {
+                        banner.innerHTML = '<i class="fas fa-info-circle"></i><span>Alguns jogos estão restritos. <a href="/membros/login.html" style="color:#1a3a5c;font-weight:600;">Faça login</a> ou identifique-se ao iniciar um jogo para liberar mais opções.</span>';
+                    } else {
+                        banner.innerHTML = '<i class="fas fa-info-circle"></i><span>Você está como <strong>' + label + '</strong>. Alguns jogos podem estar restritos para outras categorias.</span>';
+                    }
+                    banner.style.display = 'flex';
+                }
+            }
+        });
+    });
+    </script>
 </body>
 </html>
