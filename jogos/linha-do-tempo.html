@@ -11,6 +11,7 @@
 <meta property="og:type" content="website">
 <meta property="og:locale" content="pt_BR">
 <link rel="icon" type="image/png" href="/img/logo-acmp-brasil.png">
+<script src="/js/game-gate.js" defer></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700;9..40,900&display=swap');
 
@@ -530,14 +531,31 @@ function buildResults(score, correct){
 
   panel.classList.add('show');
   setTimeout(()=>panel.scrollIntoView({behavior:'smooth',block:'start'}),100);
+
+  if(window.GameGate){
+    setTimeout(()=>GameGate.finish({
+      gameId:'linha-do-tempo',
+      gameTitle:'Linha do Tempo da GM',
+      scoreData:{mode:mode,score:score,total:n,round:round}
+    }), 2500);
+  }
 }
 
 function reset(){ init(); window.scrollTo({top:0,behavior:'smooth'}); }
 function nextRound(){ round++; document.getElementById('rnd').textContent=round; init(); window.scrollTo({top:0,behavior:'smooth'}); }
 
-// boot
-document.getElementById('srow').style.gridTemplateColumns=`repeat(${n}, 1fr)`;
-init();
+// boot — pergunta identidade via GameGate antes de iniciar (defer ⇒ esperar DOMContentLoaded)
+function boot(){
+  document.getElementById('srow').style.gridTemplateColumns=`repeat(${n}, 1fr)`;
+  init();
+}
+document.addEventListener('DOMContentLoaded', function(){
+  if(window.GameGate){
+    GameGate.start({ gameId:'linha-do-tempo', gameTitle:'Linha do Tempo da GM', onReady: boot });
+  } else {
+    boot();
+  }
+});
 </script>
 </body>
 </html>

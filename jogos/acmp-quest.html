@@ -10,6 +10,7 @@
 <meta property="og:type" content="website">
 <meta property="og:locale" content="pt_BR">
 <link rel="icon" type="image/png" href="/img/logo-acmp-brasil.png">
+<script src="/js/game-gate.js" defer></script>
 <title>ACMP Quest — ACMP Brasil</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
@@ -1662,6 +1663,18 @@ function selectDiff(el){
 }
 
 function launchGame(){
+  if(window.GameGate){
+    GameGate.start({
+      gameId:'acmp-quest',
+      gameTitle:'ACMP Quest',
+      onReady:function(p){
+        if(p && p.name && !p.anonymous){ player.name = p.name; savePlayer(); updateHomeUI(); }
+        _launchGameCore();
+      }
+    });
+  } else { _launchGameCore(); }
+}
+function _launchGameCore(){
   const mc=MODE_CONFIG[gMode];
   const dc=DIFF_CONFIG[gDiff]||{bank:'medium',lives:3,timeMult:1};
   let pool;
@@ -1980,6 +1993,13 @@ function endGame(bossFail=false){
   if(reviewBtn) reviewBtn.style.display=gWrongQuestions.length>0?'inline-block':'none';
   updateHomeUI();
   if(newLevel>prevLevel)setTimeout(()=>showLevelUp(newLevel),600);
+  if(window.GameGate){
+    setTimeout(()=>GameGate.finish({
+      gameId:'acmp-quest',
+      gameTitle:'ACMP Quest',
+      scoreData:{mode:gMode,difficulty:gDiff,score:gScore,correct:gCorrect,total:totalQ,grade:String(grade),max_streak:gMaxStreak,xp_earned:xpEarned}
+    }), 2500);
+  }
 }
 
 // ══════════════════════════════════════════════════
@@ -2260,7 +2280,10 @@ setTimeout(()=>{
   showProfessor(true);
 }, 800);
 
-if(!player.name||player.name==='Agente')setTimeout(showNameModal,600);
+// O GameGate (../js/game-gate.js) já pede nome+e-mail quando o usuário inicia
+// uma partida. Mantemos showNameModal para o botão "Alterar Nome" da home,
+// mas só abrimos automaticamente se o gate não estiver carregado.
+if(!window.GameGate && (!player.name||player.name==='Agente'))setTimeout(showNameModal,600);
 </script>
 
 <!-- ═══════════════ PROF. CM CHARACTER ═══════════════ -->
