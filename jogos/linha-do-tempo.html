@@ -13,6 +13,7 @@
 <link rel="icon" type="image/png" href="/img/logo-acmp-brasil.png">
 <script src="/js/game-gate.js" defer></script>
 <script src="/js/game-access.js" defer></script>
+<script src="/js/leaderboard.js" defer></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700;9..40,900&display=swap');
 
@@ -320,6 +321,7 @@ h1 em { font-style: italic; color: var(--teal); }
   </div>
   <div class="rsub" id="rsub"></div>
   <div class="ritems" id="ritems"></div>
+  <div id="lt-leaderboard" style="margin:24px 0;"></div>
   <div class="ract">
     <button class="btn btn-ghost" onclick="reset()">↺ Jogar novamente</button>
     <button class="btn btn-primary" onclick="nextRound()">Nova rodada →</button>
@@ -533,12 +535,25 @@ function buildResults(score, correct){
   panel.classList.add('show');
   setTimeout(()=>panel.scrollIntoView({behavior:'smooth',block:'start'}),100);
 
+  // Score normalizado para leaderboard: % de acertos da rodada (0–100)
+  var lbScore = Math.round((score / n) * 100);
   if(window.GameGate){
     setTimeout(()=>GameGate.finish({
       gameId:'linha-do-tempo',
       gameTitle:'Linha do Tempo da GM',
+      score: lbScore,
       scoreData:{mode:mode,score:score,total:n,round:round}
     }), 2500);
+  }
+  if(window.Leaderboard){
+    setTimeout(()=>Leaderboard.render({
+      container:'#lt-leaderboard',
+      gameId:'linha-do-tempo',
+      limit:10,
+      theme:'dark',
+      title:'Top jogadores',
+      formatScore: function(r){ return r.score + '%'; }
+    }), 800);
   }
 }
 

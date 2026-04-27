@@ -140,6 +140,16 @@
                 <span class="play-btn"><i class="fas fa-play"></i> Entrar na Simulação</span>
             </a>
         </div>
+
+        <section style="margin:60px 20px 0;">
+            <h2 style="font-size:1.25rem;font-weight:800;color:var(--text-dark);text-align:center;margin-bottom:8px;letter-spacing:-.01em;">Quem está no topo</h2>
+            <p style="font-size:0.9rem;color:var(--text-light);text-align:center;margin-bottom:24px;">Melhor pontuação de cada jogador, por jogo. Identifique-se ao iniciar uma partida para entrar no ranking.</p>
+            <div class="catalog-leaderboards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;">
+                <div id="lb-quiz-cm"></div>
+                <div id="lb-linha-do-tempo"></div>
+                <div id="lb-change-manager-simulator"></div>
+            </div>
+        </section>
     </main>
 
     <footer style="background: var(--primary-dark); color: rgba(255,255,255,0.7); padding: 30px 20px; text-align: center; font-size: 0.85rem;">
@@ -148,8 +158,14 @@
     </footer>
 
     <script src="../js/game-access.js" defer></script>
+    <script src="../js/leaderboard.js" defer></script>
     <script>
     document.addEventListener('DOMContentLoaded', function () {
+        if (window.Leaderboard) {
+            Leaderboard.render({ container:'#lb-quiz-cm',                  gameId:'quiz-cm',                  limit:5, title:'Top 5', formatScore:function(r){return r.score+'%';} });
+            Leaderboard.render({ container:'#lb-linha-do-tempo',           gameId:'linha-do-tempo',           limit:5, title:'Top 5', formatScore:function(r){return r.score+'%';} });
+            Leaderboard.render({ container:'#lb-change-manager-simulator', gameId:'change-manager-simulator', limit:5, title:'Top 5' });
+        }
         if (!window.GameAccess) return;
         GameAccess.applyToCatalog({
             onApplied: function (info) {

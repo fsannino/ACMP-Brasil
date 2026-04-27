@@ -96,6 +96,21 @@
         return supaFetch('game_feedback', payload);
     }
 
+    function saveScoreToSupa(payload) {
+        return supaFetch('game_scores', payload);
+    }
+
+    function buildPlayerPayload(opts) {
+        var player = getStoredPlayer() || {};
+        var member = getMemberSession();
+        return {
+            player_email: (player.email || (member && member.email) || '').toLowerCase() || null,
+            player_name: player.name || (member && member.email ? member.email.split('@')[0] : null),
+            is_member: !!player.isMember || !!member,
+            game_id: opts.gameId
+        };
+    }
+
     /* ============================================
        STYLES (injected once)
        ============================================ */
@@ -333,7 +348,20 @@
 
         finish: function (opts) {
             opts = opts || {};
-            if (feedbackAlreadyDone(opts.gameId)) return; // 1x por sessão
+
+            // 1) Score: gravado SEMPRE que opts.score é numérico, independente do feedback.
+            //    Habilita leaderboard mesmo se o jogador pular o formulário de avaliação.
+            if (typeof opts.score === 'number' && isFinite(opts.score)) {
+                var base = buildPlayerPayload(opts);
+                if (base.player_email && base.player_name) {
+                    base.score = Math.round(opts.score);
+                    base.score_data = opts.scoreData || null;
+                    saveScoreToSupa(base);
+                }
+            }
+
+            // 2) Feedback: 1x por sessão (rating + sugestão).
+            if (feedbackAlreadyDone(opts.gameId)) return;
             showFeedbackForm(opts);
         },
 

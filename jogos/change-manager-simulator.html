@@ -13,6 +13,7 @@
 <link rel="icon" type="image/png" href="/img/logo-acmp-brasil.png">
 <script src="/js/game-gate.js" defer></script>
 <script src="/js/game-access.js" defer></script>
+<script src="/js/leaderboard.js" defer></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@400;500;700;900&display=swap');
 :root{--navy:#0D1E35;--navy2:#112338;--dark:#080F1C;--teal:#009E8E;--gold:#F5A420;--nb:#1B3868;--mu:#2D4A5E;--dim:#1A2E45;--tx:#3D5A72;--lt:#7A98B0;--danger:#E24B4A;--cream:#F5F3EE}
@@ -223,6 +224,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
       <div class="fm"><div class="fm-val" id="ef-sp" style="color:var(--gold)"></div><div class="fm-label">Patrocinador</div></div>
     </div>
     <div class="lesson-box"><div class="lesson-title">Lições do Standard ACMP</div><div id="endLessons"></div></div>
+    <div id="cm-leaderboard" style="max-width:540px;margin:24px auto;text-align:left"></div>
     <div style="display:flex;gap:12px;justify-content:center">
       <button class="btn btn-ghost" onclick="restartGame()">← Menu de casos</button>
       <button class="btn btn-primary" onclick="replayCase()">↺ Jogar mesmo caso</button>
@@ -571,12 +573,25 @@ function showEnding(){
   document.getElementById('endLessons').innerHTML=end.lessons.map(l=>`<div class="lesson-item">${l}</div>`).join('');
   window.scrollTo({top:0,behavior:'smooth'});
 
+  // Score do leaderboard: composto Adoção + (Patrocinador − Resistência), normalizado em 0–100
+  var lbScore = Math.max(0, Math.min(100, Math.round(st.ad + (st.sp - st.re) / 2)));
   if(window.GameGate){
     setTimeout(()=>GameGate.finish({
       gameId:'change-manager-simulator',
       gameTitle:'Change Manager Simulator',
-      scoreData:{ caseId:st.caseId, adoption:st.ad, resistance:st.re, sponsor:st.sp, badge:end.badge }
+      score: lbScore,
+      scoreData:{ caseId:st.caseId, adoption:st.ad, resistance:st.re, sponsor:st.sp, badge:end.badge, composite:lbScore }
     }), 2500);
+  }
+  if(window.Leaderboard){
+    setTimeout(()=>Leaderboard.render({
+      container:'#cm-leaderboard',
+      gameId:'change-manager-simulator',
+      limit:10,
+      theme:'dark',
+      title:'Top Change Managers',
+      formatScore: function(r){ return String(r.score); }
+    }), 800);
   }
 }
 

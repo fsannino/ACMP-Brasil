@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="../js/game-gate.js" defer></script>
     <script src="../js/game-access.js" defer></script>
+    <script src="../js/leaderboard.js" defer></script>
     <style>
         :root { --primary: #1a3a5c; --primary-light: #2a5a8c; --secondary: #e8a838; --accent: #28a745; --text-dark: #1a1a2e; --text-body: #4a4a5a; --text-light: #6b7280; --bg-white: #fff; --bg-light: #f8f9fc; --border: #e2e8f0; --radius-sm: 6px; --radius-md: 10px; --radius-lg: 16px; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -219,6 +220,7 @@
             '<div class="score-value">' + pct + '%</div><div class="score-label">' + score + '/' + questions.length + ' corretas</div></div>' +
             '<div class="score-msg">' + msg + '</div>' +
             '<div class="score-detail">Você acertou ' + score + ' de ' + questions.length + ' perguntas sobre Gestão de Mudanças.</div>' +
+            '<div id="quiz-leaderboard" style="margin:24px 0;"></div>' +
             '<div class="score-actions">' +
             '<button class="btn-replay" onclick="startQuiz()"><i class="fas fa-redo"></i> Jogar Novamente</button>' +
             '<a href="/membros/" class="btn-back"><i class="fas fa-arrow-left"></i> Voltar</a>' +
@@ -228,8 +230,18 @@
                 GameGate.finish({
                     gameId: 'quiz-cm',
                     gameTitle: 'Quiz: Gestão de Mudanças',
+                    score: pct,
                     scoreData: { score: score, total: questions.length, percentage: pct }
                 });
+                if (window.Leaderboard) {
+                    Leaderboard.render({
+                        container: '#quiz-leaderboard',
+                        gameId: 'quiz-cm',
+                        limit: 10,
+                        title: 'Top jogadores',
+                        formatScore: function (r) { return r.score + '%'; }
+                    });
+                }
             }, 2200);
         }
     }
