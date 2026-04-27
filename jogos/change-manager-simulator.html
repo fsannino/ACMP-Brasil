@@ -3,7 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Change Manager Simulator v2 — ACMP Brasil</title>
+<title>Change Manager Simulator — ACMP Brasil</title>
+<meta name="description" content="Coloque-se no papel de um(a) Change Manager e tome decisões em casos reais de transformação organizacional. Cada escolha é guiada pelas 5 áreas de processo do Standard ACMP.">
+<meta name="theme-color" content="#0D1E35">
+<meta property="og:title" content="Change Manager Simulator — ACMP Brasil">
+<meta property="og:description" content="Simulador de decisões de Gestão de Mudanças baseado no Standard ACMP 2ª edição. Múltiplos casos, 3 fases, feedback acionável.">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="pt_BR">
+<link rel="icon" type="image/png" href="/img/logo-acmp-brasil.png">
+<script src="/js/game-gate.js" defer></script>
+<script src="/js/game-access.js" defer></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@400;500;700;900&display=swap');
 :root{--navy:#0D1E35;--navy2:#112338;--dark:#080F1C;--teal:#009E8E;--gold:#F5A420;--nb:#1B3868;--mu:#2D4A5E;--dim:#1A2E45;--tx:#3D5A72;--lt:#7A98B0;--danger:#E24B4A;--cream:#F5F3EE}
@@ -561,11 +570,31 @@ function showEnding(){
   document.getElementById('ef-ad').textContent=st.ad;document.getElementById('ef-re').textContent=st.re;document.getElementById('ef-sp').textContent=st.sp;
   document.getElementById('endLessons').innerHTML=end.lessons.map(l=>`<div class="lesson-item">${l}</div>`).join('');
   window.scrollTo({top:0,behavior:'smooth'});
+
+  if(window.GameGate){
+    setTimeout(()=>GameGate.finish({
+      gameId:'change-manager-simulator',
+      gameTitle:'Change Manager Simulator',
+      scoreData:{ caseId:st.caseId, adoption:st.ad, resistance:st.re, sponsor:st.sp, badge:end.badge }
+    }), 2500);
+  }
 }
 
 function backToIntro(){hideAll();document.getElementById('intro').style.display='block';window.scrollTo({top:0,behavior:'smooth'})}
 function restartGame(){hideAll();showCaseSelect()}
 function replayCase(){startGame()}
+
+// boot — pergunta identidade via GameGate antes de iniciar (defer ⇒ esperar DOMContentLoaded)
+document.addEventListener('DOMContentLoaded', function(){
+  var openGate = function(){
+    if(window.GameGate){
+      GameGate.start({ gameId:'change-manager-simulator', gameTitle:'Change Manager Simulator', onReady:function(){} });
+    }
+  };
+  if(window.GameAccess){
+    GameAccess.guardPage({ gameId:'change-manager-simulator' }).then(function(ok){ if(ok) openGate(); });
+  } else { openGate(); }
+});
 </script>
 </body>
 </html>
