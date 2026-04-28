@@ -50,6 +50,9 @@
         .vol-tag.tag-educacao { background: #e8f5e9; color: #2e7d32; }
         .vol-tag.tag-traducao { background: #f3e5f5; color: #6a1b9a; }
         .vol-tag.tag-branches { background: #fce4ec; color: #c2185b; }
+        .vol-tag.tag-conselho { background: #ede7f6; color: #4527a0; }
+        .vol-bio { font-size: 0.82rem; color: var(--text-body); line-height: 1.55; margin: 0 0 12px; }
+        .vol-city { font-size: 0.78rem; color: var(--text-light); margin-bottom: 10px; }
         .vol-link { display: inline-flex; align-items: center; gap: 6px; color: var(--primary); font-size: 0.82rem; font-weight: 600; }
         .vol-link:hover { text-decoration: underline; }
 
@@ -117,7 +120,7 @@
             <p>A ACMP Brasil é movida por voluntários. Cada evento, conteúdo, tradução ou iniciativa do capítulo é fruto da dedicação de profissionais que escolhem doar seu tempo, conhecimento e energia para fortalecer a Gestão de Mudanças no país. Esta página reconhece e apresenta os voluntários atuantes em nossos comitês e branches regionais.</p>
 
             <div class="stats-row">
-                <div class="stat-block"><span class="stat-num">1</span><span class="stat-lbl">Voluntários Ativos</span></div>
+                <div class="stat-block"><span class="stat-num">2</span><span class="stat-lbl">Voluntários Ativos</span></div>
                 <div class="stat-block"><span class="stat-num">4</span><span class="stat-lbl">Comitês</span></div>
                 <div class="stat-block"><span class="stat-num">5</span><span class="stat-lbl">Branches Regionais</span></div>
                 <div class="stat-block"><span class="stat-num">—</span><span class="stat-lbl">Estados Representados</span></div>
@@ -159,6 +162,7 @@
                 <button class="filter-btn" data-filter="educacao">Educação</button>
                 <button class="filter-btn" data-filter="traducao">Tradução</button>
                 <button class="filter-btn" data-filter="branches">Branches</button>
+                <button class="filter-btn" data-filter="conselho">Conselho</button>
             </div>
 
             <div class="vol-grid" id="vol-grid-active">
@@ -169,6 +173,19 @@
                         <span class="vol-tag tag-eventos">Eventos</span>
                     </div>
                     <a href="https://www.linkedin.com/in/milena-c-01601a2a/" class="vol-link" target="_blank" rel="noopener">
+                        <i class="fab fa-linkedin"></i> LinkedIn
+                    </a>
+                </div>
+                <div class="vol-card" data-tags="educacao conselho">
+                    <div class="vol-avatar">NB</div>
+                    <div class="vol-name">Neusa Bastos</div>
+                    <p class="vol-city"><i class="fas fa-map-marker-alt"></i> São Paulo, SP</p>
+                    <div class="vol-tags">
+                        <span class="vol-tag tag-educacao">Educação</span>
+                        <span class="vol-tag tag-conselho">Conselho Consultivo</span>
+                    </div>
+                    <p class="vol-bio">Professora da PUC-SP e ex-membro do Conselho Consultivo da ACMP Brasil, contribui para o fortalecimento acadêmico e estratégico do capítulo.</p>
+                    <a href="https://www.linkedin.com/in/neusa-bastos-3ba87692" class="vol-link" target="_blank" rel="noopener">
                         <i class="fab fa-linkedin"></i> LinkedIn
                     </a>
                 </div>
