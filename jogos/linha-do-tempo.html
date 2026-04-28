@@ -326,6 +326,9 @@ h1 em { font-style: italic; color: var(--teal); }
     <button class="btn btn-ghost" onclick="reset()">↺ Jogar novamente</button>
     <button class="btn btn-primary" onclick="nextRound()">Nova rodada →</button>
   </div>
+  <div style="text-align:center;margin-top:14px;">
+    <button id="lt-finish-btn" type="button" onclick="ltTriggerFinish()" style="background:transparent;border:0;color:var(--teal);font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;text-decoration:underline;letter-spacing:.04em;opacity:.85;">⭐ Avaliar partida e desafiar amigo</button>
+  </div>
 </div>
 
 </div>
@@ -587,24 +590,34 @@ function buildResults(score, correct){
 
   // Score normalizado para leaderboard: % de acertos da rodada (0–100)
   var lbScore = Math.round((score / n) * 100);
-  if(window.GameGate){
-    setTimeout(()=>GameGate.finish({
-      gameId:'linha-do-tempo',
-      gameTitle:'Linha do Tempo da GM',
-      score: lbScore,
-      scoreData:{mode:mode,score:score,total:n,round:round}
-    }), 2500);
+  ltFinishOpts = {
+    gameId:'linha-do-tempo',
+    gameTitle:'Linha do Tempo da GM',
+    score: lbScore,
+    scoreData:{mode:mode,score:score,total:n,round:round}
+  };
+  if(window.GameGate && typeof GameGate.saveScore === 'function'){
+    GameGate.saveScore(ltFinishOpts);
+    ltFinishOpts.scoreSaved = true;
   }
   if(window.Leaderboard){
-    setTimeout(()=>Leaderboard.render({
+    Leaderboard.render({
       container:'#lt-leaderboard',
       gameId:'linha-do-tempo',
       limit:10,
       theme:'dark',
       title:'Top jogadores',
       formatScore: function(r){ return r.score + '%'; }
-    }), 800);
+    });
   }
+}
+
+let ltFinishOpts = null;
+function ltTriggerFinish(){
+  if(!window.GameGate || !ltFinishOpts) return;
+  var btn = document.getElementById('lt-finish-btn');
+  if(btn){ btn.disabled = true; btn.textContent = 'Carregando…'; }
+  GameGate.finish(ltFinishOpts);
 }
 
 function reset(){ init(); window.scrollTo({top:0,behavior:'smooth'}); }
