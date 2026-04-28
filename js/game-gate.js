@@ -366,8 +366,7 @@
                 '<p class="gg-sub" style="text-align:center;">Seu apoio fortalece a comunidade brasileira de Gestão de Mudanças.</p>' +
                 buildInviteSection(opts) +
                 '<div class="gg-actions">' +
-                    '<a href="/jogos/" class="gg-btn-primary">Outros jogos</a>' +
-                    '<a href="/" class="gg-btn-skip">Voltar para o site</a>' +
+                    '<a href="/jogos/" class="gg-btn-primary">← Voltar para Todos os Jogos</a>' +
                 '</div>' +
             '</div>';
         modal.style.display = 'flex';

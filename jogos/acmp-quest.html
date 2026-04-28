@@ -317,6 +317,18 @@ body::before{
   font-family:var(--font-main);font-size:14px;font-weight:900;
   color:var(--white);letter-spacing:.04em;
 }
+.hint-btn{
+  display:inline-flex;align-items:center;gap:4px;
+  background:rgba(245,164,32,0.15);border:1px solid rgba(245,164,32,0.4);
+  color:#F5A420;font-family:var(--font-main);font-size:12px;font-weight:700;
+  letter-spacing:.04em;padding:4px 10px;border-radius:14px;cursor:pointer;
+  transition:all .15s;user-select:none;
+}
+.hint-btn:hover:not(:disabled){background:rgba(245,164,32,0.25);transform:translateY(-1px)}
+.hint-btn:disabled{opacity:.35;cursor:not-allowed}
+.hint-btn .hint-icon{font-size:14px;line-height:1}
+.opt.hint-eliminated{opacity:.25;pointer-events:none;filter:grayscale(1)}
+.opt.hint-eliminated::after{content:'✗';position:absolute;top:8px;right:10px;color:var(--red);font-weight:900;font-size:18px}
 .score-delta{
   position:fixed;font-family:var(--font-main);font-size:18px;font-weight:900;
   color:var(--green);pointer-events:none;z-index:100;
@@ -1159,9 +1171,9 @@ body::before{
   <a href="/" class="quest-logo" aria-label="ACMP Brasil — página inicial">
     <img src="/img/logo-acmp-brasil.png" alt="ACMP Brasil">
   </a>
-  <a href="/membros/" class="quest-back" aria-label="Voltar à Área do Associado">
+  <a href="/jogos/" class="quest-back" aria-label="Voltar para Todos os Jogos">
     <span class="quest-back-arrow" aria-hidden="true">←</span>
-    <span>Área do Associado</span>
+    <span>Todos os Jogos</span>
   </a>
 </header>
 
@@ -1265,6 +1277,10 @@ body::before{
       <span class="heart" id="h3">❤️</span>
     </div>
     <div class="streak-badge inactive" id="streakBadge" aria-live="polite">🔥 x1</div>
+    <button class="hint-btn" id="hintBtn" type="button" onclick="useHint()" aria-label="Usar dica" title="Eliminar uma opção errada">
+      <span class="hint-icon" aria-hidden="true">💡</span>
+      <span id="hintCount">2</span>
+    </button>
     <div class="timer-wrap" id="timerWrap" style="display:none">
       <div class="timer-ring">
         <svg width="36" height="36" viewBox="0 0 36 36" aria-hidden="true">
@@ -1297,6 +1313,9 @@ body::before{
       <button class="btn-back" onclick="goHome()">← Menu</button>
       <button class="btn-primary" id="reviewBtn" style="display:none" onclick="showReview()">📚 Revisar Erradas</button>
       <button class="btn-primary" onclick="replayGame()">↺ Jogar Novamente</button>
+    </div>
+    <div style="margin-top:14px;text-align:center">
+      <button class="btn-back" id="finishBtn" onclick="triggerFinish()" style="font-size:12px;opacity:.85">⭐ Avaliar partida e desafiar amigo</button>
     </div>
   </div>
 </div>
@@ -2045,7 +2064,7 @@ async function supaFetchLeaderboard(limit){
 //  GAME STATE
 // ══════════════════════════════════════════════════
 let gMode='sprint',gDiff='easy',gQuestions=[],gIdx=0,gScore=0,gLives=3;
-let gStreak=0,gMaxStreak=0,gCorrect=0,gTimer=null,gTimeLeft=0;
+let gStreak=0,gMaxStreak=0,gCorrect=0,gTimer=null,gTimeLeft=0,gHintsLeft=2;
 let gAnswered=false,gGameOver=false,gEndCalled=false;
 let connectCorrectIdx=-1;
 let gWrongQuestions=[];
@@ -2172,6 +2191,8 @@ function _launchGameCore(){
   gIdx=0;gScore=0;gLives=gMode==='boss'?1:dc.lives;
   gStreak=0;gMaxStreak=0;gCorrect=0;gAnswered=false;gGameOver=false;gEndCalled=false;
   gWrongQuestions=[];
+  gHintsLeft = gMode==='connect' ? 0 : (gMode==='boss' ? 1 : (gDiff==='easy' ? 3 : 2));
+  updateHintBtn();
   showScreen('gameScreen');
   if(gMode==='boss'){showBossIntro();}else{renderQuestion();}
 }
@@ -2210,6 +2231,7 @@ function updateHUD(){
   document.getElementById('hudMode').textContent=mc.label||gMode.toUpperCase();
   document.getElementById('hudQ').textContent=`Q ${gIdx+1}/${gQuestions.length}`;
   document.getElementById('hudScore').textContent=gScore.toLocaleString()+' pts';
+  if(typeof updateHintBtn==='function') updateHintBtn();
   for(let i=1;i<=3;i++){
     const h=document.getElementById('h'+i);
     if(!h)continue;
@@ -2287,11 +2309,53 @@ function renderQuestion(){
     el.addEventListener('click',()=>answer(parseInt(el.dataset.idx)));
   });
   document.getElementById('nextBtn').addEventListener('click',nextQuestion);
+  updateHintBtn();
   if(mc.hasTimer){
     const dc=DIFF_CONFIG[gDiff]||{timeMult:1};
     gTimeLeft=Math.round(mc.timePerQ*(dc.timeMult||1));
     startTimer(gTimeLeft);
   }
+}
+
+// ══════════════════════════════════════════════════
+//  HINT (50/50)
+// ══════════════════════════════════════════════════
+function updateHintBtn(){
+  const btn=document.getElementById('hintBtn');
+  const cnt=document.getElementById('hintCount');
+  if(!btn||!cnt) return;
+  cnt.textContent=gHintsLeft;
+  const onGameScreen=document.getElementById('gameScreen')&&!document.getElementById('gameScreen').classList.contains('hidden');
+  const isConnect=gMode==='connect';
+  const disabled=gHintsLeft<=0||gAnswered||gGameOver||isConnect||!onGameScreen;
+  btn.disabled=disabled;
+  btn.style.display=isConnect?'none':'inline-flex';
+}
+const HINT_MSGS=[
+  '💡 Eliminei uma opção errada para você!',
+  '💡 Olha bem para as opções restantes...',
+  '💡 Pista: ignore a opção riscada.',
+  '💡 Agora ficou mais fácil escolher!'
+];
+function useHint(){
+  if(gHintsLeft<=0||gAnswered||gGameOver) return;
+  if(gMode==='connect') return;
+  const q=gQuestions[gIdx];
+  if(!q||typeof q.c!=='number') return;
+  const opts=document.querySelectorAll('#opts .opt');
+  if(!opts||!opts.length) return;
+  // Pick a random wrong option not already eliminated
+  const candidates=[];
+  opts.forEach((el,i)=>{
+    if(i!==q.c && !el.classList.contains('hint-eliminated')) candidates.push(el);
+  });
+  if(!candidates.length) return;
+  const victim=candidates[Math.floor(Math.random()*candidates.length)];
+  victim.classList.add('hint-eliminated');
+  gHintsLeft--;
+  updateHintBtn();
+  const msg=HINT_MSGS[Math.floor(Math.random()*HINT_MSGS.length)];
+  if(typeof setProfState==='function') setProfState('explain', msg, false);
 }
 
 // ══════════════════════════════════════════════════
@@ -2492,13 +2556,22 @@ function endGame(bossFail=false){
   if(reviewBtn) reviewBtn.style.display=gWrongQuestions.length>0?'inline-block':'none';
   updateHomeUI();
   if(newLevel>prevLevel)setTimeout(()=>showLevelUp(newLevel),600);
-  if(window.GameGate){
-    setTimeout(()=>GameGate.finish({
-      gameId:'acmp-quest',
-      gameTitle:'ACMP Quest',
-      scoreData:{mode:gMode,difficulty:gDiff,score:gScore,correct:gCorrect,total:totalQ,grade:String(grade),max_streak:gMaxStreak,xp_earned:xpEarned}
-    }), 2500);
-  }
+  // Salva contexto para uso pelo botão "Avaliar partida"
+  gFinishOpts={
+    gameId:'acmp-quest',
+    gameTitle:'ACMP Quest',
+    scoreData:{mode:gMode,difficulty:gDiff,score:gScore,correct:gCorrect,total:totalQ,grade:String(grade),max_streak:gMaxStreak,xp_earned:xpEarned}
+  };
+  const fb=document.getElementById('finishBtn');
+  if(fb){fb.style.display='inline-block';fb.disabled=false;fb.textContent='⭐ Avaliar partida e desafiar amigo';}
+}
+
+let gFinishOpts=null;
+function triggerFinish(){
+  if(!window.GameGate||!gFinishOpts) return;
+  const fb=document.getElementById('finishBtn');
+  if(fb){fb.disabled=true;fb.textContent='Carregando…';}
+  GameGate.finish(gFinishOpts);
 }
 
 // ══════════════════════════════════════════════════
