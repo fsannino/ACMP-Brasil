@@ -331,51 +331,101 @@ h1 em { font-style: italic; color: var(--teal); }
 </div>
 <script>
 const ALL_EVENTS = [
-  // FÁCIL (6 eventos) — marco global + brasil
-  { id:'e1', year:1947, icon:'🧠', label:'fácil',
-    badge:'global',
+  // FÁCIL (12 eventos) — marcos clássicos icônicos da disciplina
+  { id:'e1', year:1947, icon:'🧠', label:'fácil', badge:'global',
     short:'Lewin publica o modelo Unfreeze–Change–Refreeze',
     detail:'Kurt Lewin, pai da psicologia social, publica sua teoria de mudança em 3 etapas — a base de quase todos os modelos modernos de Gestão de Mudanças.' },
-  { id:'e2', year:1996, icon:'📖', label:'fácil',
-    badge:'global',
+  { id:'e2', year:1969, icon:'💔', label:'fácil', badge:'global',
+    short:'Kübler-Ross publica "On Death and Dying"',
+    detail:'A psiquiatra Elisabeth Kübler-Ross descreve as 5 fases do luto. Adaptada décadas depois como "Curva da Mudança", virou referência para entender resistência e transição emocional em GM.' },
+  { id:'e3', year:1990, icon:'📚', label:'fácil', badge:'global',
+    short:'Senge publica "The Fifth Discipline"',
+    detail:'Peter Senge define o conceito de "Learning Organizations" e populariza o pensamento sistêmico aplicado à mudança organizacional — best-seller global e leitura obrigatória em GM.' },
+  { id:'e4', year:1996, icon:'📖', label:'fácil', badge:'global',
     short:'Kotter publica "Leading Change" — os 8 passos',
     detail:'O livro mais influente da história da GM, com mais de 1 milhão de cópias vendidas. Define o vocabulário que toda organização usa até hoje.' },
-  { id:'e3', year:2011, icon:'🌐', label:'fácil',
-    badge:'global',
+  { id:'e5', year:1998, icon:'🧩', label:'fácil', badge:'global',
+    short:'Hiatt formaliza o modelo ADKAR na Prosci',
+    detail:'Jeff Hiatt estrutura o ADKAR (Awareness, Desire, Knowledge, Ability, Reinforcement) a partir das pesquisas da Prosci. Hoje é o framework individual de mudança mais usado no mundo — presente em +80 países.' },
+  { id:'e6', year:2010, icon:'🐘', label:'fácil', badge:'global',
+    short:'Heath Brothers publicam "Switch"',
+    detail:'Chip e Dan Heath usam a metáfora do "Cavaleiro, Elefante e Caminho" para explicar como mudar comportamento — ponte entre psicologia comportamental e GM organizacional.' },
+  { id:'e7', year:2011, icon:'🌐', label:'fácil', badge:'global',
     short:'Fundação da ACMP Global + 1ª Conferência em Orlando',
     detail:'Lançamento oficial da ACMP em fevereiro de 2011, com a 1ª Global Conference em maio em Orlando — keynote de John Kotter. Marco da era profissional da disciplina.' },
-  { id:'e4', year:2014, icon:'📋', label:'fácil',
-    badge:'global',
+  { id:'e8', year:2014, icon:'📋', label:'fácil', badge:'global',
     short:'Standard for Change Management v1 publicado pela ACMP',
     detail:'Resultado de 1.100+ profissionais de 57 países. Primeiro documento de referência neutro em metodologia para a disciplina de GM no mundo.' },
-  { id:'e5', year:2017, icon:'🇧🇷', label:'fácil',
-    badge:'brasil',
+  { id:'e9', year:2017, icon:'🇧🇷', label:'fácil', badge:'brasil',
     short:'Fundação oficial do Chapter ACMP Brasil',
     detail:'A ACMP Global reconhece oficialmente o chapter brasileiro. 1ª diretoria formada por Fabiano Sannino, Emerson Zuccherato, Isis Moda Pires, Daniel Druwe Araujo, Armando Kokitsu e Geni Elisabeth Esteves.' },
-  { id:'e6', year:2026, icon:'💻', label:'fácil',
-    badge:'brasil',
+  { id:'e10', year:2020, icon:'🦠', label:'fácil', badge:'global',
+    short:'Pandemia COVID-19 acelera a Gestão de Mudanças',
+    detail:'A maior mudança organizacional simultânea da história. GM deixa de ser projeto pontual e passa a ser capacidade crítica — explosão de transformação digital, trabalho remoto e redesenho de cultura.' },
+  { id:'e11', year:2022, icon:'🤖', label:'fácil', badge:'global',
+    short:'Lançamento do ChatGPT redefine o escopo de GM',
+    detail:'Em novembro de 2022, a OpenAI lança o ChatGPT. A IA generativa explode no mundo corporativo e força a disciplina de GM a lidar com mudanças tecnológicas em velocidade sem precedente.' },
+  { id:'e12', year:2026, icon:'💻', label:'fácil', badge:'brasil',
     short:'ACMP Brasil lança o novo site acmpbrasil.org.br',
     detail:'Novo hub digital da maior comunidade de Change Management do Brasil — com área do associado, certificações, agenda e recursos exclusivos para membros.' },
 
-  // NORMAL (8 eventos) — adicionam 2 marcos
-  { id:'e7', year:2003, icon:'🧩', label:'normal',
-    badge:'global',
-    short:'ADKAR formalizado como modelo de GM individual',
-    detail:'A Prosci publica o ADKAR (Awareness, Desire, Knowledge, Ability, Reinforcement) como framework estruturado. Hoje é o modelo individual de mudança mais usado no mundo — presente em +80 países.' },
-  { id:'e8', year:2016, icon:'🏅', label:'normal',
-    badge:'brasil',
-    short:'Fabiano Sannino e Daniel Araujo — primeiros CCMPs do Brasil',
-    detail:'Os dois profissionais pioneiros obtêm a Certified Change Management Professional® no Brasil, abrindo caminho para a certificação da comunidade brasileira de GM.' },
-
-  // DIFÍCIL (10 eventos) — adicionam 2 marcos históricos
-  { id:'e9', year:1994, icon:'🔬', label:'hard',
-    badge:'global',
+  // NORMAL (10 eventos) — marcos importantes para quem já conhece a disciplina
+  { id:'e13', year:1911, icon:'🏭', label:'normal', badge:'global',
+    short:'Taylor publica "Principles of Scientific Management"',
+    detail:'Frederick Winslow Taylor lança a primeira teoria científica sobre como organizar o trabalho. Marco fundador do pensamento administrativo moderno e ponto de partida para discutir mudança organizacional.' },
+  { id:'e14', year:1946, icon:'🧪', label:'normal', badge:'global',
+    short:'Lewin cria Action Research e os T-Groups',
+    detail:'Kurt Lewin cunha o termo "Action Research" e funda os Training Groups (T-Groups) no MIT. Inaugura a tradição experiencial e participativa que dará origem ao Desenvolvimento Organizacional.' },
+  { id:'e15', year:1980, icon:'🏢', label:'normal', badge:'global',
+    short:'Daryl Conner funda a ODR Inc.',
+    detail:'Conner cria a Organizational Development Resources, primeira consultoria do mundo dedicada exclusivamente à Gestão de Mudanças. Pavimenta o caminho para a disciplina como mercado profissional.' },
+  { id:'e16', year:1991, icon:'🌉', label:'normal', badge:'global',
+    short:'Bridges publica "Managing Transitions"',
+    detail:'William Bridges separa "mudança" (evento externo) de "transição" (processo psicológico interno). Seu modelo Ending → Neutral Zone → New Beginning é referência mundial em GM individual.' },
+  { id:'e17', year:1994, icon:'🔬', label:'normal', badge:'global',
     short:'Prosci é fundada por Jeff Hiatt',
     detail:'Ex-engenheiro da Bell Labs, Jeff Hiatt cria a Prosci como empresa de pesquisa em GM — que se tornaria a maior empresa mundial dedicada à disciplina, com +3 milhões de praticantes certificados.' },
-  { id:'e10', year:2019, icon:'🎤', label:'hard',
-    badge:'brasil',
+  { id:'e18', year:2013, icon:'📊', label:'normal', badge:'global',
+    short:'McKinsey populariza o dado "70% das transformações falham"',
+    detail:'A McKinsey publica pesquisa global mostrando que apenas 30% das transformações organizacionais atingem seus objetivos. O dado vira mantra do mercado e impulsiona a contratação de profissionais de GM.' },
+  { id:'e19', year:2015, icon:'🏅', label:'normal', badge:'global',
+    short:'ACMP lança a certificação CCMP',
+    detail:'A Certified Change Management Professional® é lançada como primeira certificação independente e neutra em metodologia. Marco decisivo na profissionalização da carreira em GM no mundo.' },
+  { id:'e20', year:2016, icon:'🎖️', label:'normal', badge:'brasil',
+    short:'Fabiano Sannino e Daniel Araujo — primeiros CCMPs do Brasil',
+    detail:'Os dois profissionais pioneiros obtêm a Certified Change Management Professional® no Brasil, abrindo caminho para a certificação da comunidade brasileira de GM.' },
+  { id:'e21', year:2019, icon:'🎤', label:'normal', badge:'brasil',
     short:'1ª Conferência ACMP Brasil em São Paulo (~200 pessoas)',
     detail:'Primeiro grande evento presencial do chapter brasileiro, reunindo cerca de 200 profissionais de GM em São Paulo. Marco da consolidação da comunidade nacional.' },
+  { id:'e22', year:2021, icon:'⚙️', label:'normal', badge:'global',
+    short:'GM se integra a Agile, DevOps e Transformação Digital',
+    detail:'O pós-pandemia consolida a integração entre Change Management, métodos ágeis e transformação digital. A "mudança contínua" substitui a "mudança pontual" como paradigma dominante.' },
+
+  // DIFÍCIL (8 eventos) — marcos avançados, conhecidos por especialistas
+  { id:'e23', year:1932, icon:'🔦', label:'hard', badge:'global',
+    short:'Encerramento dos estudos de Hawthorne (Elton Mayo)',
+    detail:'Os experimentos da Western Electric coordenados por Elton Mayo descobrem o "Efeito Hawthorne" e fundam a Escola de Relações Humanas — base científica para entender o lado humano da mudança.' },
+  { id:'e24', year:1970, icon:'🧬', label:'hard', badge:'global',
+    short:'Desenvolvimento Organizacional (OD) se consolida como disciplina',
+    detail:'A década de 1960-70 consolida o Organization Development como campo acadêmico e prático, integrando psicologia social, sociologia e teoria sistêmica — antecessor direto da Gestão de Mudanças moderna.' },
+  { id:'e25', year:1992, icon:'⚡', label:'hard', badge:'global',
+    short:'Conner publica "Managing at the Speed of Change"',
+    detail:'Daryl Conner introduz conceitos como "resilience", "burning platform" e "sponsorship" — vocabulário fundamental que se tornaria padrão na disciplina de GM em todo o mundo.' },
+  { id:'e26', year:1993, icon:'🛠️', label:'hard', badge:'global',
+    short:'Hammer & Champy publicam "Reengineering the Corporation"',
+    detail:'O livro lança o Business Process Reengineering (BPR) e dispara uma onda massiva de reestruturações nos anos 90. A reação aos altos índices de fracasso impulsionou a profissionalização da GM.' },
+  { id:'e27', year:2021, icon:'👥', label:'hard', badge:'brasil',
+    short:'Criação do Conselho Consultivo da ACMP Brasil',
+    detail:'O chapter brasileiro institui um Conselho Consultivo com profissionais e acadêmicos de referência (entre eles Neusa Bastos, da PUC-SP), fortalecendo a estratégia e a chancela acadêmica do capítulo.' },
+  { id:'e28', year:2023, icon:'🎯', label:'hard', badge:'global',
+    short:'ACMP reforça papel estratégico: cultura, EX e mudança contínua',
+    detail:'A disciplina evolui do foco em projetos para liderar agendas de cultura organizacional, Employee Experience e transformação contínua — Change Manager passa a ser papel estratégico no C-level.' },
+  { id:'e29', year:2024, icon:'✨', label:'hard', badge:'global',
+    short:'IA generativa aplicada à Gestão de Mudanças',
+    detail:'Ferramentas de IA generativa passam a ser usadas para automação de comunicação de mudança, análise preditiva de resistência e personalização de jornadas de transição em escala — nova fronteira da disciplina.' },
+  { id:'e30', year:2025, icon:'👔', label:'hard', badge:'brasil',
+    short:'Nova diretoria da ACMP Brasil assume sob Michel de Arruda Pires',
+    detail:'Michel de Arruda Pires assume a presidência da ACMP Brasil, com Isis Moda Pires (Marketing e Eventos) e Fabiano Sannino (Financeiro) — nova fase do capítulo brasileiro.' },
 ];
 
 const MODES = { easy:6, normal:8, hard:10 };
@@ -400,7 +450,7 @@ function pool(){
 function shuffle(a){ const b=[...a]; for(let i=b.length-1;i>0;i--){const j=0|Math.random()*(i+1);[b[i],b[j]]=[b[j],b[i]];} return b; }
 
 function init(){
-  shuffled=shuffle(pool()); slots=new Array(n).fill(null);
+  shuffled=shuffle(pool()).slice(0,n); slots=new Array(n).fill(null);
   sel=null; answered=false;
   document.getElementById('results').classList.remove('show');
   document.getElementById('chk').disabled=true;
@@ -481,7 +531,7 @@ function unplace(i,e){
 
 function check(){
   answered=true;
-  const correct=[...pool()].sort((a,b)=>a.year-b.year);
+  const correct=[...shuffled].sort((a,b)=>a.year-b.year);
   let score=0;
   document.querySelectorAll('.slot').forEach((el,i)=>{
     const ev=slots[i];
