@@ -262,6 +262,9 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
       <button class="btn btn-ghost" onclick="restartGame()">← Menu de casos</button>
       <button class="btn btn-primary" onclick="replayCase()">↺ Jogar mesmo caso</button>
     </div>
+    <div style="text-align:center;margin-top:14px;">
+      <button id="cm-finish-btn" type="button" onclick="cmTriggerFinish()" style="background:transparent;border:0;color:var(--teal);font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;text-decoration:underline;letter-spacing:.04em;opacity:.85;">⭐ Avaliar partida e desafiar amigo</button>
+    </div>
   </div>
 </div>
 
@@ -632,24 +635,37 @@ function showEnding(){
 
   // Score do leaderboard: composto Adoção + (Patrocinador − Resistência), normalizado em 0–100
   var lbScore = Math.max(0, Math.min(100, Math.round(st.ad + (st.sp - st.re) / 2)));
-  if(window.GameGate){
-    setTimeout(()=>GameGate.finish({
-      gameId:'change-manager-simulator',
-      gameTitle:'Change Manager Simulator',
-      score: lbScore,
-      scoreData:{ caseId:st.caseId, adoption:st.ad, resistance:st.re, sponsor:st.sp, badge:end.badge, composite:lbScore }
-    }), 2500);
+  cmFinishOpts = {
+    gameId:'change-manager-simulator',
+    gameTitle:'Change Manager Simulator',
+    score: lbScore,
+    scoreData:{ caseId:st.caseId, adoption:st.ad, resistance:st.re, sponsor:st.sp, badge:end.badge, composite:lbScore }
+  };
+  if(window.GameGate && typeof GameGate.saveScore === 'function'){
+    GameGate.saveScore(cmFinishOpts);
+    cmFinishOpts.scoreSaved = true;
   }
   if(window.Leaderboard){
-    setTimeout(()=>Leaderboard.render({
+    Leaderboard.render({
       container:'#cm-leaderboard',
       gameId:'change-manager-simulator',
       limit:10,
       theme:'dark',
       title:'Top Change Managers',
       formatScore: function(r){ return String(r.score); }
-    }), 800);
+    });
   }
+  // Reset estado do botão de avaliar (caso usuário esteja jogando outra rodada)
+  var fb = document.getElementById('cm-finish-btn');
+  if(fb){ fb.disabled = false; fb.textContent = '⭐ Avaliar partida e desafiar amigo'; }
+}
+
+let cmFinishOpts = null;
+function cmTriggerFinish(){
+  if(!window.GameGate || !cmFinishOpts) return;
+  var btn = document.getElementById('cm-finish-btn');
+  if(btn){ btn.disabled = true; btn.textContent = 'Carregando…'; }
+  GameGate.finish(cmFinishOpts);
 }
 
 function backToIntro(){hideAll();document.getElementById('intro').style.display='block';window.scrollTo({top:0,behavior:'smooth'})}

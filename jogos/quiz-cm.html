@@ -230,6 +230,7 @@
         }
     }
 
+    var quizFinishOpts = null;
     function showResult() {
         document.getElementById('quiz-game').style.display = 'none';
         var pct = Math.round(score / questions.length * 100);
@@ -246,26 +247,39 @@
             '<div class="score-actions">' +
             '<button class="btn-replay" onclick="startQuiz()"><i class="fas fa-redo"></i> Jogar Novamente</button>' +
             '<a href="/jogos/" class="btn-back"><i class="fas fa-arrow-left"></i> Todos os Jogos</a>' +
-            '</div></div>';
-        if (window.GameGate) {
-            setTimeout(function () {
-                GameGate.finish({
-                    gameId: 'quiz-cm',
-                    gameTitle: 'Quiz: Gestão de Mudanças',
-                    score: pct,
-                    scoreData: { score: score, total: questions.length, percentage: pct }
-                });
-                if (window.Leaderboard) {
-                    Leaderboard.render({
-                        container: '#quiz-leaderboard',
-                        gameId: 'quiz-cm',
-                        limit: 10,
-                        title: 'Top jogadores',
-                        formatScore: function (r) { return r.score + '%'; }
-                    });
-                }
-            }, 2200);
+            '</div>' +
+            '<div style="text-align:center;margin-top:14px;">' +
+              '<button id="quiz-finish-btn" type="button" onclick="quizTriggerFinish()" style="background:transparent;border:0;color:var(--primary);font-family:inherit;font-size:0.82rem;font-weight:600;cursor:pointer;text-decoration:underline;opacity:.85;">⭐ Avaliar partida e desafiar amigo</button>' +
+            '</div>' +
+            '</div>';
+
+        // Salva pontuação imediatamente e renderiza ranking — sem abrir modal.
+        quizFinishOpts = {
+            gameId: 'quiz-cm',
+            gameTitle: 'Quiz: Gestão de Mudanças',
+            score: pct,
+            scoreData: { score: score, total: questions.length, percentage: pct }
+        };
+        if (window.GameGate && typeof GameGate.saveScore === 'function') {
+            GameGate.saveScore(quizFinishOpts);
+            quizFinishOpts.scoreSaved = true;
         }
+        if (window.Leaderboard) {
+            Leaderboard.render({
+                container: '#quiz-leaderboard',
+                gameId: 'quiz-cm',
+                limit: 10,
+                title: 'Top jogadores',
+                formatScore: function (r) { return r.score + '%'; }
+            });
+        }
+    }
+
+    function quizTriggerFinish() {
+        if (!window.GameGate || !quizFinishOpts) return;
+        var btn = document.getElementById('quiz-finish-btn');
+        if (btn) { btn.disabled = true; btn.textContent = 'Carregando…'; }
+        GameGate.finish(quizFinishOpts);
     }
     </script>
 </body>

@@ -524,7 +524,8 @@
 
             // 1) Score: gravado SEMPRE que opts.score é numérico, independente do feedback.
             //    Habilita leaderboard mesmo se o jogador pular o formulário de avaliação.
-            if (typeof opts.score === 'number' && isFinite(opts.score)) {
+            //    Se o jogo já chamou saveScore() antes (e setou opts.scoreSaved=true), não duplica.
+            if (!opts.scoreSaved && typeof opts.score === 'number' && isFinite(opts.score)) {
                 var base = buildPlayerPayload(opts);
                 if (base.player_email && base.player_name) {
                     base.score = Math.round(opts.score);
@@ -541,6 +542,20 @@
                 return;
             }
             showFeedbackForm(opts);
+        },
+
+        // Salva pontuação no Supabase sem abrir modal de feedback.
+        // Permite que a página renderize o leaderboard imediatamente
+        // e deixe o disparo do modal a cargo do usuário (botão explícito).
+        saveScore: function (opts) {
+            opts = opts || {};
+            if (typeof opts.score !== 'number' || !isFinite(opts.score)) return false;
+            var base = buildPlayerPayload(opts);
+            if (!base.player_email || !base.player_name) return false;
+            base.score = Math.round(opts.score);
+            base.score_data = opts.scoreData || null;
+            saveScoreToSupa(base);
+            return true;
         },
 
         // Helpers expostos para os jogos
