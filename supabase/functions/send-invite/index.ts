@@ -11,8 +11,8 @@
 //
 // Secrets esperados (supabase secrets set ...):
 //   - RESEND_API_KEY                (obrigatório)
-//   - INVITE_FROM                   (default: "ACMP Brasil <onboarding@resend.dev>")
-//   - INVITE_REPLY_TO               (default: nenhum)
+//   - INVITE_FROM                   (default: "ACMP Brasil <contato@acmpbrasil.org.br>")
+//   - INVITE_REPLY_TO               (default: "contato@acmpbrasil.org.br")
 //   - TURNSTILE_SECRET_KEY          (opcional — se ausente, captcha é pulado)
 //   - SUPABASE_URL                  (auto-injetado)
 //   - SUPABASE_SERVICE_ROLE_KEY     (auto-injetado)
@@ -168,9 +168,9 @@ Deno.serve(async (req: Request) => {
     return json(500, { error: "Servidor não configurado (Supabase env ausente)." });
   }
   // @ts-ignore deno
-  const FROM = Deno.env.get("INVITE_FROM") || "ACMP Brasil <onboarding@resend.dev>";
+  const FROM = Deno.env.get("INVITE_FROM") || "ACMP Brasil <contato@acmpbrasil.org.br>";
   // @ts-ignore deno
-  const REPLY_TO = Deno.env.get("INVITE_REPLY_TO") || "";
+  const REPLY_TO = Deno.env.get("INVITE_REPLY_TO") || "contato@acmpbrasil.org.br";
 
   let body: any;
   try {
