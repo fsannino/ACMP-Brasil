@@ -18,8 +18,14 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@400;500;700;900&display=swap');
 :root{--navy:#0D1E35;--navy2:#112338;--dark:#080F1C;--teal:#009E8E;--gold:#F5A420;--nb:#1B3868;--mu:#2D4A5E;--dim:#1A2E45;--tx:#3D5A72;--lt:#7A98B0;--danger:#E24B4A;--cream:#F5F3EE}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--dark);font-family:'DM Sans',sans-serif;color:#fff;min-height:100vh;overflow-x:hidden}
+body{background:var(--dark);font-family:'DM Sans',sans-serif;color:#fff;min-height:100vh;overflow-x:hidden;padding-top:44px}
 body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 70% 50% at 15% 15%,rgba(0,158,142,0.05) 0%,transparent 55%),radial-gradient(ellipse 50% 60% at 85% 85%,rgba(27,56,104,0.08) 0%,transparent 55%);pointer-events:none;z-index:0}
+.cms-topbar{position:fixed;top:0;left:0;right:0;z-index:30;display:flex;align-items:center;justify-content:space-between;height:44px;padding:0 18px;background:#fff;border-bottom:1px solid #e2e8f0;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.cms-topbar a{display:inline-flex;align-items:center;gap:8px;color:#1a3a5c;text-decoration:none;font-size:13px;font-weight:600;letter-spacing:.02em;font-family:'DM Sans',sans-serif;transition:color .15s}
+.cms-topbar a:hover{color:#0f2440}
+.cms-topbar .cms-logo img{height:24px;display:block}
+.cms-topbar .cms-back-arrow{font-size:16px;line-height:1}
+@media (max-width:600px){.cms-topbar{height:40px;padding:0 12px}.cms-topbar a{font-size:12px}.cms-topbar .cms-logo img{height:20px}body{padding-top:40px}.cms-topbar .cms-back span:not(.cms-back-arrow){display:none}}
 .game{position:relative;z-index:1;max-width:860px;margin:0 auto;padding:32px 20px 80px}
 .ghead{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}
 .logo-mark{display:flex;align-items:center;gap:6px}
@@ -134,6 +140,16 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 </style>
 </head>
 <body>
+<header class="cms-topbar" role="banner">
+  <a href="/" class="cms-logo" aria-label="ACMP Brasil — página inicial">
+    <img src="/img/logo-acmp-brasil.png" alt="ACMP Brasil">
+  </a>
+  <a href="/jogos/" class="cms-back" aria-label="Voltar para Todos os Jogos">
+    <span class="cms-back-arrow" aria-hidden="true">←</span>
+    <span>Todos os Jogos</span>
+  </a>
+</header>
+
 <div class="game">
   <div class="ghead" id="ghead" style="display:none">
     <div class="logo-mark"><svg viewBox="0 0 20 17"><polygon points="10,0 20,17 0,17" fill="#F5A420"/></svg><span class="lt">CMP</span><span class="lb">BRASIL</span></div>
@@ -147,6 +163,22 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
       <div class="intro-badge">Change Manager Simulator v2</div>
       <h1 class="intro-title">Você é o<br><em>Change Manager.</em></h1>
       <p class="intro-sub">Escolha um caso real de transformação organizacional. Cada decisão é guiada pelas 5 áreas de processo do Standard ACMP para Gestão de Mudanças (2ª edição). Suas escolhas determinam o destino do projeto.</p>
+
+      <div style="background:rgba(255,255,255,0.025);border:1px solid var(--dim);border-radius:12px;padding:20px 24px;margin-bottom:24px;max-width:600px">
+        <div style="font-size:11px;letter-spacing:0.18em;color:var(--teal);text-transform:uppercase;font-weight:700;margin-bottom:14px">Como funciona</div>
+        <div style="display:grid;gap:11px;font-size:13px;color:#c0d0dc;line-height:1.55">
+          <div style="display:flex;gap:10px"><span style="color:var(--teal);font-weight:900;flex-shrink:0">1.</span><span>Você assume o papel de <strong>Change Manager</strong> em um caso real (com nomes alterados).</span></div>
+          <div style="display:flex;gap:10px"><span style="color:var(--teal);font-weight:900;flex-shrink:0">2.</span><span>Em cada cena, você recebe uma situação e <strong>3 decisões possíveis</strong> — cada uma com consequências distintas.</span></div>
+          <div style="display:flex;gap:10px"><span style="color:var(--teal);font-weight:900;flex-shrink:0">3.</span><span>Suas escolhas afetam <strong>3 métricas</strong>: <span style="color:var(--teal)">Adoção</span>, <span style="color:var(--danger)">Resistência</span> e <span style="color:var(--gold)">Patrocínio</span> — visíveis o tempo todo.</span></div>
+          <div style="display:flex;gap:10px"><span style="color:var(--teal);font-weight:900;flex-shrink:0">4.</span><span>Cada decisão recebe <strong>feedback acionável</strong> com referência ao Standard ACMP — explicando por que funcionou ou não.</span></div>
+          <div style="display:flex;gap:10px"><span style="color:var(--teal);font-weight:900;flex-shrink:0">5.</span><span>Ao final das 3 fases, sua atuação é avaliada (<strong>Mestre da Mudança</strong>, <strong>Missão Cumprida</strong>, <strong>Lição Aprendida</strong> ou <strong>Projeto em Risco</strong>).</span></div>
+        </div>
+        <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--dim);font-size:11.5px;color:var(--mu);line-height:1.5">
+          <strong style="color:var(--lt)">Dica:</strong> não há resposta "certa" universal — cada caso tem contexto próprio. Leia o cenário com atenção antes de decidir. Você pode rejogar quantas vezes quiser.
+        </div>
+      </div>
+
+      <div style="font-size:11px;letter-spacing:0.18em;color:var(--mu);text-transform:uppercase;font-weight:700;margin-bottom:10px">Áreas do Standard ACMP cobertas</div>
       <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px">
         <div class="std-ref">5.1 Avaliar Impacto</div>
         <div class="std-ref">5.2 Formular Estratégia</div>
@@ -171,6 +203,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
     <div style="font-size:10px;letter-spacing:0.22em;color:var(--teal);text-transform:uppercase;margin-bottom:14px" id="briefCaseType"></div>
     <h2 style="font-family:'DM Serif Display',serif;font-size:30px;margin-bottom:6px" id="briefCaseTitle"></h2>
     <p style="font-size:13px;color:var(--lt);line-height:1.7;margin-bottom:20px" id="briefCaseDesc"></p>
+    <div id="briefNarrative" style="margin-bottom:20px"></div>
     <div class="briefing" id="briefingBox"></div>
     <div style="display:flex;gap:12px">
       <button class="btn btn-ghost" onclick="showCaseSelect()">← Outro caso</button>
@@ -271,6 +304,11 @@ const CASES = {
     diff:'Normal', diffClass:'diff-normal',
     desc:'Indústria e logística com 3.400 colaboradores implementando novo sistema ERP. 340 usuários impactados, prazo de 6 meses até o go-live.',
     tags:['ERP','340 usuários','6 meses','Indústria'],
+    narrative:[
+      {h:'O cenário',t:'O <strong>Grupo Meridian</strong> é uma indústria e operadora logística fundada em 1972, com sede em São Paulo e plantas em Cubatão (SP) e Camaçari (BA). Hoje emprega <strong>3.400 colaboradores</strong>, fatura R$ 2,8 bi/ano e atende clientes nos setores químico, alimentício e automotivo. Após 22 anos com o mesmo ERP legado (já fora do suporte do fornecedor), o conselho aprovou um investimento de <strong>R$ 24 milhões</strong> para implementar o SAP S/4HANA.'},
+      {h:'O contexto da mudança',t:'A decisão foi tomada de cima para baixo, em uma reunião de conselho. A diretoria executiva quer go-live em <strong>6 meses</strong> para captar incentivos fiscais que expiram no fim do exercício. Os <strong>340 usuários impactados</strong> estão distribuídos em 12 áreas: Finanças, Compras, Logística, Manufatura, Comercial, Faturamento, Custos, Controladoria, RH, Jurídico, TI e Qualidade. Hoje, 60% deles ainda fazem parte do controle operacional em planilhas Excel paralelas.'},
+      {h:'As pessoas-chave',t:'<strong>Roberto Mendes</strong> (CEO, há 18 meses no cargo) — tem urgência e visibilidade pessoal no projeto.<br><strong>Patrícia Hayashi</strong> (Diretora de Operações, sponsor designado) — agenda lotada, ainda não engajou de fato.<br><strong>Bruno Castro</strong> (Gerente de Projetos de TI) — entregou cronograma técnico sem nenhuma atividade de Gestão de Mudanças.<br><strong>Cláudia Vasconcelos</strong> (Gerente de Finanças, 23 anos de casa) — vista pelos pares como referência técnica; reagiu publicamente "esse sistema vai criar caos".<br><strong>Você</strong> — Change Manager contratado há 2 semanas, com mandato direto do CEO mas sem orçamento aprovado.'}
+    ],
     briefing:[
       ['Empresa','Grupo Meridian — Indústria e Logística, 3.400 colaboradores'],
       ['Projeto','Implementação de novo sistema ERP — 340 usuários impactados'],
@@ -329,6 +367,11 @@ const CASES = {
     diff:'Difícil', diffClass:'diff-hard',
     desc:'Empresa de cosméticos com 2.000 colaboradores mudando de prédio. Desafio emocional: apego ao local antigo, perda de benefícios, nova liderança recente.',
     tags:['2.000 pessoas','Mudança física','Cultura','Cosméticos'],
+    narrative:[
+      {h:'O cenário',t:'O <strong>Grupo Floresta</strong> é uma empresa brasileira de cosméticos e bem-estar fundada em 1989, com <strong>2.000 colaboradores</strong> diretos e mais de 12 mil consultoras independentes. A sede atual fica em um prédio histórico no Centro de São Paulo há 28 anos — para muitos, é parte da identidade da empresa. A nova sede será em um <strong>campus de 42.000 m²</strong> em Cajamar (SP), a 35 km do Centro, com investimento de <strong>R$ 180 milhões</strong>.'},
+      {h:'O contexto da mudança',t:'A mudança física acontece em <strong>5 meses</strong>. Dos 2.000 colaboradores impactados, <strong>500 já trabalham parcialmente no campus novo</strong> (a equipe de P&D, transferida em 2024) — eles deveriam ser anfitriões dos 1.500 que chegarão. Pesquisa interna inicial: 40% das pessoas dizem "não ver razão para mudar"; 67% citam perda de benefícios locais (vale-refeição mais alto, restaurantes próximos, transporte público) como principal preocupação.'},
+      {h:'As pessoas-chave',t:'<strong>Marina Coelho</strong> (Presidente, 9 meses no cargo) — primeira mulher CEO da empresa, ainda construindo capital político interno; quer a mudança como marco de modernização.<br><strong>André Lemos</strong> (CHRO, sponsor do projeto de pessoas) — defende abordagem gradual e humanizada.<br><strong>Renata Tavares</strong> (Diretora de Engenharia e Facilities) — lidera a obra física, prazo apertado.<br><strong>Os 500 "Desbravadores"</strong> (P&D no campus novo) — sentem-se "donos" do espaço; alguns já reclamaram em redes sociais sobre a "invasão" iminente.<br><strong>Você</strong> — Change Manager contratado para liderar a transição cultural, com orçamento de R$ 1,2 mi e equipe de 3 pessoas.'}
+    ],
     briefing:[
       ['Empresa','Grupo Floresta — Cosméticos e Bem-estar, 2.000 colaboradores'],
       ['Projeto','Mudança da sede corporativa do Centro para novo campus no Parque Industrial'],
@@ -387,6 +430,11 @@ const CASES = {
     diff:'Expert', diffClass:'diff-expert',
     desc:'Duas empresas de tecnologia se fundiram. O departamento de TI (280 pessoas) precisa operar como uma só organização — com culturas, sistemas e lideranças diferentes.',
     tags:['M&A','280 pessoas TI','2 culturas','Modelo operacional'],
+    narrative:[
+      {h:'O cenário',t:'O <strong>TechNova Group</strong> nasceu há 4 meses da fusão entre duas empresas de tecnologia: a <strong>NovaSys</strong> (140 pessoas, fundada em 2008, cultura informal e remota-first, foco em produto SaaS) e a <strong>TechPrime</strong> (140 pessoas, fundada em 1998, cultura corporativa e híbrida, foco em serviços de outsourcing). Operação combinada: <strong>280 profissionais de TI</strong>, faturamento de R$ 420 mi/ano e 3 escritórios (SP, BH e Recife).'},
+      {h:'O contexto da mudança',t:'A integração das equipes técnicas precisa acontecer em <strong>12 meses</strong> — exigência dos investidores que financiaram a fusão (US$ 85 mi). A pesquisa de engajamento aplicada 30 dias após a fusão mostrou <strong>melhoria em apenas 4 de 11 categorias</strong> (vs. baseline de cada empresa antes da fusão). Sistemas duplicados em 8 áreas (ITSM, monitoramento, identidade, repositório de código…). Os <strong>12 Service Line Managers</strong> (6 de cada origem) operam de forma desconectada. Já houve 3 pedidos de demissão de líderes-chave.'},
+      {h:'As pessoas-chave',t:'<strong>Rodrigo Sá</strong> (CTO do TechNova, ex-NovaSys) — quer "big bang" em 3 meses para acabar logo com a incerteza.<br><strong>Letícia Ferraz</strong> (CHRO do TechNova, ex-TechPrime) — defende abordagem gradual em 12 meses para preservar talentos.<br><strong>Marcelo Brito</strong> (Diretor de Infraestrutura, ex-NovaSys) — disputa o controle da nova área de infra unificada.<br><strong>Juliana Okada</strong> (Diretora de Infraestrutura, ex-TechPrime) — também disputa o mesmo posto; tem time leal.<br><strong>O conselho do investidor</strong> — pressiona por sinergia financeira de R$ 18 mi/ano.<br><strong>Você</strong> — Change Manager Sênior contratado pelo CHRO para mediar a integração cultural e operacional.'}
+    ],
     briefing:[
       ['Empresa','TechNova Group — resultado da fusão entre NovaSys e TechPrime'],
       ['Projeto','Unificação do departamento de TI — novo modelo operacional para 280 profissionais'],
@@ -475,8 +523,17 @@ function showBriefing(caseId){
   document.getElementById('briefCaseType').textContent=c.type;
   document.getElementById('briefCaseTitle').textContent=c.icon+' '+c.title;
   document.getElementById('briefCaseDesc').textContent=c.desc;
+  const nb=document.getElementById('briefNarrative');
+  if(c.narrative&&c.narrative.length){
+    nb.innerHTML=c.narrative.map(s=>`
+      <div style="background:var(--navy);border:1px solid var(--dim);border-radius:12px;padding:18px 22px;margin-bottom:10px">
+        <div style="font-size:10px;letter-spacing:0.22em;color:var(--teal);text-transform:uppercase;font-weight:700;margin-bottom:10px">${s.h}</div>
+        <p style="font-size:13.5px;color:#c0d0dc;line-height:1.7">${s.t}</p>
+      </div>`).join('');
+    nb.style.display='block';
+  } else { nb.innerHTML=''; nb.style.display='none'; }
   const box=document.getElementById('briefingBox');
-  box.innerHTML=`<div class="briefing-head">Seu briefing</div>${c.briefing.map(([k,v])=>`<div class="briefing-row"><span class="briefing-key">${k}</span><span class="briefing-val">${v}</span></div>`).join('')}`;
+  box.innerHTML=`<div class="briefing-head">Briefing — Resumo</div>${c.briefing.map(([k,v])=>`<div class="briefing-row"><span class="briefing-key">${k}</span><span class="briefing-val">${v}</span></div>`).join('')}`;
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
