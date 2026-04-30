@@ -179,21 +179,50 @@
             return res.ok;
         }
 
-        // Notify admin via Formspree when a new user registers
+        // Notify admin via Formspree AND record in Supabase form_submissions
         async function notifyAdminNewUser(name, email, type) {
+            var tipoLabel = type === 'member' ? 'Associado ACMP Global (aguardando aprovação)' : 'Comunidade/Voluntário';
+            var mensagem = 'Novo usuário cadastrado no portal ACMP Brasil.\n\nNome: ' + name + '\nE-mail: ' + email + '\nTipo: ' + tipoLabel;
+
+            // 1) Email notification via Formspree
             try {
                 await fetch('https://formspree.io/f/mbdqrbkp', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
                     body: JSON.stringify({
                         _subject: '[ACMP Brasil] Novo cadastro: ' + name,
-                        nome: name,
-                        email: email,
-                        tipo: type === 'member' ? 'Associado ACMP (requer aprovação)' : 'Comunidade',
-                        mensagem: 'Novo usuário cadastrado no portal ACMP Brasil.\n\nNome: ' + name + '\nE-mail: ' + email + '\nTipo: ' + (type === 'member' ? 'Associado ACMP Global (aguardando aprovação)' : 'Comunidade/Voluntário') + '\n\nAcesse o painel admin para gerenciar: https://acmpbrasil.org.br/admin'
+                        nome: name, email: email,
+                        tipo: tipoLabel,
+                        mensagem: mensagem + '\n\nAcesse o painel admin para gerenciar: https://acmpbrasil.org.br/admin'
                     })
                 });
             } catch(e) { console.log('Admin notification failed:', e); }
+
+            // 2) Persist in form_submissions (admin inbox)
+            try {
+                await fetch(SUPA_URL + '/rest/v1/form_submissions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'apikey': SUPA_KEY,
+                        'Authorization': 'Bearer ' + SUPA_KEY,
+                        'Prefer': 'return=minimal'
+                    },
+                    body: JSON.stringify({
+                        form_type: 'login_signup',
+                        form_label: 'Novo cadastro: ' + (type === 'member' ? 'Associado ACMP' : 'Comunidade'),
+                        subject: '[ACMP Brasil] Novo cadastro: ' + name,
+                        name: name, email: email,
+                        message: mensagem,
+                        extra_data: { tipo: type, tipo_label: tipoLabel },
+                        source_page: document.title,
+                        source_path: location.pathname,
+                        source_url: location.href,
+                        referrer: document.referrer || null,
+                        user_agent: navigator.userAgent
+                    })
+                });
+            } catch(e) { console.log('Inbox record failed:', e); }
         }
 
         // Init: show login form immediately
