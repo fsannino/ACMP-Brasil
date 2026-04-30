@@ -18,7 +18,7 @@
         .admin-header .header-actions a, .admin-header .header-actions button { color: rgba(255,255,255,0.7); background: none; border: 1px solid rgba(255,255,255,0.2); padding: 6px 14px; border-radius: var(--radius-sm); font-size: 0.8rem; cursor: pointer; text-decoration: none; font-family: var(--font-main); }
         .admin-header .header-actions { display: flex; gap: 8px; }
         .admin { max-width: 1100px; margin: 0 auto; padding: 30px 20px; }
-        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 30px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; margin-bottom: 30px; }
         .stat-card { background: var(--bg-white); padding: 24px; border-radius: var(--radius-md); box-shadow: var(--shadow-sm); }
         .stat-card .stat-icon { width: 44px; height: 44px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; color: white; margin-bottom: 12px; }
         .stat-card .stat-val { font-size: 2rem; font-weight: 800; color: var(--text-dark); }
@@ -46,6 +46,26 @@
         .content-form label { display: block; font-size: 0.82rem; font-weight: 600; color: var(--text-dark); margin-bottom: 4px; }
         .alert-admin { padding: 12px 16px; border-radius: var(--radius-sm); font-size: 0.85rem; margin-bottom: 16px; }
         @media (max-width: 768px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } .content-form { grid-template-columns: 1fr; } .admin-header-inner { flex-direction: column; gap: 10px; } }
+
+        /* Message detail modal */
+        .msg-modal-bg { position: fixed; inset: 0; background: rgba(15,23,42,0.5); display: none; align-items: center; justify-content: center; z-index: 9999; padding: 20px; }
+        .msg-modal-bg.open { display: flex; }
+        .msg-modal { background: white; border-radius: var(--radius-lg); max-width: 720px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .msg-modal-header { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+        .msg-modal-header h3 { margin: 0; font-size: 1.1rem; font-weight: 700; }
+        .msg-modal-close { background: none; border: none; font-size: 1.4rem; cursor: pointer; color: var(--text-light); padding: 4px 8px; }
+        .msg-modal-body { padding: 20px 24px; }
+        .msg-field { margin-bottom: 14px; }
+        .msg-field-label { font-size: 0.74rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-light); margin-bottom: 4px; }
+        .msg-field-value { font-size: 0.9rem; color: var(--text-dark); word-break: break-word; }
+        .msg-field-value pre { background: var(--bg-light); padding: 12px 14px; border-radius: var(--radius-sm); white-space: pre-wrap; font-family: var(--font-main); font-size: 0.85rem; margin: 0; line-height: 1.5; }
+        .msg-extra-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 16px; }
+        .msg-modal-footer { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+        .msg-status-badge { display:inline-block; padding:3px 10px; border-radius:50px; font-size:0.75rem; font-weight:600; }
+        .msg-status-new      { background:#fee2e2; color:#dc2626; }
+        .msg-status-read     { background:#fef3c7; color:#92400e; }
+        .msg-status-replied  { background:#dcfce7; color:#16a34a; }
+        .msg-status-archived { background:#e5e7eb; color:#6b7280; }
     </style>
 </head>
 <body>
@@ -61,6 +81,11 @@
                 <button onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> Sair</button>
             </div>
         </div>
+    </div>
+
+    <!-- Message detail modal -->
+    <div class="msg-modal-bg" id="msg-modal-bg" onclick="if(event.target===this)closeMessage()">
+        <div class="msg-modal" id="msg-modal-content"></div>
     </div>
 
     <div class="admin">
@@ -85,10 +110,16 @@
                 <div class="stat-val" id="stat-content">-</div>
                 <div class="stat-lbl">Conteúdos</div>
             </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background: #ef4444;"><i class="fas fa-envelope"></i></div>
+                <div class="stat-val" id="stat-messages">-</div>
+                <div class="stat-lbl">Mensagens novas</div>
+            </div>
         </div>
 
         <div class="admin-tabs">
             <button class="admin-tab active" onclick="showAdminTab('members')"><i class="fas fa-users"></i> Membros</button>
+            <button class="admin-tab" onclick="showAdminTab('messages')"><i class="fas fa-envelope"></i> Mensagens <span id="tab-msg-badge" style="background:#ef4444;color:white;font-size:0.7rem;padding:1px 7px;border-radius:50px;margin-left:4px;display:none;">0</span></button>
             <button class="admin-tab" onclick="showAdminTab('content')"><i class="fas fa-folder"></i> Conteúdo</button>
             <button class="admin-tab" onclick="showAdminTab('games')"><i class="fas fa-gamepad"></i> Jogos</button>
             <button class="admin-tab" onclick="showAdminTab('import')"><i class="fas fa-file-csv"></i> Importar CSV</button>
@@ -104,6 +135,46 @@
                         <tr><th>Nome</th><th>E-mail</th><th>Cidade</th><th>Status</th><th>CCMP</th><th>Desde</th><th>Ações</th></tr>
                     </thead>
                     <tbody id="members-tbody">
+                        <tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text-light);">Carregando...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Messages Panel -->
+        <div class="admin-panel" id="panel-messages" style="display: none;">
+            <h3>Mensagens recebidas</h3>
+            <div id="messages-alert" class="alert-admin" style="display: none;"></div>
+
+            <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;align-items:center;">
+                <label style="font-size:0.82rem;color:var(--text-light);">Filtrar:</label>
+                <select id="msg-filter-status" onchange="loadMessages()" style="padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:0.85rem;">
+                    <option value="active">Ativas (novas + lidas)</option>
+                    <option value="new">Apenas novas</option>
+                    <option value="replied">Respondidas</option>
+                    <option value="archived">Arquivadas</option>
+                    <option value="all">Todas</option>
+                </select>
+                <select id="msg-filter-type" onchange="loadMessages()" style="padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:0.85rem;">
+                    <option value="">Todos os formulários</option>
+                </select>
+                <input id="msg-filter-search" placeholder="Buscar por nome ou e-mail..." oninput="filterMessages()" style="flex:1;min-width:200px;padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:0.85rem;">
+            </div>
+
+            <div style="overflow-x: auto;">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Formulário</th>
+                            <th>Nome</th>
+                            <th>E-mail</th>
+                            <th>Origem</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="messages-tbody">
                         <tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text-light);">Carregando...</td></tr>
                     </tbody>
                 </table>
@@ -272,12 +343,13 @@
             currentRole = prof.role;
 
             // Moderators: hide delete buttons, content management, games access, import
+            // Tabs: [0]=Membros, [1]=Mensagens, [2]=Conteúdo, [3]=Jogos, [4]=Importar
             if (currentRole === 'moderator') {
                 document.querySelector('.admin-badge').textContent = 'GESTOR';
                 var tabs = document.querySelectorAll('.admin-tab');
-                if (tabs[1]) tabs[1].style.display = 'none'; // Content tab
-                if (tabs[2]) tabs[2].style.display = 'none'; // Games tab
-                if (tabs[3]) tabs[3].style.display = 'none'; // Import tab
+                if (tabs[2]) tabs[2].style.display = 'none'; // Content tab
+                if (tabs[3]) tabs[3].style.display = 'none'; // Games tab
+                if (tabs[4]) tabs[4].style.display = 'none'; // Import tab
             }
 
             await loadAdminData();
@@ -294,6 +366,7 @@
             document.getElementById('stat-content').textContent = contentList ? contentList.length : 0;
             await loadMembersTable();
             await loadContentTable();
+            await loadMessageStats();
         }
 
         async function loadMembersTable() {
@@ -509,6 +582,224 @@
         }
 
         function handleLogout() { localStorage.removeItem('sb-token'); localStorage.removeItem('sb-user'); window.location.href = '/membros/login'; }
+
+        // ========== Mensagens (form_submissions inbox) ==========
+        var FORM_TYPE_LABELS = {
+            newsletter:    'Newsletter',
+            exit_popup:    'Newsletter (Pop-up Saída)',
+            voluntario:    'Voluntário',
+            parceiro:      'Parceiro',
+            parceiro_home: 'Parceiro (Home)',
+            branch:        'Branch Regional',
+            evento:        'Inscrição em Evento',
+            login_signup:  'Novo Cadastro',
+            contato:       'Contato'
+        };
+
+        var allMessages = [];
+
+        async function loadMessageStats() {
+            var url = SUPA_URL + '/rest/v1/form_submissions?select=id&status=eq.new&is_spam=eq.false';
+            var res = await fetch(url, { headers: { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + (getToken()||SUPA_KEY), 'Prefer': 'count=exact' } });
+            var range = res.headers.get('content-range');
+            var count = range ? parseInt(range.split('/')[1]) : 0;
+            var statEl = document.getElementById('stat-messages');
+            if (statEl) statEl.textContent = count;
+            var badge = document.getElementById('tab-msg-badge');
+            if (badge) {
+                if (count > 0) { badge.style.display = 'inline-block'; badge.textContent = count; }
+                else { badge.style.display = 'none'; }
+            }
+        }
+
+        async function loadMessages() {
+            var status = document.getElementById('msg-filter-status').value;
+            var type = document.getElementById('msg-filter-type').value;
+            var filter = 'is_spam=eq.false&order=created_at.desc';
+            if (status === 'active') filter += '&status=in.(new,read)';
+            else if (status !== 'all') filter += '&status=eq.' + status;
+            if (type) filter += '&form_type=eq.' + encodeURIComponent(type);
+
+            var rows = await supaQ('form_submissions', filter);
+            allMessages = rows || [];
+            renderMessages(allMessages);
+            populateTypeFilter();
+        }
+
+        function populateTypeFilter() {
+            var sel = document.getElementById('msg-filter-type');
+            if (!sel || sel.options.length > 1) return;
+            // Build distinct list from currently loaded messages
+            var seen = {};
+            allMessages.forEach(function(m){ if (m.form_type) seen[m.form_type] = true; });
+            Object.keys(seen).forEach(function(ft){
+                var opt = document.createElement('option');
+                opt.value = ft;
+                opt.textContent = FORM_TYPE_LABELS[ft] || ft;
+                sel.appendChild(opt);
+            });
+        }
+
+        function filterMessages() {
+            var q = (document.getElementById('msg-filter-search').value || '').toLowerCase().trim();
+            if (!q) { renderMessages(allMessages); return; }
+            var filtered = allMessages.filter(function(m){
+                return ((m.name||'') + ' ' + (m.email||'') + ' ' + (m.organization||'')).toLowerCase().indexOf(q) !== -1;
+            });
+            renderMessages(filtered);
+        }
+
+        function renderMessages(rows) {
+            var tbody = document.getElementById('messages-tbody');
+            if (!rows || rows.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text-light);">Nenhuma mensagem encontrada</td></tr>';
+                return;
+            }
+            tbody.innerHTML = rows.map(function(m){
+                var dt = m.created_at ? new Date(m.created_at) : null;
+                var dtStr = dt ? dt.toLocaleString('pt-BR', {dateStyle:'short', timeStyle:'short'}) : '-';
+                var typeLabel = FORM_TYPE_LABELS[m.form_type] || m.form_type || '-';
+                var origin = m.source_path || '';
+                if (origin.length > 32) origin = origin.substring(0, 30) + '...';
+                var statusCls = 'msg-status-' + (m.status || 'new');
+                var statusTxt = ({new:'Nova', read:'Lida', replied:'Respondida', archived:'Arquivada'})[m.status] || m.status;
+                var nameDisplay = m.name || m.organization || '-';
+                if (m.status === 'new') nameDisplay = '<strong>' + nameDisplay + '</strong>';
+                return '<tr style="cursor:pointer;" onclick="openMessage(\'' + m.id + '\')">' +
+                    '<td>' + dtStr + '</td>' +
+                    '<td><span style="font-size:0.78rem;color:var(--primary);font-weight:600;">' + typeLabel + '</span></td>' +
+                    '<td>' + nameDisplay + '</td>' +
+                    '<td>' + (m.email || '-') + '</td>' +
+                    '<td><code style="font-size:0.75rem;color:var(--text-light);">' + (origin || '-') + '</code></td>' +
+                    '<td><span class="msg-status-badge ' + statusCls + '">' + statusTxt + '</span></td>' +
+                    '<td onclick="event.stopPropagation();">' +
+                        '<button class="action-btn" title="Ver" onclick="openMessage(\'' + m.id + '\')"><i class="fas fa-eye"></i></button>' +
+                        (m.status !== 'archived'
+                            ? '<button class="action-btn" title="Arquivar" onclick="setMessageStatus(\'' + m.id + '\',\'archived\')"><i class="fas fa-archive"></i></button>'
+                            : '<button class="action-btn" title="Reabrir" onclick="setMessageStatus(\'' + m.id + '\',\'read\')"><i class="fas fa-undo"></i></button>') +
+                        (currentRole === 'admin' ? '<button class="action-btn reject" title="Excluir" onclick="deleteMessage(\'' + m.id + '\')"><i class="fas fa-trash"></i></button>' : '') +
+                    '</td>' +
+                '</tr>';
+            }).join('');
+        }
+
+        async function openMessage(id) {
+            var m = allMessages.find(function(x){ return x.id === id; });
+            if (!m) return;
+            // Mark as read if still new
+            if (m.status === 'new') {
+                await supaPatch('form_submissions', 'id=eq.' + id, { status: 'read', read_at: new Date().toISOString() });
+                m.status = 'read';
+                loadMessageStats();
+            }
+
+            var dt = m.created_at ? new Date(m.created_at).toLocaleString('pt-BR', {dateStyle:'long', timeStyle:'medium'}) : '-';
+            var typeLabel = FORM_TYPE_LABELS[m.form_type] || m.form_type || '-';
+            var statusTxt = ({new:'Nova', read:'Lida', replied:'Respondida', archived:'Arquivada'})[m.status] || m.status;
+
+            var extraHTML = '';
+            if (m.extra_data && Object.keys(m.extra_data).length > 0) {
+                extraHTML = '<div class="msg-field"><div class="msg-field-label">Demais campos do formulário</div><div class="msg-extra-grid">' +
+                    Object.keys(m.extra_data).map(function(k){
+                        var v = m.extra_data[k];
+                        if (v == null || v === '') return '';
+                        if (typeof v === 'object') v = JSON.stringify(v);
+                        return '<div><div class="msg-field-label" style="font-size:0.7rem;">' + k + '</div><div class="msg-field-value" style="font-size:0.85rem;">' + escapeHtml(String(v)) + '</div></div>';
+                    }).join('') +
+                '</div></div>';
+            }
+
+            var html =
+                '<div class="msg-modal-header">' +
+                    '<div>' +
+                        '<h3>' + typeLabel + ' <span class="msg-status-badge msg-status-' + m.status + '" style="margin-left:8px;">' + statusTxt + '</span></h3>' +
+                        '<div style="font-size:0.78rem;color:var(--text-light);margin-top:4px;">' + dt + ' &middot; ID: ' + id.substring(0,8) + '</div>' +
+                    '</div>' +
+                    '<button class="msg-modal-close" onclick="closeMessage()">&times;</button>' +
+                '</div>' +
+                '<div class="msg-modal-body">' +
+                    field('Nome', m.name) +
+                    field('E-mail', m.email ? '<a href="mailto:' + escapeAttr(m.email) + '">' + escapeHtml(m.email) + '</a>' : null, true) +
+                    field('Telefone', m.phone) +
+                    field('Organização', m.organization) +
+                    field('LinkedIn', m.linkedin ? '<a href="' + escapeAttr(m.linkedin) + '" target="_blank" rel="noopener">' + escapeHtml(m.linkedin) + '</a>' : null, true) +
+                    field('Cidade / Estado', m.city_state) +
+                    (m.message ? '<div class="msg-field"><div class="msg-field-label">Mensagem</div><div class="msg-field-value"><pre>' + escapeHtml(m.message) + '</pre></div></div>' : '') +
+                    extraHTML +
+                    '<hr style="margin:18px 0;border:none;border-top:1px solid var(--border);">' +
+                    field('Página de origem', m.source_page) +
+                    field('URL', m.source_url ? '<a href="' + escapeAttr(m.source_url) + '" target="_blank" rel="noopener">' + escapeHtml(m.source_url) + '</a>' : null, true) +
+                    field('Referrer', m.referrer) +
+                    field('User Agent', m.user_agent ? '<small style="font-size:0.75rem;color:var(--text-light);">' + escapeHtml(m.user_agent) + '</small>' : null, true) +
+                    (m.subject ? field('Assunto (Formspree)', m.subject) : '') +
+                '</div>' +
+                '<div class="msg-modal-footer">' +
+                    (m.email ? '<a href="mailto:' + escapeAttr(m.email) + '?subject=Re: ' + escapeAttr(m.subject || typeLabel) + '" class="action-btn approve" onclick="setMessageStatus(\'' + id + '\',\'replied\')"><i class="fas fa-reply"></i> Responder por e-mail</a>' : '') +
+                    (m.status !== 'replied' ? '<button class="action-btn approve" onclick="setMessageStatus(\'' + id + '\',\'replied\', true)"><i class="fas fa-check"></i> Marcar como respondida</button>' : '') +
+                    (m.status !== 'archived' ? '<button class="action-btn" onclick="setMessageStatus(\'' + id + '\',\'archived\', true)"><i class="fas fa-archive"></i> Arquivar</button>' : '') +
+                    (currentRole === 'admin' ? '<button class="action-btn reject" onclick="deleteMessage(\'' + id + '\', true)"><i class="fas fa-trash"></i> Excluir</button>' : '') +
+                '</div>';
+
+            document.getElementById('msg-modal-content').innerHTML = html;
+            document.getElementById('msg-modal-bg').classList.add('open');
+        }
+
+        function field(label, value, isHtml) {
+            if (value == null || value === '') return '';
+            return '<div class="msg-field"><div class="msg-field-label">' + label + '</div><div class="msg-field-value">' + (isHtml ? value : escapeHtml(String(value))) + '</div></div>';
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/[&<>"']/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]; });
+        }
+        function escapeAttr(s) { return escapeHtml(s).replace(/"/g, '&quot;'); }
+
+        function closeMessage() { document.getElementById('msg-modal-bg').classList.remove('open'); }
+
+        async function setMessageStatus(id, status, closeAfter) {
+            var patch = { status: status };
+            if (status === 'replied') patch.replied_at = new Date().toISOString();
+            if (status === 'archived') patch.archived_at = new Date().toISOString();
+            if (status === 'read') patch.read_at = new Date().toISOString();
+            var ok = await supaPatch('form_submissions', 'id=eq.' + id, patch);
+            if (ok) {
+                showAlert('messages-alert', 'Mensagem atualizada', 'success');
+                if (closeAfter) closeMessage();
+                await loadMessages();
+                await loadMessageStats();
+            } else {
+                showAlert('messages-alert', 'Erro ao atualizar', 'error');
+            }
+        }
+
+        async function deleteMessage(id, closeAfter) {
+            if (!confirm('Excluir esta mensagem permanentemente? Esta ação não pode ser desfeita.')) return;
+            var ok = await supaDel('form_submissions', 'id=eq.' + id);
+            if (ok) {
+                showAlert('messages-alert', 'Mensagem excluída', 'success');
+                if (closeAfter) closeMessage();
+                await loadMessages();
+                await loadMessageStats();
+            } else {
+                showAlert('messages-alert', 'Erro ao excluir', 'error');
+            }
+        }
+
+        // Override the tab switcher to include the messages panel
+        showAdminTab = function(tab) {
+            document.querySelectorAll('.admin-tab').forEach(function(t){t.classList.remove('active');});
+            if (event && event.target) event.target.classList.add('active');
+            document.getElementById('panel-members').style.display = tab === 'members' ? 'block' : 'none';
+            document.getElementById('panel-messages').style.display = tab === 'messages' ? 'block' : 'none';
+            document.getElementById('panel-content').style.display = tab === 'content' ? 'block' : 'none';
+            document.getElementById('panel-games').style.display = tab === 'games' ? 'block' : 'none';
+            document.getElementById('panel-import').style.display = tab === 'import' ? 'block' : 'none';
+            if (tab === 'games') loadGamesAccessTable();
+            if (tab === 'messages') loadMessages();
+        };
+
+        // ESC closes modal
+        document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeMessage(); });
     </script>
 </body>
 </html>

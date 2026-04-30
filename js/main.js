@@ -305,7 +305,7 @@ document.addEventListener('DOMContentLoaded', function () {
             '<div class="exit-icon"><i class="fas fa-hand-paper"></i></div>' +
             '<h3>Espere! Antes de sair...</h3>' +
             '<p>Inscreva-se na newsletter da ACMP Brasil e receba conteúdos exclusivos sobre Gestão de Mudanças.</p>' +
-            '<form class="exit-form" action="https://formspree.io/f/mbdqrbkp" method="POST">' +
+            '<form class="exit-form" action="https://formspree.io/f/mbdqrbkp" method="POST" data-form-type="exit_popup" data-form-label="Newsletter (Exit Intent)">' +
             '<input type="hidden" name="_subject" value="Newsletter via Exit Popup - ACMP Brasil">' +
             '<input type="email" name="email" placeholder="Seu melhor e-mail" required>' +
             '<button type="submit" class="btn btn-primary">Quero Receber</button>' +
@@ -578,5 +578,141 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
+
+    // --- Form Submissions: dual-submit (Supabase + Formspree) ---
+    // Forms tagged with `data-form-type` are intercepted: data is recorded
+    // in the form_submissions table (admin inbox) AND forwarded to Formspree
+    // to preserve the email notification flow.
+    (function () {
+        var SUPA_URL = 'https://yaumzlssybzoipwmllqy.supabase.co';
+        var SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlhdW16bHNzeWJ6b2lwd21sbHF5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU5MTcwMTEsImV4cCI6MjA5MTQ5MzAxMX0.GWK1jnlEmgxWmeWk1VGwR25fLBvquWtrkQ4ipq_A3RU';
+
+        var COLUMN_MAP = {
+            name:         ['nome', 'name', 'full_name', 'fullname', 'nome_completo', 'contato'],
+            email:        ['email', 'e-mail'],
+            phone:        ['telefone', 'phone', 'whatsapp', 'celular'],
+            organization: ['empresa', 'organizacao', 'organization', 'company'],
+            linkedin:     ['linkedin'],
+            city_state:   ['cidade_estado', 'cidade', 'city', 'localizacao'],
+            message:      ['mensagem', 'message', 'motivacao', 'comentario', 'descricao']
+        };
+
+        function pickField(data, names) {
+            for (var i = 0; i < names.length; i++) {
+                var v = data[names[i]];
+                if (v != null && String(v).trim() !== '') return v;
+            }
+            return null;
+        }
+
+        function gatherFormData(form) {
+            var fd = new FormData(form);
+            var obj = {};
+            fd.forEach(function (v, k) {
+                if (obj[k] !== undefined) {
+                    if (Array.isArray(obj[k])) obj[k].push(v); else obj[k] = [obj[k], v];
+                } else {
+                    obj[k] = v;
+                }
+            });
+            return obj;
+        }
+
+        function buildPayload(form, data) {
+            var skipKeys = { '_subject': 1, '_gotcha': 1, '_next': 1, 'password': 1, 'senha': 1 };
+            var extras = {};
+            Object.keys(data).forEach(function (k) {
+                if (!skipKeys[k]) extras[k] = data[k];
+            });
+            return {
+                form_type:   form.getAttribute('data-form-type') || 'unknown',
+                form_label:  form.getAttribute('data-form-label') || null,
+                subject:     data._subject || null,
+                name:        pickField(data, COLUMN_MAP.name),
+                email:       pickField(data, COLUMN_MAP.email),
+                phone:       pickField(data, COLUMN_MAP.phone),
+                organization: pickField(data, COLUMN_MAP.organization),
+                linkedin:    pickField(data, COLUMN_MAP.linkedin),
+                city_state:  pickField(data, COLUMN_MAP.city_state),
+                message:     pickField(data, COLUMN_MAP.message),
+                extra_data:  extras,
+                source_page: document.title,
+                source_path: location.pathname,
+                source_url:  location.href,
+                referrer:    document.referrer || null,
+                user_agent:  navigator.userAgent,
+                is_spam:     data._gotcha ? true : false
+            };
+        }
+
+        function submitToSupabase(payload) {
+            return fetch(SUPA_URL + '/rest/v1/form_submissions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'apikey': SUPA_KEY,
+                    'Authorization': 'Bearer ' + SUPA_KEY,
+                    'Prefer': 'return=minimal'
+                },
+                body: JSON.stringify(payload)
+            });
+        }
+
+        function submitToFormspree(form) {
+            return fetch(form.action, {
+                method: 'POST',
+                headers: { 'Accept': 'application/json' },
+                body: new FormData(form)
+            });
+        }
+
+        function showResult(form, ok) {
+            var existing = form.querySelector('.acmp-form-result');
+            if (existing) existing.remove();
+            var msg = document.createElement('div');
+            msg.className = 'acmp-form-result';
+            msg.style.cssText = 'padding:14px 18px;border-radius:8px;margin-top:14px;font-size:0.9rem;font-weight:500;' +
+                (ok
+                    ? 'background:#dcfce7;color:#166534;border:1px solid #86efac;'
+                    : 'background:#fee2e2;color:#991b1b;border:1px solid #fca5a5;');
+            msg.innerHTML = ok
+                ? '<i class="fas fa-check-circle"></i> Mensagem recebida! Entraremos em contato em breve.'
+                : '<i class="fas fa-exclamation-circle"></i> Não foi possível enviar agora. Tente novamente em alguns instantes.';
+            form.appendChild(msg);
+            if (ok) form.reset();
+            setTimeout(function () { if (msg.parentNode) msg.remove(); }, 7000);
+        }
+
+        document.addEventListener('submit', function (e) {
+            var form = e.target;
+            if (!form || form.tagName !== 'FORM') return;
+            if (!form.hasAttribute('data-form-type')) return;
+
+            e.preventDefault();
+            var data = gatherFormData(form);
+
+            // Honeypot: if filled, silently drop (still flag in DB for audit)
+            var payload = buildPayload(form, data);
+
+            var btn = form.querySelector('button[type=submit], input[type=submit]');
+            var btnHTML;
+            if (btn) {
+                btnHTML = btn.innerHTML;
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+            }
+
+            var supaPromise = submitToSupabase(payload).catch(function () { return null; });
+            var fsPromise = (form.action && form.action.indexOf('formspree.io') !== -1)
+                ? submitToFormspree(form).catch(function () { return null; })
+                : Promise.resolve(null);
+
+            Promise.all([supaPromise, fsPromise]).then(function (results) {
+                var ok = (results[0] && results[0].ok) || (results[1] && results[1].ok);
+                showResult(form, ok);
+                if (btn) { btn.disabled = false; btn.innerHTML = btnHTML; }
+            });
+        }, true);
+    })();
 
 });
